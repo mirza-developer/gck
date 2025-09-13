@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://gckgames.ir/</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/" />
+  </url>
+  
+  <url>
+    <loc>https://gckgames.ir/games</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/games" />
+  </url>
+  
+  <url>
+    <loc>https://gckgames.ir/tournaments</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/tournaments" />
+  </url>
+  
+  <url>
+    <loc>https://gckgames.ir/leaderboard</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/leaderboard" />
+  </url>
+  
+  <!-- Game pages -->
+  <url>
+    <loc>https://gckgames.ir/games/space-battle</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/games/space-battle" />
+  </url>
+  
+  <url>
+    <loc>https://gckgames.ir/games/strategic-chess</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/games/strategic-chess" />
+  </url>
+  
+  <url>
+    <loc>https://gckgames.ir/games/speed-race</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://gckgames.ir/games/speed-race" />
+  </url>
+</urlset>

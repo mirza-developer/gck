@@ -1,0 +1,226 @@
+﻿@using Gck.Components
+@inherits LayoutComponentBase
+
+<div class="page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-gamepad"></i>
+                Gck Games
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">خانه</a></li>
+                <li><a href="/games" class="nav-link">بازی‌ها</a></li>
+                <li><a href="/tournaments" class="nav-link">تورنمنت‌ها</a></li>
+                <li><a href="/leaderboard" class="nav-link">رنک‌بندی</a></li>
+                <li><a href="/community" class="nav-link">انجمن</a></li>
+                <li><a href="/profile" class="nav-link">پروفایل</a></li>
+                <li>
+                    <button class="btn-gaming" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-user-plus"></i>
+                        عضویت
+                    </button>
+                </li>
+            </ul>
+            
+            <button class="mobile-menu-toggle" style="display: none; background: none; border: none; color: white; font-size: 1.5rem;">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        @Body
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>مرکز بازی‌های Gck</h3>
+                    <p>بهترین تجربه گیمینگ آنلاین با جدیدترین بازی‌های روز دنیا</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>دسته‌بندی بازی‌ها</h4>
+                    <ul class="footer-links">
+                        <li><a href="/games/action">اکشن</a></li>
+                        <li><a href="/games/strategy">استراتژی</a></li>
+                        <li><a href="/games/puzzle">پازل</a></li>
+                        <li><a href="/games/sports">ورزشی</a></li>
+                        <li><a href="/games/racing">مسابقه‌ای</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>پشتیبانی</h4>
+                    <ul class="footer-links">
+                        <li><a href="/help">راهنما</a></li>
+                        <li><a href="/contact">تماس با ما</a></li>
+                        <li><a href="/privacy">حریم خصوصی</a></li>
+                        <li><a href="/terms">قوانین</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>خبرنامه</h4>
+                    <p>از آخرین بازی‌ها و تورنمنت‌ها باخبر شوید</p>
+                    <div class="newsletter">
+                        <input type="email" placeholder="ایمیل شما" class="newsletter-input">
+                        <button class="btn-gaming" style="padding: 0.8rem 1rem;">عضویت</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; ۱۴۰۳ مرکز بازی‌های Gck. تمامی حقوق محفوظ است.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding-top: 80px;
+}
+
+.footer {
+    background: var(--darker-bg);
+    border-top: 1px solid rgba(108, 92, 231, 0.2);
+    padding: 3rem 0 1rem;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section h3,
+.footer-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.footer-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-purple);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(108, 92, 231, 0.2);
+    color: var(--primary-purple);
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: var(--primary-purple);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.newsletter {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.newsletter-input {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 25px;
+    background: rgba(26, 26, 46, 0.5);
+    color: var(--text-primary);
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+.newsletter-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(108, 92, 231, 0.1);
+    color: var(--text-secondary);
+}
+
+@@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+    
+    .newsletter {
+        flex-direction: column;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+}
+</style>

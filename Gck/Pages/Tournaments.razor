@@ -1,0 +1,401 @@
+@page "/tournaments"
+@using Gck.Components
+
+<SeoHead Title="?????????? - ???? ???????? Gck"
+         Description="?? ??????????? PS5 ???? ????! ??????? FC25? Mortal Kombat? Forza ? ???????? ???? ?? ????? ????"
+         Keywords="??????? PS5, ?????? FC25, ??????? ?????? ????, ?????? ?????, ????? ????"
+         Url="https://gckgames.ir/tournaments" />
+
+<div class="container" style="padding-top: 2rem;">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="hero-title">?? ?????????? ? ???????</h1>
+        <p class="hero-subtitle">?? ??????? PS5 ???? ???? ? ????? ???? ??? ????</p>
+    </div>
+
+    <!-- Active Tournament Banner -->
+    <div class="gaming-card mb-4 tournament-banner" style="text-align: center;">
+        <h2 style="color: white; font-size: 2rem; margin-bottom: 1rem;">
+            <i class="fas fa-trophy"></i>
+            ??? FC25 ?????? ????
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; margin: 2rem 0;">
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: white;" class="countdown-days">?</div>
+                <div style="color: rgba(255,255,255,0.8);">??? ??????????</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: white;">??</div>
+                <div style="color: rgba(255,255,255,0.8);">??????????</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: white;">?M</div>
+                <div style="color: rgba(255,255,255,0.8);">????? (?????)</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: white;">??</div>
+                <div style="color: rgba(255,255,255,0.8);">????? ??</div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="tel:02112345678" class="btn-gaming" style="background: white; color: var(--primary-purple);">
+                <i class="fas fa-phone"></i>
+                ??????? ?????
+            </a>
+            <a href="#rules" class="btn-gaming btn-secondary" style="border-color: white; color: white;">
+                <i class="fas fa-info-circle"></i>
+                ?????? ???????
+            </a>
+        </div>
+    </div>
+
+    <!-- Tournament Categories -->
+    <div class="section">
+        <h2 class="section-title">?? ????? ??????????</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <div class="gaming-card fade-in-up glow-pulse">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00a8ff, #0078ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                        ?
+                    </div>
+                    <h3 style="color: var(--accent-cyan);">??????? ??????</h3>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">
+                    ??????? FC25 ? eFootball ?? ????? ????
+                </p>
+                <ul style="list-style: none; color: var(--text-secondary); margin-bottom: 2rem;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-gamepad" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                        FC25 ? eFootball
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-users" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                        ??-?? ???
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-trophy" style="color: var(--secondary-pink); margin-left: 0.5rem;"></i>
+                        ?-??M ?????
+                    </li>
+                </ul>
+                <button class="btn-gaming" style="width: 100%; text-align: center;">
+                    ???? ?? ???????
+                </button>
+            </div>
+
+            <div class="gaming-card fade-in-up">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #8b0000, #ff4500); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                        ??
+                    </div>
+                    <h3 style="color: var(--secondary-pink);">??????? ??????</h3>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">
+                    ??????? Mortal Kombat ? Street Fighter
+                </p>
+                <ul style="list-style: none; color: var(--text-secondary); margin-bottom: 2rem;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-fist-raised" style="color: var(--secondary-pink); margin-left: 0.5rem;"></i>
+                        Mortal Kombat 1
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-users" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                        ?-?? ???
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-trophy" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                        ?-?M ?????
+                    </li>
+                </ul>
+                <button class="btn-gaming" style="width: 100%; text-align: center;">
+                    ???? ?? ???????
+                </button>
+            </div>
+
+            <div class="gaming-card fade-in-up">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6b6b, #ffd93d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                        ???
+                    </div>
+                    <h3 style="color: var(--accent-yellow);">??????? ??????</h3>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">
+                    ??????? Forza Horizon ? Gran Turismo
+                </p>
+                <ul style="list-style: none; color: var(--text-secondary); margin-bottom: 2rem;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-car" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                        Forza Horizon 5
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-users" style="color: var(--secondary-pink); margin-left: 0.5rem;"></i>
+                        ??-?? ???
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-trophy" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                        ?.?-?M ?????
+                    </li>
+                </ul>
+                <button class="btn-gaming" style="width: 100%; text-align: center;">
+                    ???? ?? ???????
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Tournaments -->
+    <div class="section">
+        <h2 class="section-title">?? ??????????? ?????</h2>
+        
+        <div style="display: grid; gap: 2rem;">
+            <div class="gaming-card fade-in-up" style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b0000, #ff4500); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            ??
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--text-primary);">??????? Mortal Kombat</h3>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">?????? ????????? ?????</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-cyan); font-weight: 700;">? ???</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-yellow); font-weight: 700;">?M</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--secondary-pink); font-weight: 700;">??</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--primary-purple); font-weight: 700;">?</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">???????</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="tel:02112345678" class="btn-gaming mb-2">
+                        <i class="fas fa-phone"></i>
+                        ???????
+                    </a>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                        ????? ???????: ??K ?????
+                    </div>
+                </div>
+            </div>
+
+            <div class="gaming-card fade-in-up" style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ff6b6b, #ffd93d); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            ???
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--text-primary);">??????? Forza</h3>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">?????? ??????????? ??????</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-cyan); font-weight: 700;">? ????</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-yellow); font-weight: 700;">?M</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--secondary-pink); font-weight: 700;">??</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--primary-purple); font-weight: 700;">?</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">???????</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="tel:02112345678" class="btn-gaming mb-2">
+                        <i class="fas fa-phone"></i>
+                        ???????
+                    </a>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                        ????? ???????: ???K ?????
+                    </div>
+                </div>
+            </div>
+
+            <div class="gaming-card fade-in-up" style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #00a8ff, #0078ff); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            ?
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--text-primary);">??? eFootball</h3>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">??????? ??????? ?????</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-cyan); font-weight: 700;">? ???</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--accent-yellow); font-weight: 700;">?M</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--secondary-pink); font-weight: 700;">??</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">?????</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--primary-purple); font-weight: 700;">??</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">???????</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="tel:02112345678" class="btn-gaming mb-2">
+                        <i class="fas fa-phone"></i>
+                        ???????
+                    </a>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                        ????? ???????: ??????
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tournament Rules Section -->
+    <div class="section" id="rules">
+        <h2 class="section-title">?? ?????? ??????????</h2>
+        
+        <div class="gaming-card fade-in-up">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div>
+                    <h3 style="color: var(--primary-purple); margin-bottom: 1rem;">
+                        <i class="fas fa-user-check"></i>
+                        ????? ????
+                    </h3>
+                    <ul style="list-style: none; color: var(--text-secondary);">
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-check" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ???? ?? ???? ??????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-check" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ??????? ?? ??? ?????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-check" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ????? ?????? ??????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-check" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ???? ??????? ???
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: var(--secondary-pink); margin-bottom: 1rem;">
+                        <i class="fas fa-trophy"></i>
+                        ???? ????? ?????
+                    </h3>
+                    <ul style="list-style: none; color: var(--text-secondary);">
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-money-bill" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                            ????? ???? ????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-medal" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                            ??? ? ???? ???????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-gift" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                            ???? ???? ??????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-star" style="color: var(--accent-yellow); margin-left: 0.5rem;"></i>
+                            ?????? ???? ????
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--accent-cyan); margin-bottom: 1rem;">
+                        <i class="fas fa-gamepad"></i>
+                        ??????? ? ??????
+                    </h3>
+                    <ul style="list-style: none; color: var(--text-secondary);">
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-tv" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            PS5 ????????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-headphones" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ???? ???????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-ban" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ??????? ????
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-clock" style="color: var(--accent-cyan); margin-left: 0.5rem;"></i>
+                            ????? ?????????
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="section">
+        <div class="gaming-card fade-in-up" style="text-align: center; background: var(--gradient-1);">
+            <h2 style="color: white; margin-bottom: 1rem;">?? ????? ??????</h2>
+            <p style="color: rgba(255,255,255,0.9); margin-bottom: 2rem; font-size: 1.1rem;">
+                ???? ???? ???? ?????? ? ?? ??????????? ??????????? ???? ????
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="tel:02112345678" class="btn-gaming" style="background: white; color: var(--primary-purple);">
+                    <i class="fas fa-phone"></i>
+                    ???-????????
+                </a>
+                <a href="#contact" class="btn-gaming btn-secondary" style="border-color: white; color: white;">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ???? ????
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tournament-banner {
+    background: var(--gradient-1);
+    background-size: 400% 400%;
+    animation: gradientShift 6s ease infinite;
+}
+
+@@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+</style>

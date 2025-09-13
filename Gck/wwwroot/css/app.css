@@ -1,0 +1,202 @@
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+    text-align: right;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+/* Blazor Error UI - RTL Version */
+#blazor-error-ui {
+    color-scheme: dark;
+    background: var(--darker-bg);
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(108, 92, 231, 0.3);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    color: var(--text-primary);
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+    border-top: 2px solid var(--primary-purple);
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    left: 0.75rem;
+    top: 0.5rem;
+    color: var(--secondary-pink);
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+#blazor-error-ui .dismiss:hover {
+    color: var(--accent-yellow);
+}
+
+#blazor-error-ui .reload {
+    color: var(--primary-purple);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+#blazor-error-ui .reload:hover {
+    color: var(--accent-cyan);
+}
+
+.blazor-error-boundary {
+    background: linear-gradient(135deg, var(--darker-bg), var(--card-bg));
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: var(--text-primary);
+    border-radius: 10px;
+    border: 1px solid var(--primary-purple);
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+}
+
+.blazor-error-boundary::after {
+    content: "????? ?? ???? ???.";
+}
+
+/* Enhanced Loading Animation for RTL */
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: rgba(108, 92, 231, 0.3);
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: var(--primary-purple);
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+    filter: drop-shadow(0 0 10px var(--primary-purple));
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    font-family: 'Vazirmatn', sans-serif;
+    color: var(--text-primary);
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "?? ??? ???????...");
+}
+
+/* Code Highlighting */
+code {
+    color: var(--secondary-pink);
+    background: rgba(26, 26, 46, 0.8);
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    direction: ltr;
+    display: inline-block;
+}
+
+/* Form Controls RTL Enhancement */
+.form-floating > .form-control-plaintext::placeholder, 
+.form-floating > .form-control::placeholder {
+    color: var(--text-secondary);
+    text-align: right;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, 
+.form-floating > .form-control:focus::placeholder {
+    text-align: right;
+}
+
+/* Input and Select Enhancements */
+input, select, textarea {
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+}
+
+input[type="email"], input[type="url"] {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Responsive Text Alignment */
+@media (max-width: 768px) {
+    .text-center {
+        text-align: center !important;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-purple: #8a2be2;
+        --secondary-pink: #ff1493;
+        --accent-cyan: #00ffff;
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .navbar, .footer, .btn-gaming, .gaming-card {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* Selection Colors */
+::selection {
+    background: var(--primary-purple);
+    color: white;
+}
+
+::-moz-selection {
+    background: var(--primary-purple);
+    color: white;
+}

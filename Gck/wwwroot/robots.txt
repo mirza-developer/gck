@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and temporary areas
+Disallow: /admin/
+Disallow: /temp/
+Disallow: /_framework/
+
+# Sitemap location
+Sitemap: https://gckgames.ir/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
