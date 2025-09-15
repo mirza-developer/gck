@@ -1,3 +1,76 @@
+.gradient-1-bg { background: var(--gradient-1); }
+.gradient-2-bg { background: var(--gradient-2); }
+.gradient-3-bg { background: var(--gradient-3); }
+.bg-purple-07 { background: rgba(108, 92, 231, 0.07); }
+.text-white { color: white; }
+.primary-purple { color: var(--primary-purple); }
+.secondary-pink { color: var(--secondary-pink); }
+.accent-cyan { color: var(--accent-cyan); }
+.accent-yellow { color: var(--accent-yellow); }
+.text-secondary { color: var(--text-secondary); }
+.mb-1rem { margin-bottom: 1rem; }
+.mb-1-5rem { margin-bottom: 1.5rem; }
+.mb-2rem { margin-bottom: 2rem; }
+.ml-0-5rem { margin-left: 0.5rem; }
+.p-0-7rem { padding: 0.7rem; }
+.font-600 { font-weight: 600; }
+.font-700 { font-weight: 700; }
+
+.center-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+.feature-list {
+    list-style: none;
+}
+.pricing-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.pricing-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.pricing-table {
+    width: 100%;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.pricing-btn {
+    width: 100%;
+    text-align: center;
+}
+.contact-section {
+    background: rgba(26, 26, 46, 0.3);
+    margin: 2rem 0;
+    border-radius: 20px;
+}
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+}
+.contact-address {
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+.contact-hours {
+    line-height: 2;
+}
+.contact-hours-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.contact-btn {
+    width: 100%;
+    text-align: center;
+}
+
+/* Existing styles remain below */
 .tournament-banner {
     background: var(--gradient-1);
     background-size: 400% 400%;
@@ -12,6 +85,126 @@
     margin-top: 1rem;
     color: var(--primary-purple);
     font-weight: 600;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0 1rem 0;
+}
+
+.feature-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px 0 rgba(80, 80, 120, 0.10);
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+    text-align: center;
+    border: none;
+    transition: transform 0.18s, box-shadow 0.18s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 210px;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px 0 rgba(108, 92, 231, 0.13);
+}
+
+.feature-icon {
+    font-size: 2.7rem;
+    color: var(--primary-purple, #6c5ce7);
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #6c5ce7 40%, #fd79a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.feature-title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #222;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.2px;
+}
+
+.feature-desc {
+    font-size: 1.02rem;
+    color: #555;
+    margin-bottom: 0.2rem;
+    font-weight: 400;
+}
+
+.btn-gaming {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(90deg, var(--primary-purple, #6c5ce7) 60%, var(--secondary-pink, #fd79a8) 100%);
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.08rem;
+    font-weight: 700;
+    padding: 0.7rem 2.2rem;
+    border: none;
+    border-radius: 30px;
+    box-shadow: 0 2px 12px 0 rgba(108, 92, 231, 0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.13s;
+    text-decoration: none;
+    outline: none;
+}
+
+.btn-gaming:hover, .btn-gaming:focus {
+    background: linear-gradient(90deg, var(--secondary-pink, #fd79a8) 40%, var(--primary-purple, #6c5ce7) 100%);
+    box-shadow: 0 4px 24px 0 rgba(108, 92, 231, 0.18);
+    transform: translateY(-2px) scale(1.03);
+    color: #fff;
+}
+
+.btn-gaming.btn-secondary {
+    background: linear-gradient(90deg, var(--accent-cyan, #00b894) 60%, var(--primary-purple, #6c5ce7) 100%);
+    color: #fff;
+}
+
+.btn-gaming.btn-secondary:hover, .btn-gaming.btn-secondary:focus {
+    background: linear-gradient(90deg, var(--primary-purple, #6c5ce7) 40%, var(--accent-cyan, #00b894) 100%);
+}
+
+.btn-gaming i {
+    font-size: 1.1em;
+    margin-left: 0.4em;
+}
+
+@media (max-width: 600px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .feature-card {
+        padding: 1.2rem 0.5rem 0.8rem 0.5rem;
+        min-height: 140px;
+    }
+    .feature-title {
+        font-size: 1rem;
+    }
+    .feature-icon {
+        font-size: 2rem;
+    }
+    .center-features-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .btn-gaming {
+        width: 100%;
+        padding: 0.7rem 0.5rem;
+        font-size: 1rem;
+    }
 }
 
 @keyframes gradientShift {
