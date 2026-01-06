@@ -85,8 +85,8 @@ Gck/
 cd Gck.Api
 dotnet run
 ```
-API will be available at: `https://localhost:7001`
-Swagger UI: `https://localhost:7001/swagger`
+API will be available at: `https://localhost:7023`
+Swagger UI: `https://localhost:7023/swagger`
 
 **Terminal 2 - Blazor UI:**
 ```bash
@@ -148,7 +148,7 @@ UI will be available at: `https://localhost:5001` (or the port shown in terminal
 
 **Create User:**
 ```bash
-curl -X POST https://localhost:7001/api/user \
+curl -X POST https://localhost:7023/api/user \
   -H "Content-Type: application/json" \
   -d '{
     "username": "john.doe",
@@ -161,7 +161,7 @@ curl -X POST https://localhost:7001/api/user \
 
 **Get All Users:**
 ```bash
-curl https://localhost:7001/api/user
+curl https://localhost:7023/api/user
 ```
 
 ## Project Structure
