@@ -1,0 +1,154 @@
+@page "/login"
+@using Gck.Application.Features.Auth.Commands.Login
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<section class="section login-section">
+    <div class="container">
+        <div class="login-container fade-in-up">
+            <div class="login-card gaming-card">
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h2 class="login-title">
+                        ورود به سیستم
+                    </h2>
+                    <p class="login-subtitle">
+                        گیم سنتر کوثر
+                    </p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(successMessage))
+                {
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i>
+                        @successMessage
+                    </div>
+                }
+
+                <EditForm Model="@loginCommand" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            نام کاربری
+                        </label>
+                        <InputText @bind-Value="loginCommand.Username" 
+                                   class="form-input" 
+                                   placeholder="نام کاربری خود را وارد کنید"
+                                   autofocus />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            رمز عبور
+                        </label>
+                        <InputText type="password" 
+                                   @bind-Value="loginCommand.Password" 
+                                   class="form-input" 
+                                   placeholder="رمز عبور خود را وارد کنید" />
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-gaming btn-login" disabled="@isLoggingIn">
+                            @if (isLoggingIn)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>در حال ورود...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>ورود</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+
+                <div class="login-footer">
+                    <p class="default-credentials">
+                        <i class="fas fa-info-circle"></i>
+                        اطلاعات ورود پیش‌فرض: admin / Admin@123
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private LoginCommand loginCommand = new();
+    private bool isLoggingIn = false;
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if user is already logged in
+        var currentUser = await LocalStorage.GetItemAsync<string>("currentUser");
+        if (!string.IsNullOrEmpty(currentUser))
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        isLoggingIn = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/login"), loginCommand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+                if (result != null && result.Success)
+                {
+                    // Store user info in local storage
+                    await LocalStorage.SetItemAsync("currentUser", result.Username);
+                    await LocalStorage.SetItemAsync("currentUserId", result.UserId);
+                    await LocalStorage.SetItemAsync("currentUserName", result.Name);
+
+                    successMessage = result.Message;
+                    await Task.Delay(1000);
+
+                    // Redirect to home page
+                    Navigation.NavigateTo("/", true);
+                }
+                else
+                {
+                    errorMessage = result?.Message ?? "خطا در ورود به سیستم";
+                }
+            }
+            else
+            {
+                errorMessage = "خطا در اتصال به سرور";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
+        }
+        finally
+        {
+            isLoggingIn = false;
+        }
+    }
+}
