@@ -8,12 +8,11 @@ This project follows Clean Architecture with clear separation of concerns:
 
 ```
 gck/
-├── src/
-│   ├── Gck.Domain/          # Domain entities and business rules
-│   ├── Gck.Persistence/     # Data access layer with EF Core
-│   ├── Gck.Application/     # Application logic with CQRS
-│   ├── Gck.Api/            # REST API layer
-│   └── Gck/                # Blazor WebAssembly UI
+├── Gck.Domain/          # Domain entities and business rules
+├── Gck.Persistence/     # Data access layer with EF Core
+├── Gck.Application/     # Application logic with CQRS
+├── Gck.Api/            # REST API layer
+├── Gck/                # Blazor WebAssembly UI
 └── README.md
 ```
 
@@ -64,7 +63,7 @@ gck/
 
 1. **Update Connection String** (if needed)
    
-   Edit `src/Gck.Api/appsettings.json`:
+   Edit `Gck.Api/appsettings.json`:
    ```json
    {
      "ConnectionStrings": {
@@ -79,13 +78,13 @@ gck/
 
    Or manually apply migrations:
    ```bash
-   cd src/Gck.Persistence
+   cd Gck.Persistence
    dotnet ef database update
    ```
 
    Or from solution root:
    ```bash
-   dotnet ef database update --project src/Gck.Persistence --startup-project src/Gck.Api
+   dotnet ef database update --project Gck.Persistence --startup-project Gck.Api
    ```
 
 ### Default Admin Credentials
@@ -102,7 +101,7 @@ This allows immediate access to the system for testing and configuration.
 
 **Terminal 1 - API:**
 ```bash
-cd src/Gck.Api
+cd Gck.Api
 dotnet run
 ```
 API will be available at: `https://localhost:7023`
@@ -110,7 +109,7 @@ Swagger UI: `https://localhost:7023/swagger`
 
 **Terminal 2 - Blazor UI:**
 ```bash
-cd src/Gck
+cd Gck
 dotnet run
 ```
 UI will be available at: `https://localhost:5001` (or the port shown in terminal)
@@ -314,10 +313,10 @@ dotnet build
 ### Migration Issues
 ```bash
 # Remove last migration
-dotnet ef migrations remove --project src/Gck.Persistence
+dotnet ef migrations remove --project Gck.Persistence
 
 # Add new migration
-dotnet ef migrations add MigrationName --project src/Gck.Persistence
+dotnet ef migrations add MigrationName --project Gck.Persistence
 ```
 
 ## Development
