@@ -1,0 +1,174 @@
+@page "/users"
+@using Gck.Application.DTOs
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i>
+                مدیریت کاربران
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                افزودن کاربر جدید
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">در حال بارگذاری...</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="جستجوی کاربر (نام، نام کاربری)..." 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredUsers.Any())
+                {
+                    <div class="users-grid">
+                        @foreach (var user in FilteredUsers)
+                        {
+                            <div class="user-card fade-in-up">
+                                <div class="user-header">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        <h3 class="user-name">@user.Name</h3>
+                                        <p class="user-username">@@@user.Username</p>
+                                    </div>
+                                    <div class="user-status @(user.IsActive ? "active" : "inactive")">
+                                        @(user.IsActive ? "فعال" : "غیرفعال")
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(user.Username)">
+                                        <i class="fas fa-edit"></i>
+                                        ویرایش
+                                    </button>
+                                    <button class="btn-action btn-delete" @onclick="() => DeleteUser(user.Id)">
+                                        <i class="fas fa-trash"></i>
+                                        حذف
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>کاربری یافت نشد</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<GetAllUsersVm> users = new();
+    private string searchText = string.Empty;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    private List<GetAllUsersVm> FilteredUsers =>
+        users.Where(u =>
+            string.IsNullOrEmpty(searchText) ||
+            u.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            u.Username.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/user"));
+            if (response.IsSuccessStatusCode)
+            {
+                users = await response.Content.ReadFromJsonAsync<List<GetAllUsersVm>>() ?? new();
+            }
+            else
+            {
+                errorMessage = "خطا در دریافت لیست کاربران. لطفاً اطمینان حاصل کنید که API در حال اجرا است.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/users/add");
+    }
+
+    private void NavigateToEdit(string username)
+    {
+        Navigation.NavigateTo($"/users/edit/{username}");
+    }
+
+    private async Task DeleteUser(string userId)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "آیا از حذف این کاربر اطمینان دارید؟");
+        
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadUsers();
+                }
+                else
+                {
+                    errorMessage = "خطا در حذف کاربر";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"خطا: {ex.Message}";
+            }
+        }
+    }
+}

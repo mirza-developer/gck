@@ -1,6 +1,8 @@
 ﻿@using Gck.Components
 @inherits LayoutComponentBase
 @inject IJSRuntime JS
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
 
 <div class="page">
     <nav class="navbar">
@@ -13,7 +15,29 @@
             <ul class="nav-menu">
                 <li><a href="/" class="nav-link">خانه</a></li>
                 <li><a href="/games" class="nav-link">بازی‌ها</a></li>
+                @if (isLoggedIn)
+                {
+                    <li><a href="/users" class="nav-link">کاربران</a></li>
+                }
             </ul>
+            
+            <div class="nav-actions">
+                @if (isLoggedIn)
+                {
+                    <span class="user-name">@currentUserName</span>
+                    <button class="btn-logout" @onclick="HandleLogout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        خروج
+                    </button>
+                }
+                else
+                {
+                    <a href="/login" class="btn-login-nav">
+                        <i class="fas fa-sign-in-alt"></i>
+                        ورود
+                    </a>
+                }
+            </div>
             
             <button class="mobile-menu-toggle">
                 <i class="fas fa-bars"></i>
@@ -65,11 +89,47 @@
 </div>
 
 @code {
+    private bool isLoggedIn = false;
+    private string currentUserName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckLoginStatus();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JS.InvokeVoidAsync("initFooterMap");
         }
+    }
+
+    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        await CheckLoginStatus();
+        StateHasChanged();
+    }
+
+    private async Task CheckLoginStatus()
+    {
+        var user = await LocalStorage.GetItemAsync<string>("currentUser");
+        var name = await LocalStorage.GetItemAsync<string>("currentUserName");
+        isLoggedIn = !string.IsNullOrEmpty(user);
+        currentUserName = name ?? user ?? string.Empty;
+    }
+
+    private async Task HandleLogout()
+    {
+        await LocalStorage.RemoveItemAsync("currentUser");
+        await LocalStorage.RemoveItemAsync("currentUserId");
+        await LocalStorage.RemoveItemAsync("currentUserName");
+        Navigation.NavigateTo("/login", true);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
     }
 }
