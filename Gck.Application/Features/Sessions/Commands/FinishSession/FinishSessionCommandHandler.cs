@@ -42,7 +42,7 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         session.IsCompleted = true;
         
         var duration = (session.EndDateTime.Value - session.StartDateTime).TotalHours;
-        var recommendedPrice = (decimal)duration * session.FeePerHour;
+        var recommendedPrice = Convert.ToDecimal(duration) * session.FeePerHour;
         session.RecommendedPrice = recommendedPrice;
         session.FinalPrice = request.FinalPrice;
         session.LastModifiedDate = DateTime.UtcNow;

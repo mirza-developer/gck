@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gck.Persistence.Migrations
 {
     [DbContext(typeof(GckDbContext))]
-    [Migration("20260106111339_AddGamingCenterManagement")]
+    [Migration("20260106112638_AddGamingCenterManagement")]
     partial class AddGamingCenterManagement
     {
         /// <inheritdoc />
@@ -203,7 +203,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("SessionId", "CustomerId")
+                    b.HasIndex(new[] { "SessionId", "CustomerId" }, "IX_SessionCustomer_SessionId_CustomerId")
                         .IsUnique();
 
                     b.ToTable("tbl_SessionCustomer");

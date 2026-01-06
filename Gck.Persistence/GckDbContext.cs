@@ -110,7 +110,7 @@ public class GckDbContext : DbContext
                   .HasForeignKey(e => e.CustomerId)
                   .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasIndex(e => new { e.SessionId, e.CustomerId }).IsUnique();
+            entity.HasIndex(e => new { e.SessionId, e.CustomerId }, "IX_SessionCustomer_SessionId_CustomerId").IsUnique();
         });
 
         // Configure AccountantReceipt entity

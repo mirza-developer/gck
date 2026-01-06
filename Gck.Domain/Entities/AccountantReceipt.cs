@@ -26,7 +26,7 @@ public class AccountantReceipt
     [Required]
     public DateTime ReceiptDateTime { get; set; }
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; }
 
     // Navigation properties
     [ForeignKey(nameof(SessionId))]

@@ -24,9 +24,9 @@ public class Customer
     [StringLength(20)]
     public string Gender { get; set; } = "Male";
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; }
 
-    public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
+    public DateTime LastModifiedDate { get; set; }
 
     // Navigation property
     public virtual ICollection<SessionCustomer> SessionCustomers { get; set; } = new List<SessionCustomer>();

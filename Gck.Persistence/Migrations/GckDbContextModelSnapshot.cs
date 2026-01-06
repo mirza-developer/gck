@@ -200,7 +200,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("SessionId", "CustomerId")
+                    b.HasIndex(new[] { "SessionId", "CustomerId" }, "IX_SessionCustomer_SessionId_CustomerId")
                         .IsUnique();
 
                     b.ToTable("tbl_SessionCustomer");

@@ -15,7 +15,7 @@ public class SessionCustomer
     [Required]
     public int CustomerId { get; set; }
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; }
 
     // Navigation properties
     [ForeignKey(nameof(SessionId))]

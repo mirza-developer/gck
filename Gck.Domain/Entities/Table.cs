@@ -22,9 +22,9 @@ public class Table
 
     public bool IsOccupied { get; set; } = false;
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; }
 
-    public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
+    public DateTime LastModifiedDate { get; set; }
 
     // Navigation property
     public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();

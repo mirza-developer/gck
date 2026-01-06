@@ -23,12 +23,16 @@ public class UpdateTableCommandHandler : IRequestHandler<UpdateTableCommand, Uni
             throw new InvalidOperationException($"Table with ID '{request.Id}' not found.");
         }
 
-        var existingTable = await _context.Tables
-            .FirstOrDefaultAsync(t => t.Name == request.Name && t.Id != request.Id, cancellationToken);
-
-        if (existingTable != null)
+        // Only check for name uniqueness if the name has changed
+        if (table.Name != request.Name)
         {
-            throw new InvalidOperationException($"Table with name '{request.Name}' already exists.");
+            var existingTable = await _context.Tables
+                .FirstOrDefaultAsync(t => t.Name == request.Name && t.Id != request.Id, cancellationToken);
+
+            if (existingTable != null)
+            {
+                throw new InvalidOperationException($"Table with name '{request.Name}' already exists.");
+            }
         }
 
         table.Name = request.Name;

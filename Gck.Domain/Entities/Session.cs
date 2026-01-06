@@ -29,9 +29,9 @@ public class Session
     [Column(TypeName = "decimal(18,2)")]
     public decimal? FinalPrice { get; set; }
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; }
 
-    public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
+    public DateTime LastModifiedDate { get; set; }
 
     // Navigation properties
     [ForeignKey(nameof(TableId))]
