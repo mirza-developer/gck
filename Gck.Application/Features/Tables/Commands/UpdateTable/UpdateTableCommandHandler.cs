@@ -36,8 +36,6 @@ public class UpdateTableCommandHandler : IRequestHandler<UpdateTableCommand, Uni
         }
 
         table.Name = request.Name;
-        table.NumberOfControllers = request.NumberOfControllers;
-        table.HourlyFeePerController = request.HourlyFeePerController;
         table.LastModifiedDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);

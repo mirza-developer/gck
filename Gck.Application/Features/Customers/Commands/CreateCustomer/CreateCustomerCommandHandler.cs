@@ -20,7 +20,7 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,
             BirthYear = request.BirthYear,
-            Gender = request.Gender,
+            IsMale = request.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase),
             CreateDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow
         };

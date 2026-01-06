@@ -19,6 +19,7 @@ public class GckDbContext : DbContext
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<SessionCustomer> SessionCustomers { get; set; } = null!;
     public DbSet<AccountantReceipt> AccountantReceipts { get; set; } = null!;
+    public DbSet<HourlyFee> Fees { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,20 +28,12 @@ public class GckDbContext : DbContext
         // Configure User entity
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Username).IsUnique();
-            entity.Property(e => e.Username).IsRequired().HasMaxLength(256);
-            entity.Property(e => e.Name).IsRequired().HasMaxLength(512);
-            entity.Property(e => e.Email).HasMaxLength(256);
-            entity.Property(e => e.PasswordHash).IsRequired();
-            entity.Property(e => e.CreatorIdentityID).HasMaxLength(128);
-            entity.Property(e => e.LastModifierIdentityID).HasMaxLength(128);
         });
 
         // Configure UserClaim entity
         modelBuilder.Entity<UserClaim>(entity =>
         {
-            entity.HasKey(e => e.Id);
             entity.HasOne(e => e.User)
                   .WithMany(u => u.UserClaims)
                   .HasForeignKey(e => e.UserId)
@@ -50,41 +43,18 @@ public class GckDbContext : DbContext
         // Configure Table entity
         modelBuilder.Entity<Table>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.NumberOfControllers).IsRequired();
-            entity.Property(e => e.HourlyFeePerController).IsRequired().HasColumnType("decimal(18,2)");
             entity.HasIndex(e => e.Name).IsUnique();
         });
 
         // Configure Customer entity
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).IsRequired().HasMaxLength(256);
-            entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.BirthYear).IsRequired();
-            entity.Property(e => e.Gender).IsRequired().HasMaxLength(20);
             entity.HasIndex(e => e.PhoneNumber);
-        });
-
-        // Configure FinancialAccount entity
-        modelBuilder.Entity<FinancialAccount>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.AccountName).IsRequired().HasMaxLength(256);
-            entity.Property(e => e.CardNumber).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.BankName).IsRequired().HasMaxLength(256);
         });
 
         // Configure Session entity
         modelBuilder.Entity<Session>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.FeePerHour).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.RecommendedPrice).HasColumnType("decimal(18,2)");
-            entity.Property(e => e.FinalPrice).HasColumnType("decimal(18,2)");
-            
             entity.HasOne(e => e.Table)
                   .WithMany(t => t.Sessions)
                   .HasForeignKey(e => e.TableId)
@@ -98,8 +68,6 @@ public class GckDbContext : DbContext
         // Configure SessionCustomer entity
         modelBuilder.Entity<SessionCustomer>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            
             entity.HasOne(e => e.Session)
                   .WithMany(s => s.SessionCustomers)
                   .HasForeignKey(e => e.SessionId)
@@ -116,11 +84,6 @@ public class GckDbContext : DbContext
         // Configure AccountantReceipt entity
         modelBuilder.Entity<AccountantReceipt>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.RecommendedPrice).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.FinalPrice).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.ReceiptDateTime).IsRequired();
-            
             entity.HasOne(e => e.Session)
                   .WithOne(s => s.AccountantReceipt)
                   .HasForeignKey<AccountantReceipt>(e => e.SessionId)

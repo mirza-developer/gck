@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gck.Persistence.Migrations
 {
     [DbContext(typeof(GckDbContext))]
-    [Migration("20260106112638_AddGamingCenterManagement")]
-    partial class AddGamingCenterManagement
+    [Migration("20260106141406_Init_Mig")]
+    partial class Init_Mig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,10 +77,9 @@ namespace Gck.Persistence.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Gender")
-                        .IsRequired()
+                    b.Property<bool>("IsMale")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -136,6 +135,31 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_FinancialAccount");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeatsCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tbl_HourlyFee");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
                 {
                     b.Property<int>("Id")
@@ -150,8 +174,8 @@ namespace Gck.Persistence.Migrations
                     b.Property<DateTime?>("EndDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("FeePerHour")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("FeeId")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("FinalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -172,6 +196,8 @@ namespace Gck.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FeeId");
 
                     b.HasIndex("IsCompleted");
 
@@ -220,9 +246,6 @@ namespace Gck.Persistence.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("HourlyFeePerController")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<bool>("IsOccupied")
                         .HasColumnType("bit");
 
@@ -233,9 +256,6 @@ namespace Gck.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("NumberOfControllers")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -348,11 +368,19 @@ namespace Gck.Persistence.Migrations
 
             modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
                 {
+                    b.HasOne("Gck.Domain.Entities.HourlyFee", "Fee")
+                        .WithMany("Sessions")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Gck.Domain.Entities.Table", "Table")
                         .WithMany("Sessions")
                         .HasForeignKey("TableId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Fee");
 
                     b.Navigation("Table");
                 });
@@ -395,6 +423,11 @@ namespace Gck.Persistence.Migrations
             modelBuilder.Entity("Gck.Domain.Entities.FinancialAccount", b =>
                 {
                     b.Navigation("AccountantReceipts");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.Session", b =>

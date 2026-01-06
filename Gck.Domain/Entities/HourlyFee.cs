@@ -1,19 +1,19 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gck.Domain.Entities;
 
-[Table("tbl_Table")]
-public class Table
+[Table("tbl_HourlyFee")]
+public class HourlyFee
 {
-    [Key]
     public int Id { get; set; }
 
     [Required]
-    [StringLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public int SeatsCount { get; set; }
 
-    public bool IsOccupied { get; set; } = false;
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Fee { get; set; }
 
     public DateTime CreateDate { get; set; }
 

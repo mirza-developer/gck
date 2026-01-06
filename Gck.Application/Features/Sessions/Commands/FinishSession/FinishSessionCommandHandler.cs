@@ -18,6 +18,7 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
     {
         var session = await _context.Sessions
             .Include(s => s.Table)
+            .Include(s => s.Fee)
             .FirstOrDefaultAsync(s => s.Id == request.SessionId, cancellationToken);
 
         if (session == null)
@@ -42,7 +43,7 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         session.IsCompleted = true;
         
         var duration = (session.EndDateTime.Value - session.StartDateTime).TotalHours;
-        var recommendedPrice = Convert.ToDecimal(duration) * session.FeePerHour;
+        var recommendedPrice = Convert.ToDecimal(duration) * session.Fee.Fee;
         session.RecommendedPrice = recommendedPrice;
         session.FinalPrice = request.FinalPrice;
         session.LastModifiedDate = DateTime.UtcNow;

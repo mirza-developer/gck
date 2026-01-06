@@ -35,7 +35,6 @@ public static class DbInitializer
                 logger.LogInformation("Database migrations applied successfully");
             }
 
-            // Seed default admin user if no users exist
             if (!await context.Users.AnyAsync())
             {
                 var adminUser = new User
@@ -55,10 +54,6 @@ public static class DbInitializer
 
                 context.Users.Add(adminUser);
                 await context.SaveChangesAsync();
-
-                logger.LogInformation("Default admin user created successfully");
-                logger.LogInformation("Username: admin");
-                logger.LogInformation("Password: Admin@123");
             }
         }
         catch (Exception ex)

@@ -1,0 +1,145 @@
+@page "/customers/add"
+@using Gck.Application.Features.Customers.Commands.CreateCustomer
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                @PersianResources.AddNewCustomer
+            </h2>
+            <button class="btn-gaming btn-secondary" @onclick="NavigateBack">
+                <i class="fas fa-arrow-right"></i>
+                @PersianResources.Back
+            </button>
+        </div>
+
+        <div class="gaming-card fade-in-up">
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @errorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    @successMessage
+                </div>
+            }
+
+            <EditForm Model="@command" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        @PersianResources.CustomerName <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputText @bind-Value="command.Name" class="form-input" placeholder="@PersianResources.CustomerNamePlaceholder" />
+                    <ValidationMessage For="@(() => command.Name)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-phone"></i>
+                        @PersianResources.PhoneNumber <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputText @bind-Value="command.PhoneNumber" class="form-input" placeholder="@PersianResources.PhonePlaceholder" />
+                    <ValidationMessage For="@(() => command.PhoneNumber)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        @PersianResources.BirthYear <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputNumber @bind-Value="command.BirthYear" class="form-input" placeholder="@PersianResources.BirthYearPlaceholder" />
+                    <ValidationMessage For="@(() => command.BirthYear)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-venus-mars"></i>
+                        @PersianResources.Gender <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputSelect @bind-Value="command.Gender" class="form-input">
+                        <option value="Male">@PersianResources.Male</option>
+                        <option value="Female">@PersianResources.Female</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => command.Gender)" class="validation-error" />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-gaming" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>@PersianResources.Submitting</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-save"></i>
+                            <span>@PersianResources.SubmitCustomer</span>
+                        }
+                    </button>
+                    <button type="button" class="btn-gaming btn-secondary" @onclick="NavigateBack" disabled="@isSubmitting">
+                        <i class="fas fa-times"></i>
+                        @PersianResources.Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</section>
+
+@code {
+    private CreateCustomerCommand command = new() { Gender = "Male" };
+    private bool isSubmitting = false;
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/customers"), command);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = PersianResources.CustomerAddSuccess;
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/customers");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                errorMessage = $"{PersianResources.Error}: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

@@ -18,6 +18,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
     {
         var session = await _context.Sessions
             .Include(s => s.Table)
+            .Include(s => s.Fee)
             .Include(s => s.SessionCustomers)
             .ThenInclude(sc => sc.Customer)
             .Where(s => s.Id == request.Id)
@@ -26,7 +27,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
                 Id = s.Id,
                 TableId = s.TableId,
                 TableName = s.Table.Name,
-                FeePerHour = s.FeePerHour,
+                FeePerHour = s.Fee.Fee,
                 StartDateTime = s.StartDateTime,
                 EndDateTime = s.EndDateTime,
                 IsCompleted = s.IsCompleted,
@@ -38,7 +39,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
                     Name = sc.Customer.Name,
                     PhoneNumber = sc.Customer.PhoneNumber,
                     BirthYear = sc.Customer.BirthYear,
-                    Gender = sc.Customer.Gender
+                    Gender = sc.Customer.IsMale ? "Male" : "Female"
                 }).ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);

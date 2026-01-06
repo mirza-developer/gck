@@ -18,6 +18,8 @@ public class GetDashboardTablesQueryHandler : IRequestHandler<GetDashboardTables
     {
         var tables = await _context.Tables
             .Include(t => t.Sessions.Where(s => !s.IsCompleted))
+            .ThenInclude(s => s.Fee)
+            .Include(t => t.Sessions.Where(s => !s.IsCompleted))
             .ThenInclude(s => s.SessionCustomers)
             .ThenInclude(sc => sc.Customer)
             .OrderBy(t => t.Name)
@@ -36,7 +38,7 @@ public class GetDashboardTablesQueryHandler : IRequestHandler<GetDashboardTables
                     Id = currentSession.Id,
                     TableId = t.Id,
                     TableName = t.Name,
-                    FeePerHour = currentSession.FeePerHour,
+                    FeePerHour = currentSession.Fee.Fee,
                     StartDateTime = currentSession.StartDateTime,
                     EndDateTime = currentSession.EndDateTime,
                     IsCompleted = false,
@@ -47,7 +49,7 @@ public class GetDashboardTablesQueryHandler : IRequestHandler<GetDashboardTables
                             Name = sc.Customer.Name,
                             PhoneNumber = sc.Customer.PhoneNumber,
                             BirthYear = sc.Customer.BirthYear,
-                            Gender = sc.Customer.Gender
+                            Gender = sc.Customer.IsMale ? "Male" : "Female"
                         }).ToList()
                 } : null
             };

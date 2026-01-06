@@ -1,0 +1,173 @@
+@page "/financialaccounts"
+@using Gck.Application.DTOs
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-university"></i>
+                @PersianResources.FinancialAccountsManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewFinancialAccount
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchFinancialAccounts" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredAccounts.Any())
+                {
+                    <div class="users-grid">
+                        @foreach (var account in FilteredAccounts)
+                        {
+                            <div class="user-card fade-in-up">
+                                <div class="user-header">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        <h3 class="user-name">@account.AccountName</h3>
+                                        <p class="user-username">@PersianResources.Bank @account.BankName - @PersianResources.Card: @account.CardNumber</p>
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(account.Id)">
+                                        <i class="fas fa-edit"></i>
+                                        @PersianResources.Edit
+                                    </button>
+                                    <button class="btn-action btn-delete" @onclick="() => DeleteAccount(account.Id)">
+                                        <i class="fas fa-trash"></i>
+                                        @PersianResources.Delete
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoFinancialAccountsFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<FinancialAccountDto> accounts = new();
+    private string searchText = string.Empty;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    private List<FinancialAccountDto> FilteredAccounts =>
+        accounts.Where(a =>
+            string.IsNullOrEmpty(searchText) ||
+            a.AccountName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            a.BankName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            a.CardNumber.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAccounts();
+    }
+
+    private async Task LoadAccounts()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/financialaccounts"));
+            if (response.IsSuccessStatusCode)
+            {
+                accounts = await response.Content.ReadFromJsonAsync<List<FinancialAccountDto>>() ?? new();
+            }
+            else
+            {
+                errorMessage = PersianResources.LoadFinancialAccountsError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/financialaccounts/add");
+    }
+
+    private void NavigateToEdit(int id)
+    {
+        Navigation.NavigateTo($"/financialaccounts/edit/{id}");
+    }
+
+    private async Task DeleteAccount(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteFinancialAccountConfirm);
+        
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadAccounts();
+                }
+                else
+                {
+                    errorMessage = PersianResources.DeleteFinancialAccountError;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"{PersianResources.Error}: {ex.Message}";
+            }
+        }
+    }
+}

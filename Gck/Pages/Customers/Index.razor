@@ -1,0 +1,172 @@
+@page "/customers"
+@using Gck.Application.DTOs
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i>
+                @PersianResources.CustomersManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewCustomer
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchCustomers" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredCustomers.Any())
+                {
+                    <div class="users-grid">
+                        @foreach (var customer in FilteredCustomers)
+                        {
+                            <div class="user-card fade-in-up">
+                                <div class="user-header">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        <h3 class="user-name">@customer.Name</h3>
+                                        <p class="user-username">@PersianResources.Phone: @customer.PhoneNumber - @PersianResources.BirthYear: @customer.BirthYear - @(customer.Gender == "Male" ? PersianResources.Male : PersianResources.Female)</p>
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(customer.Id)">
+                                        <i class="fas fa-edit"></i>
+                                        @PersianResources.Edit
+                                    </button>
+                                    <button class="btn-action btn-delete" @onclick="() => DeleteCustomer(customer.Id)">
+                                        <i class="fas fa-trash"></i>
+                                        @PersianResources.Delete
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoCustomersFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<CustomerDto> customers = new();
+    private string searchText = string.Empty;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    private List<CustomerDto> FilteredCustomers =>
+        customers.Where(c =>
+            string.IsNullOrEmpty(searchText) ||
+            c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            c.PhoneNumber.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
+            if (response.IsSuccessStatusCode)
+            {
+                customers = await response.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
+            }
+            else
+            {
+                errorMessage = PersianResources.LoadCustomersError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/customers/add");
+    }
+
+    private void NavigateToEdit(int id)
+    {
+        Navigation.NavigateTo($"/customers/edit/{id}");
+    }
+
+    private async Task DeleteCustomer(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteCustomerConfirm);
+        
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadCustomers();
+                }
+                else
+                {
+                    errorMessage = PersianResources.DeleteCustomerError;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"{PersianResources.Error}: {ex.Message}";
+            }
+        }
+    }
+}

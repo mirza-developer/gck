@@ -27,8 +27,6 @@ public class CreateTableCommandHandler : IRequestHandler<CreateTableCommand, int
         var table = new Table
         {
             Name = request.Name,
-            NumberOfControllers = request.NumberOfControllers,
-            HourlyFeePerController = request.HourlyFeePerController,
             IsOccupied = false,
             CreateDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow

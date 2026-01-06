@@ -22,8 +22,8 @@ public class GetTableByIdQueryHandler : IRequestHandler<GetTableByIdQuery, Table
             {
                 Id = t.Id,
                 Name = t.Name,
-                NumberOfControllers = t.NumberOfControllers,
-                HourlyFeePerController = t.HourlyFeePerController,
+                NumberOfControllers = 0,
+                HourlyFeePerController = 0,
                 IsOccupied = t.IsOccupied
             })
             .FirstOrDefaultAsync(cancellationToken);

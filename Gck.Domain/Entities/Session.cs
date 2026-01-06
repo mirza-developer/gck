@@ -13,8 +13,7 @@ public class Session
     public int TableId { get; set; }
 
     [Required]
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal FeePerHour { get; set; }
+    public int FeeId { get; set; }
 
     [Required]
     public DateTime StartDateTime { get; set; }
@@ -36,6 +35,9 @@ public class Session
     // Navigation properties
     [ForeignKey(nameof(TableId))]
     public virtual Table Table { get; set; } = null!;
+
+    [ForeignKey(nameof(FeeId))]
+    public virtual HourlyFee Fee { get; set; } = null!;
 
     public virtual ICollection<SessionCustomer> SessionCustomers { get; set; } = new List<SessionCustomer>();
 

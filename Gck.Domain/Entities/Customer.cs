@@ -22,7 +22,7 @@ public class Customer
 
     [Required]
     [StringLength(20)]
-    public string Gender { get; set; } = "Male";
+    public bool IsMale { get; set; } = true;
 
     public DateTime CreateDate { get; set; }
 

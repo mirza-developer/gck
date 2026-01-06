@@ -24,7 +24,7 @@ public class GetAllCustomersQueryHandler : IRequestHandler<GetAllCustomersQuery,
                 Name = c.Name,
                 PhoneNumber = c.PhoneNumber,
                 BirthYear = c.BirthYear,
-                Gender = c.Gender
+                Gender = c.IsMale ? "Male" : "Female"
             })
             .ToListAsync(cancellationToken);
 
