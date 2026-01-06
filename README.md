@@ -1,18 +1,20 @@
 # GCK User Management System
 
-A comprehensive user management system built with Clean Architecture principles, CQRS pattern, and modern .NET technologies.
+A comprehensive user management system built with Clean Architecture principles, CQRS pattern, authentication, and modern .NET technologies.
 
 ## Architecture
 
 This project follows Clean Architecture with clear separation of concerns:
 
 ```
-Gck/
-├── Gck.Domain/          # Domain entities and business rules
-├── Gck.Persistence/     # Data access layer with EF Core
-├── Gck.Application/     # Application logic with CQRS
-├── Gck.Api/            # REST API layer
-└── Gck/                # Blazor WebAssembly UI
+gck/
+├── src/
+│   ├── Gck.Domain/          # Domain entities and business rules
+│   ├── Gck.Persistence/     # Data access layer with EF Core
+│   ├── Gck.Application/     # Application logic with CQRS
+│   ├── Gck.Api/            # REST API layer
+│   └── Gck/                # Blazor WebAssembly UI
+└── README.md
 ```
 
 ## Technologies Used
@@ -27,6 +29,13 @@ Gck/
 - **Swagger/OpenAPI** - API documentation
 
 ## Features
+
+### Authentication & Security
+- ✅ **Login System** with username/password authentication
+- ✅ **Default Admin User** (admin/Admin@123) seeded automatically
+- ✅ **Session Management** using LocalStorage
+- ✅ **Protected Routes** - Users menu visible only to authenticated users
+- ✅ **Logout Functionality** with session cleanup
 
 ### User Management
 - ✅ Create new users with validation
@@ -55,7 +64,7 @@ Gck/
 
 1. **Update Connection String** (if needed)
    
-   Edit `Gck.Api/appsettings.json`:
+   Edit `src/Gck.Api/appsettings.json`:
    ```json
    {
      "ConnectionStrings": {
@@ -66,15 +75,26 @@ Gck/
 
 2. **Apply Migrations**
 
+   The database will be automatically initialized and seeded with a default admin user when you run the API for the first time.
+
+   Or manually apply migrations:
    ```bash
-   cd Gck.Persistence
+   cd src/Gck.Persistence
    dotnet ef database update
    ```
 
    Or from solution root:
    ```bash
-   dotnet ef database update --project Gck.Persistence --startup-project Gck.Api
+   dotnet ef database update --project src/Gck.Persistence --startup-project src/Gck.Api
    ```
+
+### Default Admin Credentials
+
+After first run, a default admin user is automatically created:
+- **Username**: `admin`
+- **Password**: `Admin@123`
+
+This allows immediate access to the system for testing and configuration.
 
 ### Running the Application
 
@@ -82,7 +102,7 @@ Gck/
 
 **Terminal 1 - API:**
 ```bash
-cd Gck.Api
+cd src/Gck.Api
 dotnet run
 ```
 API will be available at: `https://localhost:7023`
@@ -90,12 +110,15 @@ Swagger UI: `https://localhost:7023/swagger`
 
 **Terminal 2 - Blazor UI:**
 ```bash
-cd Gck
+cd src/Gck
 dotnet run
 ```
 UI will be available at: `https://localhost:5001` (or the port shown in terminal)
 
-**Important:** Make sure the API URL in Blazor pages matches your API port.
+**Important:** The API will automatically:
+- Apply any pending database migrations
+- Seed the default admin user if no users exist
+- Display credentials in the console logs
 
 #### Option 2: Run with Visual Studio
 1. Right-click on Solution
@@ -107,9 +130,16 @@ UI will be available at: `https://localhost:5001` (or the port shown in terminal
 
 1. **Access the UI**
    - Navigate to `https://localhost:5001` (or your Blazor app port)
-   - Click on "کاربران" (Users) in the navigation menu
 
-2. **Add a User**
+2. **Login**
+   - Click "ورود" (Login) in the navigation menu
+   - Use default credentials: `admin` / `Admin@123`
+   - After successful login, you'll be redirected to the home page
+
+3. **Access User Management**
+   - Once logged in, click "کاربران" (Users) in the navigation menu
+
+4. **Add a User**
    - Click "افزودن کاربر جدید" (Add New User)
    - Fill in the required fields:
      - Username (required)
@@ -130,7 +160,16 @@ UI will be available at: `https://localhost:5001` (or the port shown in terminal
    - From the users list, click "حذف" (Delete) on any user card
    - Confirm the deletion
 
+5. **Logout**
+   - Click "خروج" (Logout) button in the navigation bar to end your session
+
 ## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login with username and password |
 
 ### User Management
 
@@ -145,6 +184,16 @@ UI will be available at: `https://localhost:5001` (or the port shown in terminal
 | PUT | `/api/user/{id}/password` | Update user password |
 
 ### Example API Requests
+
+**Login:**
+```bash
+curl -X POST https://localhost:7023/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin",
+    "password": "Admin@123"
+  }'
+```
 
 **Create User:**
 ```bash
@@ -265,10 +314,10 @@ dotnet build
 ### Migration Issues
 ```bash
 # Remove last migration
-dotnet ef migrations remove --project Gck.Persistence
+dotnet ef migrations remove --project src/Gck.Persistence
 
 # Add new migration
-dotnet ef migrations add MigrationName --project Gck.Persistence
+dotnet ef migrations add MigrationName --project src/Gck.Persistence
 ```
 
 ## Development
