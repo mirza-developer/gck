@@ -1,0 +1,156 @@
+@page "/users/add"
+@using Gck.Application.Features.Users.Commands.AddUser
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-user-plus"></i>
+                افزودن کاربر جدید
+            </h2>
+            <button class="btn-gaming btn-secondary" @onclick="NavigateBack">
+                <i class="fas fa-arrow-right"></i>
+                بازگشت
+            </button>
+        </div>
+
+        <div class="gaming-card fade-in-up">
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @errorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    @successMessage
+                </div>
+            }
+
+            <EditForm Model="@command" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i>
+                        نام کاربری <span class="required">*</span>
+                    </label>
+                    <InputText @bind-Value="command.Username" class="form-input" placeholder="نام کاربری را وارد کنید" />
+                    <ValidationMessage For="@(() => command.Username)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        نام کامل <span class="required">*</span>
+                    </label>
+                    <InputText @bind-Value="command.Name" class="form-input" placeholder="نام کامل را وارد کنید" />
+                    <ValidationMessage For="@(() => command.Name)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i>
+                        رمز عبور <span class="required">*</span>
+                    </label>
+                    <InputText type="password" @bind-Value="command.Password" class="form-input" placeholder="رمز عبور را وارد کنید" />
+                    <ValidationMessage For="@(() => command.Password)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        ایمیل
+                    </label>
+                    <InputText @bind-Value="command.Email" class="form-input" placeholder="example@email.com" />
+                    <ValidationMessage For="@(() => command.Email)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-phone"></i>
+                        شماره تلفن
+                    </label>
+                    <InputText @bind-Value="command.PhoneNumber" class="form-input" placeholder="09123456789" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sticky-note"></i>
+                        جزئیات اضافی
+                    </label>
+                    <InputTextArea @bind-Value="command.Details" class="form-textarea" placeholder="توضیحات و جزئیات اضافی..." rows="4" />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-gaming" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>در حال ثبت...</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-save"></i>
+                            <span>ثبت کاربر</span>
+                        }
+                    </button>
+                    <button type="button" class="btn-gaming btn-secondary" @onclick="NavigateBack" disabled="@isSubmitting">
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</section>
+
+@code {
+    private AddUserCommand command = new();
+    private bool isSubmitting = false;
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7001/api/user", command);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "کاربر با موفقیت ایجاد شد";
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/users");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                errorMessage = $"خطا در ایجاد کاربر: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/users");
+    }
+}
