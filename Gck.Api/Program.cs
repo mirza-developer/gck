@@ -21,14 +21,20 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "Gck User Management API", Version = "v1" });
 });
 
-// Add CORS
+// Add CORS - Fixed to include all Blazor client origins
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient",
         policy => policy
-            .WithOrigins("https://localhost:5001", "http://localhost:5000", "https://localhost:7001")
+            .WithOrigins(
+                "https://localhost:5001", 
+                "http://localhost:5000", 
+                "https://localhost:7001",
+                "http://localhost:5193",   // Added: Blazor WASM client
+                "https://localhost:7193")  // Added: HTTPS version
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
 
 var app = builder.Build();

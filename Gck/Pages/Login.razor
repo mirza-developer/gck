@@ -77,13 +77,6 @@
                         </button>
                     </div>
                 </EditForm>
-
-                <div class="login-footer">
-                    <p class="default-credentials">
-                        <i class="fas fa-info-circle"></i>
-                        اطلاعات ورود پیش‌فرض: admin / Admin@123
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -145,6 +138,8 @@
         catch (Exception ex)
         {
             errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
+
+            throw;
         }
         finally
         {
