@@ -1,5 +1,6 @@
 @page "/management"
 @inject HttpClient Http
+@inject ApiConfigurationService ApiConfig
 @using System.Net.Http.Json
 
 <PageTitle>مدیریت گیم سنتر</PageTitle>
@@ -203,7 +204,7 @@
             error = null;
 
             // Try to load tables from API
-            var tablesResponse = await Http.GetAsync("http://localhost:5001/api/tables");
+            var tablesResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/tables"));
             if (tablesResponse.IsSuccessStatusCode)
             {
                 tables = await tablesResponse.Content.ReadFromJsonAsync<List<TableDto>>() ?? new();
@@ -211,14 +212,14 @@
             }
 
             // Try to load customers
-            var customersResponse = await Http.GetAsync("http://localhost:5001/api/customers");
+            var customersResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
             if (customersResponse.IsSuccessStatusCode)
             {
                 customers = await customersResponse.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
             }
 
             // Try to load financial accounts
-            var accountsResponse = await Http.GetAsync("http://localhost:5001/api/financialaccounts");
+            var accountsResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/financialaccounts"));
             if (accountsResponse.IsSuccessStatusCode)
             {
                 financialAccounts = await accountsResponse.Content.ReadFromJsonAsync<List<FinancialAccountDto>>() ?? new();
