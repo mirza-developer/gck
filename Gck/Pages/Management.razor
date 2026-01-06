@@ -34,7 +34,7 @@
                     <div class="card-body">
                         <h5 class="card-title">میزها</h5>
                         <h2 class="text-primary">@tables.Count</h2>
-                        <button class="btn btn-primary btn-sm" @onclick="@(() => ShowSection("tables"))">مدیریت</button>
+                        <button class="btn btn-primary btn-sm" @onclick="ShowTablesSection">مدیریت</button>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                     <div class="card-body">
                         <h5 class="card-title">مشتریان</h5>
                         <h2 class="text-success">@customers.Count</h2>
-                        <button class="btn btn-success btn-sm" @onclick="@(() => ShowSection("customers"))">مدیریت</button>
+                        <button class="btn btn-success btn-sm" @onclick="ShowCustomersSection">مدیریت</button>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                     <div class="card-body">
                         <h5 class="card-title">حساب‌های مالی</h5>
                         <h2 class="text-info">@financialAccounts.Count</h2>
-                        <button class="btn btn-info btn-sm" @onclick="@(() => ShowSection("accounts"))">مدیریت</button>
+                        <button class="btn btn-info btn-sm" @onclick="ShowAccountsSection">مدیریت</button>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                     <div class="card-body">
                         <h5 class="card-title">میزهای اشغال</h5>
                         <h2 class="text-warning">@occupiedTablesCount</h2>
-                        <button class="btn btn-warning btn-sm" @onclick="@(() => ShowSection("dashboard"))">داشبورد</button>
+                        <button class="btn btn-warning btn-sm" @onclick="ShowDashboardSection">داشبورد</button>
                     </div>
                 </div>
             </div>
@@ -236,6 +236,26 @@
     private void ShowSection(string section)
     {
         activeSection = section;
+    }
+
+    private void ShowTablesSection()
+    {
+        activeSection = "tables";
+    }
+
+    private void ShowCustomersSection()
+    {
+        activeSection = "customers";
+    }
+
+    private void ShowAccountsSection()
+    {
+        activeSection = "accounts";
+    }
+
+    private void ShowDashboardSection()
+    {
+        activeSection = "dashboard";
     }
 
     // DTOs
