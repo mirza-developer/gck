@@ -3,10 +3,10 @@
 @inject ApiConfigurationService ApiConfig
 @using System.Net.Http.Json
 
-<PageTitle>مدیریت گیم سنتر</PageTitle>
+<PageTitle>داشبورد مدیریت</PageTitle>
 
 <div class="container" style="padding: 2rem; direction: rtl;">
-    <h1 class="text-center mb-4">پنل مدیریت گیم سنتر کوثر</h1>
+    <h1 class="text-center mb-4">داشبورد مدیریت گیم سنتر کوثر</h1>
 
     @if (loading)
     {
@@ -18,7 +18,7 @@
     {
         <div class="alert alert-warning text-center">
             <h4>⚠️ توجه</h4>
-            <p>برای استفاده از پنل مدیریت، ابتدا باید سرور API را اجرا کنید.</p>
+            <p>برای استفاده از داشبورد، ابتدا باید سرور API را اجرا کنید.</p>
             <p><strong>خطا:</strong> @error</p>
             <hr />
             <p><small>برای اجرای API، دستور زیر را در ترمینال اجرا کنید:</small></p>
@@ -29,167 +29,86 @@
     }
     else
     {
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">میزها</h5>
-                        <h2 class="text-primary">@tables.Count</h2>
-                        <button class="btn btn-primary btn-sm" @onclick="ShowTablesSection">مدیریت</button>
-                    </div>
-                </div>
+        <!-- Tables Status Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>وضعیت میزها</h3>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">مشتریان</h5>
-                        <h2 class="text-success">@customers.Count</h2>
-                        <button class="btn btn-success btn-sm" @onclick="ShowCustomersSection">مدیریت</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">حساب‌های مالی</h5>
-                        <h2 class="text-info">@financialAccounts.Count</h2>
-                        <button class="btn btn-info btn-sm" @onclick="ShowAccountsSection">مدیریت</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">میزهای اشغال</h5>
-                        <h2 class="text-warning">@occupiedTablesCount</h2>
-                        <button class="btn btn-warning btn-sm" @onclick="ShowDashboardSection">داشبورد</button>
-                    </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var table in dashboardTables)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card @(table.IsOccupied ? "border-danger" : "border-success")">
+                                <div class="card-body">
+                                    <h5 class="card-title">@table.Name</h5>
+                                    <p class="card-text">
+                                        <strong>وضعیت:</strong> 
+                                        <span class="badge @(table.IsOccupied ? "bg-danger" : "bg-success")">
+                                            @(table.IsOccupied ? "اشغال" : "آزاد")
+                                        </span>
+                                    </p>
+                                    @if (table.CurrentSession != null)
+                                    {
+                                        <hr />
+                                        <p class="mb-1"><strong>جلسه فعال:</strong></p>
+                                        <p class="mb-1"><small>شروع: @table.CurrentSession.StartDateTime.ToString("HH:mm - yyyy/MM/dd")</small></p>
+                                        <p class="mb-1"><small>نرخ ساعتی: @table.CurrentSession.FeePerHour.ToString("N0") تومان</small></p>
+                                        @if (table.CurrentSession.Customers.Any())
+                                        {
+                                            <p class="mb-0"><small>مشتریان: @string.Join(", ", table.CurrentSession.Customers.Select(c => c.Name))</small></p>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
 
-        @if (activeSection == "tables")
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>مدیریت میزها</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>نام میز</th>
-                                <th>تعداد دسته</th>
-                                <th>هزینه هر ساعت (تومان)</th>
-                                <th>وضعیت</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var table in tables)
-                            {
-                                <tr>
-                                    <td>@table.Name</td>
-                                    <td>@table.NumberOfControllers</td>
-                                    <td>@table.HourlyFeePerController.ToString("N0")</td>
-                                    <td>
-                                        <span class="badge @(table.IsOccupied ? "bg-danger" : "bg-success")">
-                                            @(table.IsOccupied ? "اشغال" : "آزاد")
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
-
-        @if (activeSection == "customers")
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>مدیریت مشتریان</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>نام</th>
-                                <th>شماره تماس</th>
-                                <th>سال تولد</th>
-                                <th>جنسیت</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var customer in customers)
-                            {
-                                <tr>
-                                    <td>@customer.Name</td>
-                                    <td>@customer.PhoneNumber</td>
-                                    <td>@customer.BirthYear</td>
-                                    <td>@customer.Gender</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
-
-        @if (activeSection == "accounts")
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>حساب‌های مالی</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>نام حساب</th>
-                                <th>شماره کارت</th>
-                                <th>نام بانک</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var account in financialAccounts)
-                            {
-                                <tr>
-                                    <td>@account.AccountName</td>
-                                    <td>@account.CardNumber</td>
-                                    <td>@account.BankName</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
-
-        @if (activeSection == "dashboard")
-        {
-            <div class="card">
-                <div class="card-header">
-                    <h3>داشبورد میزها</h3>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <p><strong>توجه:</strong> برای مشاهده داشبورد کامل با امکانات شروع و پایان جلسات، باید API را اجرا کنید و از آن استفاده کنید.</p>
+        <!-- Analytics Charts Section -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>مقایسه روزانه (این هفته)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <p><strong>نمودار در حال توسعه:</strong> مجموع رسیدهای روزانه برای امروز در مقایسه با سایر روزهای این هفته (تقویم شمسی)</p>
+                        </div>
+                        <!-- Chart placeholder - will be implemented with chart library -->
+                        <div style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 8px;">
+                            <p class="text-muted">نمودار مقایسه روزانه</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        }
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>مقایسه ماهانه (امسال)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <p><strong>نمودار در حال توسعه:</strong> مجموع رسیدهای ماهانه برای این ماه در مقایسه با سایر ماه‌های امسال (تقویم شمسی)</p>
+                        </div>
+                        <!-- Chart placeholder - will be implemented with chart library -->
+                        <div style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 8px;">
+                            <p class="text-muted">نمودار مقایسه ماهانه</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
 @code {
-    private List<TableDto> tables = new();
-    private List<CustomerDto> customers = new();
-    private List<FinancialAccountDto> financialAccounts = new();
+    private List<DashboardTableDto> dashboardTables = new();
     private bool loading = true;
     private string? error = null;
-    private string activeSection = "tables";
-    private int occupiedTablesCount = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -203,26 +122,11 @@
             loading = true;
             error = null;
 
-            // Try to load tables from API
-            var tablesResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/tables"));
-            if (tablesResponse.IsSuccessStatusCode)
+            // Load dashboard tables with active sessions
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/dashboard/tables"));
+            if (response.IsSuccessStatusCode)
             {
-                tables = await tablesResponse.Content.ReadFromJsonAsync<List<TableDto>>() ?? new();
-                occupiedTablesCount = tables.Count(t => t.IsOccupied);
-            }
-
-            // Try to load customers
-            var customersResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
-            if (customersResponse.IsSuccessStatusCode)
-            {
-                customers = await customersResponse.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
-            }
-
-            // Try to load financial accounts
-            var accountsResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/financialaccounts"));
-            if (accountsResponse.IsSuccessStatusCode)
-            {
-                financialAccounts = await accountsResponse.Content.ReadFromJsonAsync<List<FinancialAccountDto>>() ?? new();
+                dashboardTables = await response.Content.ReadFromJsonAsync<List<DashboardTableDto>>() ?? new();
             }
 
             loading = false;
@@ -234,39 +138,27 @@
         }
     }
 
-    private void ShowSection(string section)
-    {
-        activeSection = section;
-    }
-
-    private void ShowTablesSection()
-    {
-        activeSection = "tables";
-    }
-
-    private void ShowCustomersSection()
-    {
-        activeSection = "customers";
-    }
-
-    private void ShowAccountsSection()
-    {
-        activeSection = "accounts";
-    }
-
-    private void ShowDashboardSection()
-    {
-        activeSection = "dashboard";
-    }
-
     // DTOs
-    public class TableDto
+    public class DashboardTableDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public int NumberOfControllers { get; set; }
-        public decimal HourlyFeePerController { get; set; }
         public bool IsOccupied { get; set; }
+        public SessionDto? CurrentSession { get; set; }
+    }
+
+    public class SessionDto
+    {
+        public int Id { get; set; }
+        public int TableId { get; set; }
+        public string TableName { get; set; } = string.Empty;
+        public decimal FeePerHour { get; set; }
+        public DateTime StartDateTime { get; set; }
+        public DateTime? EndDateTime { get; set; }
+        public bool IsCompleted { get; set; }
+        public decimal? RecommendedPrice { get; set; }
+        public decimal? FinalPrice { get; set; }
+        public List<CustomerDto> Customers { get; set; } = new();
     }
 
     public class CustomerDto
@@ -276,13 +168,5 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public int BirthYear { get; set; }
         public string Gender { get; set; } = string.Empty;
-    }
-
-    public class FinancialAccountDto
-    {
-        public int Id { get; set; }
-        public string AccountName { get; set; } = string.Empty;
-        public string CardNumber { get; set; } = string.Empty;
-        public string BankName { get; set; } = string.Empty;
     }
 }
