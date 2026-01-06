@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
 
 <section class="section">
     <div class="container">
@@ -116,7 +117,7 @@
         
         try
         {
-            var response = await Http.GetAsync("https://localhost:7001/api/user");
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/user"));
             if (response.IsSuccessStatusCode)
             {
                 users = await response.Content.ReadFromJsonAsync<List<GetAllUsersVm>>() ?? new();
@@ -154,7 +155,7 @@
         {
             try
             {
-                var response = await Http.DeleteAsync($"https://localhost:7001/api/user/{userId}");
+                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadUsers();

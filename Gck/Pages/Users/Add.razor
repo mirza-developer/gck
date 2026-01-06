@@ -2,6 +2,7 @@
 @using Gck.Application.Features.Users.Commands.AddUser
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
 
 <section class="section">
     <div class="container">
@@ -125,7 +126,7 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync("https://localhost:7001/api/user", command);
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/user"), command);
             
             if (response.IsSuccessStatusCode)
             {

@@ -4,6 +4,7 @@
 @using Gck.Application.Features.Users.Queries.GetUserByUsername
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
 
 <section class="section">
     <div class="container">
@@ -157,7 +158,7 @@
 
         try
         {
-            var response = await Http.GetAsync($"https://localhost:7001/api/user/username/{Username}");
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/user/username/{Username}"));
             
             if (response.IsSuccessStatusCode)
             {
@@ -201,7 +202,7 @@
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"https://localhost:7001/api/user/{command.Id}", command);
+            var response = await Http.PutAsJsonAsync(ApiConfig.GetApiUrl($"/api/user/{command.Id}"), command);
             
             if (response.IsSuccessStatusCode)
             {

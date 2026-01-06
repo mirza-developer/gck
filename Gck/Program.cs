@@ -23,5 +23,6 @@ builder.Services.AddResizeListener();
 builder.Services.AddScoped<GameStatsService>();
 builder.Services.AddScoped<UserProfileService>();
 builder.Services.AddScoped<TournamentService>();
+builder.Services.AddSingleton<ApiConfigurationService>();
 
 await builder.Build().RunAsync();
