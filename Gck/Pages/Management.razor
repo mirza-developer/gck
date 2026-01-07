@@ -2,113 +2,163 @@
 @inject HttpClient Http
 @inject ApiConfigurationService ApiConfig
 @using System.Net.Http.Json
+@using Gck.Components
 
 <PageTitle>داشبورد مدیریت</PageTitle>
 
-<div class="container" style="padding: 2rem; direction: rtl;">
-    <h1 class="text-center mb-4">داشبورد مدیریت گیم سنتر کوثر</h1>
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-tachometer-alt"></i>
+                داشبورد مدیریت گیم سنتر کوثر
+            </h2>
+        </div>
 
-    @if (loading)
-    {
-        <div class="text-center">
-            <p>در حال بارگذاری...</p>
-        </div>
-    }
-    else if (error != null)
-    {
-        <div class="alert alert-warning text-center">
-            <h4>⚠️ توجه</h4>
-            <p>برای استفاده از داشبورد، ابتدا باید سرور API را اجرا کنید.</p>
-            <p><strong>خطا:</strong> @error</p>
-            <hr />
-            <p><small>برای اجرای API، دستور زیر را در ترمینال اجرا کنید:</small></p>
-            <code style="display: block; background: #f5f5f5; padding: 10px; border-radius: 5px; direction: ltr;">
-                cd Gck.Api && dotnet run
-            </code>
-        </div>
-    }
-    else
-    {
-        <!-- Tables Status Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3>وضعیت میزها</h3>
+        @if (loading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">در حال بارگذاری...</p>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    @foreach (var table in dashboardTables)
-                    {
-                        <div class="col-md-4 mb-3">
-                            <div class="card @(table.IsOccupied ? "border-danger" : "border-success")">
-                                <div class="card-body">
-                                    <h5 class="card-title">@table.Name</h5>
-                                    <p class="card-text">
-                                        <strong>وضعیت:</strong> 
-                                        <span class="badge @(table.IsOccupied ? "bg-danger" : "bg-success")">
-                                            @(table.IsOccupied ? "اشغال" : "آزاد")
-                                        </span>
-                                    </p>
+        }
+        else if (error != null)
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p><strong>خطا:</strong> @error</p>
+                <hr />
+                <p><small>برای استفاده از داشبورد، ابتدا باید سرور API را اجرا کنید.</small></p>
+                <code style="display: block; background: #f5f5f5; padding: 10px; border-radius: 5px; direction: ltr; margin-top: 1rem;">
+                    cd Gck.Api && dotnet run
+                </code>
+            </div>
+        }
+        else
+        {
+            <!-- Tables Status Section -->
+            <div class="gaming-card fade-in-up">
+                <div class="card-header-section">
+                    <h3><i class="fas fa-table"></i> وضعیت میزها</h3>
+                </div>
+
+                @if (dashboardTables.Any())
+                {
+                    <div class="users-grid">
+                        @foreach (var table in dashboardTables)
+                        {
+                            <div class="user-card fade-in-up">
+                                <div class="user-header">
+                                    <div class="user-avatar @(table.IsOccupied ? "occupied" : "available")">
+                                        <i class="fas fa-table"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        <h3 class="user-name">@table.Name</h3>
+                                        @if (table.CurrentSession != null)
+                                        {
+                                            <p class="user-username">
+                                                <i class="fas fa-clock"></i> @GetSessionDuration(table.CurrentSession.StartDateTime)
+                                                | <i class="fas fa-coins"></i> @table.CurrentSession.FeePerHour.ToString("N0") تومان/ساعت
+                                            </p>
+                                            @if (table.CurrentSession.Customers.Any())
+                                            {
+                                                <p class="user-detail">
+                                                    <i class="fas fa-users"></i> @string.Join("، ", table.CurrentSession.Customers.Select(c => c.Name))
+                                                </p>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="user-username">آماده برای شروع جلسه</p>
+                                        }
+                                    </div>
+                                    <div class="user-status @(table.IsOccupied ? "inactive" : "active")">
+                                        @(table.IsOccupied ? "اشغال" : "آزاد")
+                                    </div>
+                                </div>
+
+                                @if (table.CurrentSession != null)
+                                {
+                                    <div class="session-details">
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-play-circle"></i> شروع:</span>
+                                            <span class="detail-value">@table.CurrentSession.StartDateTime.ToString("HH:mm - yyyy/MM/dd")</span>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="user-actions">
                                     @if (table.CurrentSession != null)
                                     {
-                                        <hr />
-                                        <p class="mb-1"><strong>جلسه فعال:</strong></p>
-                                        <p class="mb-1"><small>شروع: @table.CurrentSession.StartDateTime.ToString("HH:mm - yyyy/MM/dd")</small></p>
-                                        <p class="mb-1"><small>نرخ ساعتی: @table.CurrentSession.FeePerHour.ToString("N0") تومان</small></p>
-                                        @if (table.CurrentSession.Customers.Any())
-                                        {
-                                            <p class="mb-0"><small>مشتریان: @string.Join(", ", table.CurrentSession.Customers.Select(c => c.Name))</small></p>
-                                        }
+                                        <button class="btn-action btn-delete" @onclick="() => ShowFinishModal(table.CurrentSession.Id)">
+                                            <i class="fas fa-stop"></i>
+                                            پایان جلسه
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn-action btn-edit" @onclick="() => ShowStartModal(table.Id, table.Name)">
+                                            <i class="fas fa-play"></i>
+                                            شروع جلسه
+                                        </button>
                                     }
                                 </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>هیچ میزی یافت نشد</p>
+                    </div>
+                }
             </div>
-        </div>
 
-        <!-- Analytics Charts Section -->
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>مقایسه روزانه (این هفته)</h4>
+            <!-- Analytics Charts Section -->
+            <div class="gaming-card fade-in-up" style="margin-top: 2rem;">
+                <div class="card-header-section">
+                    <h3><i class="fas fa-chart-line"></i> آمار و تحلیل‌ها</h3>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>نمودار مقایسه روزانه</p>
+                        <small>در حال توسعه</small>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <p><strong>نمودار در حال توسعه:</strong> مجموع رسیدهای روزانه برای امروز در مقایسه با سایر روزهای این هفته (تقویم شمسی)</p>
-                        </div>
-                        <!-- Chart placeholder - will be implemented with chart library -->
-                        <div style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 8px;">
-                            <p class="text-muted">نمودار مقایسه روزانه</p>
-                        </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-pie"></i>
+                        <p>نمودار مقایسه ماهانه</p>
+                        <small>در حال توسعه</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>مقایسه ماهانه (امسال)</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <p><strong>نمودار در حال توسعه:</strong> مجموع رسیدهای ماهانه برای این ماه در مقایسه با سایر ماه‌های امسال (تقویم شمسی)</p>
-                        </div>
-                        <!-- Chart placeholder - will be implemented with chart library -->
-                        <div style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 8px;">
-                            <p class="text-muted">نمودار مقایسه ماهانه</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+</section>
+
+<StartSessionModal @ref="startSessionModal" 
+                   TableId="@selectedTableId" 
+                   TableName="@selectedTableName"
+                   OnSessionStarted="@HandleSessionChanged" />
+
+<FinishSessionModal @ref="finishSessionModal"
+                    OnSessionFinished="@HandleSessionChanged" />
 
 @code {
     private List<DashboardTableDto> dashboardTables = new();
     private bool loading = true;
     private string? error = null;
+
+    private StartSessionModal? startSessionModal;
+    private FinishSessionModal? finishSessionModal;
+    private int selectedTableId;
+    private string selectedTableName = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,7 +172,6 @@
             loading = true;
             error = null;
 
-            // Load dashboard tables with active sessions
             var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/dashboard/tables"));
             if (response.IsSuccessStatusCode)
             {
@@ -136,6 +185,43 @@
             error = ex.Message;
             loading = false;
         }
+    }
+
+    private async Task ShowStartModal(int tableId, string tableName)
+    {
+        selectedTableId = tableId;
+        selectedTableName = tableName;
+
+        if (startSessionModal != null)
+        {
+            await startSessionModal.Show();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ShowFinishModal(int sessionId)
+    {
+        if (finishSessionModal != null)
+        {
+            await finishSessionModal.Show(sessionId);
+        }
+    }
+
+    private async Task HandleSessionChanged()
+    {
+        await LoadData();
+    }
+
+    private string GetSessionDuration(DateTime startTime)
+    {
+        var duration = DateTime.Now - startTime;
+        var hours = (int)duration.TotalHours;
+        var minutes = duration.Minutes;
+        
+        if (hours > 0)
+            return $"{hours}:{minutes:D2} ساعت";
+        else
+            return $"{minutes} دقیقه";
     }
 
     // DTOs

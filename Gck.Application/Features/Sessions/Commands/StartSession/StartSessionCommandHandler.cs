@@ -29,14 +29,13 @@ public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, i
             throw new InvalidOperationException($"Table '{table.Name}' is already occupied.");
         }
 
-        // Find the hourly fee based on the number of customers (seats)
-        var seatsCount = request.CustomerIds?.Count ?? 1;
+        // Find the hourly fee based on the selected seats count
         var hourlyFee = await _context.Fees
-            .FirstOrDefaultAsync(hf => hf.SeatsCount == seatsCount, cancellationToken);
+            .FirstOrDefaultAsync(hf => hf.SeatsCount == request.SeatsCount, cancellationToken);
 
         if (hourlyFee == null)
         {
-            throw new InvalidOperationException($"No hourly fee configuration found for {seatsCount} seats.");
+            throw new InvalidOperationException($"No hourly fee configuration found for {request.SeatsCount} seats.");
         }
 
         var session = new Session
