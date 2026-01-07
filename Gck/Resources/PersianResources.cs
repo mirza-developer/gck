@@ -25,6 +25,8 @@ public static class PersianResources
     public const string Saving = "در حال ذخیره...";
     public const string Submitting = "در حال ثبت...";
     public const string SaveChanges = "ذخیره تغییرات";
+    public const string Close = "بستن";
+    public const string Confirm = "تایید";
 
     // Tables
     public const string TablesManagement = "مدیریت میزها";
@@ -72,6 +74,7 @@ public static class PersianResources
     public const string BirthYearPlaceholder = "مثال: 1380";
     public const string SubmitCustomer = "ثبت مشتری";
     public const string Phone = "تلفن";
+    public const string Customers = "مشتریان";
 
     // Financial Accounts
     public const string FinancialAccountsManagement = "مدیریت حساب‌های مالی";
@@ -93,4 +96,37 @@ public static class PersianResources
     public const string SubmitAccount = "ثبت حساب";
     public const string Bank = "بانک";
     public const string Card = "کارت";
+
+    // Sessions
+    public const string StartSession = "شروع بازی جدید";
+    public const string FinishSession = "پایان بازی";
+    public const string ConfirmFinishSession = "تأیید پایان بازی";
+    public const string Table = "میز";
+    public const string SeatsCount = "تعداد صندلی (نفرات)";
+    public const string CustomersOptional = "مشتریان (اختیاری)";
+    public const string NoCustomersRegistered = "هیچ مشتری‌ای ثبت نشده است";
+    public const string HourlyRate = "نرخ ساعتی";
+    public const string TomanPerHour = "تومان/ساعت";
+    public const string SessionStartedSuccess = "بازی با موفقیت شروع شد";
+    public const string SessionFinishedSuccess = "بازی با موفقیت پایان یافت";
+    public const string ErrorStartingSession = "خطا در شروع بازی";
+    public const string ErrorFinishingSession = "خطا در پایان بازی";
+    public const string ErrorLoadingSessionDetails = "خطا در دریافت اطلاعات بازی";
+    public const string ErrorLoadingFinancialAccounts = "خطا در بارگذاری حساب‌های مالی";
+    public const string StartTime = "شروع";
+    public const string EndTime = "پایان";
+    public const string Duration = "مدت بازی";
+    public const string RecommendedPrice = "مبلغ پیشنهادی";
+    public const string FinalPrice = "مبلغ نهایی";
+    public const string EditableFinalPrice = "مبلغ نهایی (قابل ویرایش)";
+    public const string PriceDifference = "تفاوت";
+    public const string FinancialAccount = "حساب مالی پرداخت شده";
+    public const string SelectFinancialAccount = "-- انتخاب حساب مالی --";
+    public const string ConfirmAndFinish = "تایید و پایان بازی";
+    public const string ResumeSession = "ادامه بازی";
+    public const string ErrorResumingSession = "خطا در ادامه بازی";
+    public const string PersonSuffix = "نفره";
+    public const string Hours = "ساعت";
+    public const string Minutes = "دقیقه";
+    public const string And = "و";
 }
