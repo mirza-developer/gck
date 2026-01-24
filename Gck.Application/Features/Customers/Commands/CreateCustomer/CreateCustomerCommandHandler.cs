@@ -21,6 +21,9 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             PhoneNumber = request.PhoneNumber,
             BirthYear = request.BirthYear,
             IsMale = request.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase),
+            IsLoyal = request.IsLoyal,
+            SessionsRequiredForFree = request.SessionsRequiredForFree,
+            PaidSessionsCount = 0,
             CreateDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow
         };

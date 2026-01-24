@@ -8,4 +8,6 @@ public class CreateCustomerCommand : IRequest<int>
     public string PhoneNumber { get; set; } = string.Empty;
     public int BirthYear { get; set; }
     public string Gender { get; set; } = "Male";
+    public bool IsLoyal { get; set; } = false;
+    public int SessionsRequiredForFree { get; set; } = 0;
 }

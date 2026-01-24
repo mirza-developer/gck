@@ -4,6 +4,7 @@ using Gck.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gck.Persistence.Migrations
 {
     [DbContext(typeof(GckDbContext))]
-    partial class GckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108140458_AddLoyaltyProgramToCustomer")]
+    partial class AddLoyaltyProgramToCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +190,6 @@ namespace Gck.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFreeSession")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModifiedDate")

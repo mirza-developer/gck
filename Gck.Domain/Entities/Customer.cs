@@ -28,6 +28,13 @@ public class Customer
 
     public DateTime LastModifiedDate { get; set; }
 
+    // Loyalty Program Fields
+    public bool IsLoyal { get; set; } = false;
+
+    public int SessionsRequiredForFree { get; set; } = 0;
+
+    public int PaidSessionsCount { get; set; } = 0;
+
     // Navigation property
     public virtual ICollection<SessionCustomer> SessionCustomers { get; set; } = new List<SessionCustomer>();
 }

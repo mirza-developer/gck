@@ -46,15 +46,7 @@
                     }
                 </select>
             </div>
-
-            @if (model.SeatsCount > 0)
-            {
-                <div class="fee-display">
-                    <i class="fas fa-coins"></i>
-                    <span>@PersianResources.HourlyRate: <strong>@selectedFee?.ToString("N0") @PersianResources.Toman</strong></span>
-                </div>
-            }
-
+            
             <div class="form-group">
                 <label class="form-label">
                     <i class="fas fa-users"></i>
@@ -62,15 +54,46 @@
                 </label>
                 @if (customers.Any())
                 {
-                    <div class="customer-selection">
-                        @foreach (var customer in customers)
+                    <div class="multiselect-dropdown" @ref="dropdownRef">
+                        <div class="multiselect-input" @onclick="ToggleDropdown">
+                            <div class="multiselect-selected">
+                                @if (model.CustomerIds.Any())
+                                {
+                                    @foreach (var customerId in model.CustomerIds)
+                                    {
+                                        var customer = customers.FirstOrDefault(c => c.Id == customerId);
+                                        if (customer != null)
+                                        {
+                                            <span class="multiselect-tag">
+                                                @customer.Name
+                                                <i class="fas fa-times" @onclick="@(e => RemoveCustomer(customerId))" @onclick:stopPropagation="true"></i>
+                                            </span>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="multiselect-placeholder">@PersianResources.CustomersOptional</span>
+                                }
+                            </div>
+                            <i class="fas @(isDropdownOpen ? "fa-chevron-up" : "fa-chevron-down") multiselect-arrow"></i>
+                        </div>
+                        
+                        @if (isDropdownOpen)
                         {
-                            <label class="customer-checkbox">
-                                <input type="checkbox" 
-                                       checked="@model.CustomerIds.Contains(customer.Id)"
-                                       @onchange="@(e => OnCustomerToggle(customer.Id, (bool)e.Value!))" />
-                                <span>@customer.Name (@customer.PhoneNumber)</span>
-                            </label>
+                            <div class="multiselect-options">
+                                @foreach (var customer in customers)
+                                {
+                                    <div class="multiselect-option @(model.CustomerIds.Contains(customer.Id) ? "selected" : "")"
+                                         @onclick="@(() => ToggleCustomer(customer.Id))">
+                                        <input type="checkbox" 
+                                               checked="@model.CustomerIds.Contains(customer.Id)"
+                                               @onclick:stopPropagation="true"
+                                               @onchange="@(e => ToggleCustomer(customer.Id))" />
+                                        <span>@customer.Name (@customer.PhoneNumber)</span>
+                                    </div>
+                                }
+                            </div>
                         }
                     </div>
                 }
@@ -110,6 +133,170 @@
     }
 </Modal>
 
+<style>
+    .multiselect-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .multiselect-input {
+        width: 100%;
+        min-height: 3rem;
+        padding: 0.5rem 2.5rem 0.5rem 1.2rem;
+        background: rgba(26, 26, 46, 0.6);
+        border: 1px solid rgba(108, 92, 231, 0.3);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .multiselect-input:hover {
+        border-color: var(--primary-purple);
+    }
+
+    .multiselect-input:focus-within {
+        outline: none;
+        border-color: var(--primary-purple);
+        background: rgba(26, 26, 46, 0.9);
+        box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+    }
+
+    .multiselect-selected {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .multiselect-placeholder {
+        color: var(--text-secondary);
+    }
+
+    .multiselect-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, rgba(108, 92, 231, 0.3), rgba(253, 121, 168, 0.3));
+        color: var(--text-primary);
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid rgba(108, 92, 231, 0.4);
+    }
+
+    .multiselect-tag i {
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: color 0.2s;
+    }
+
+    .multiselect-tag i:hover {
+        color: var(--secondary-pink);
+    }
+
+    .multiselect-arrow {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-secondary);
+        transition: transform 0.3s ease;
+        pointer-events: none;
+    }
+
+    .multiselect-options {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        right: 0;
+        max-height: 250px;
+        overflow-y: auto;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(108, 92, 231, 0.4);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: dropdownSlide 0.3s ease;
+    }
+
+    @@keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .multiselect-options::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .multiselect-options::-webkit-scrollbar-track {
+        background: rgba(26, 26, 46, 0.5);
+        border-radius: 10px;
+    }
+
+    .multiselect-options::-webkit-scrollbar-thumb {
+        background: var(--primary-purple);
+        border-radius: 10px;
+    }
+
+    .multiselect-option {
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+    }
+
+    .multiselect-option:last-child {
+        border-bottom: none;
+    }
+
+    .multiselect-option:hover {
+        background: rgba(108, 92, 231, 0.2);
+    }
+
+    .multiselect-option.selected {
+        background: rgba(108, 92, 231, 0.3);
+    }
+
+    .multiselect-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-purple);
+    }
+
+    .multiselect-option span {
+        flex: 1;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .text-secondary {
+        color: var(--text-secondary);
+    }
+</style>
+
 @code {
     [Parameter] public int TableId { get; set; }
     [Parameter] public string TableName { get; set; } = string.Empty;
@@ -120,10 +307,13 @@
     private bool submitting;
     private string? errorMessage;
     private string? successMessage;
+    private bool isDropdownOpen;
 
     private List<HourlyFeeDto> hourlyFees = new();
     private List<CustomerDto> customers = new();
     private decimal? selectedFee;
+
+    private ElementReference dropdownRef;
 
     private StartSessionModel model = new();
 
@@ -140,6 +330,7 @@
         successMessage = null;
         isVisible = true;
         loading = true;
+        isDropdownOpen = false;
 
         await LoadData();
     }
@@ -147,6 +338,7 @@
     public void Close()
     {
         isVisible = false;
+        isDropdownOpen = false;
     }
 
     private async Task LoadData()
@@ -192,19 +384,26 @@
         selectedFee = fee?.Fee;
     }
 
-    private void OnCustomerToggle(int customerId, bool isChecked)
+    private void ToggleDropdown()
     {
-        if (isChecked)
-        {
-            if (!model.CustomerIds.Contains(customerId))
-            {
-                model.CustomerIds.Add(customerId);
-            }
-        }
-        else
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    private void ToggleCustomer(int customerId)
+    {
+        if (model.CustomerIds.Contains(customerId))
         {
             model.CustomerIds.Remove(customerId);
         }
+        else
+        {
+            model.CustomerIds.Add(customerId);
+        }
+    }
+
+    private void RemoveCustomer(int customerId)
+    {
+        model.CustomerIds.Remove(customerId);
     }
 
     private async Task HandleSubmit()
@@ -214,6 +413,7 @@
             submitting = true;
             errorMessage = null;
             successMessage = null;
+            isDropdownOpen = false;
 
             var command = new
             {

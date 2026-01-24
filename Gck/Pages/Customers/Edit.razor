@@ -99,6 +99,28 @@
                         <ValidationMessage For="@(() => command.Gender)" class="validation-error" />
                     </div>
 
+                    <div class="form-group">
+                        <div class="form-checkbox-group">
+                            <InputCheckbox @bind-Value="command.IsLoyal" id="isLoyal" class="form-checkbox" @onchange="OnLoyaltyToggle" />
+                            <label for="isLoyal" class="form-label" style="margin-bottom: 0;">
+                                <i class="fas fa-star"></i>
+                                @PersianResources.EnableLoyaltyProgram
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (command.IsLoyal)
+                    {
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-gift"></i>
+                                @PersianResources.SessionsRequiredForFree <span class="required">@PersianResources.Required</span>
+                            </label>
+                            <InputNumber @bind-Value="command.SessionsRequiredForFree" class="form-input" placeholder="@PersianResources.SessionsRequiredPlaceholder" />
+                            <ValidationMessage For="@(() => command.SessionsRequiredForFree)" class="validation-error" />
+                        </div>
+                    }
+
                     <div class="form-actions">
                         <button type="submit" class="btn-gaming" disabled="@isSubmitting">
                             @if (isSubmitting)
@@ -158,7 +180,9 @@
                         Name = customer.Name,
                         PhoneNumber = customer.PhoneNumber,
                         BirthYear = customer.BirthYear,
-                        Gender = customer.Gender
+                        Gender = customer.Gender,
+                        IsLoyal = customer.IsLoyal,
+                        SessionsRequiredForFree = customer.SessionsRequiredForFree
                     };
                 }
             }
@@ -214,5 +238,13 @@
     private void NavigateBack()
     {
         Navigation.NavigateTo("/customers");
+    }
+
+    private void OnLoyaltyToggle(ChangeEventArgs e)
+    {
+        if (command != null && !command.IsLoyal)
+        {
+            command.SessionsRequiredForFree = 0;
+        }
     }
 }

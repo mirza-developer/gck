@@ -1,4 +1,5 @@
 using Gck.Persistence;
+using Gck.Application.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ builder.Services.AddDbContext<GckDbContext>(options =>
 // Add MediatR
 builder.Services.AddMediatR(cfg => 
     cfg.RegisterServicesFromAssembly(typeof(Gck.Application.Features.Users.Commands.AddUser.AddUserCommand).Assembly));
+
+// Add Application Services
+builder.Services.AddScoped<ILoyaltyService, LoyaltyService>();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();

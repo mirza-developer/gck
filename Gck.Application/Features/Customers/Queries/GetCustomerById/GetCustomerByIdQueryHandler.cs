@@ -24,7 +24,11 @@ public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery,
                 Name = c.Name,
                 PhoneNumber = c.PhoneNumber,
                 BirthYear = c.BirthYear,
-                Gender = c.IsMale ? "Male" : "Female"
+                Gender = c.IsMale ? "Male" : "Female",
+                SessionCount = c.SessionCustomers.Count,
+                IsLoyal = c.IsLoyal,
+                SessionsRequiredForFree = c.SessionsRequiredForFree,
+                PaidSessionsCount = c.PaidSessionsCount
             })
             .FirstOrDefaultAsync(cancellationToken);
 

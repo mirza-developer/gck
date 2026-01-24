@@ -445,3 +445,416 @@ input[type="email"], input[type="url"] {
 .modal-overlay.show .modal-body > * {
     animation: modalContentFadeIn 0.5s ease 0.1s both;
 }
+
+/* ========================================
+   Data Grid System with Expandable Rows
+   ======================================== */
+
+/* Grid Container */
+.data-grid {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.6), rgba(16, 16, 36, 0.6));
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+}
+
+/* Grid Table */
+.data-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+/* Grid Header */
+.data-grid-header {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(237, 20, 91, 0.2));
+    border-bottom: 2px solid rgba(108, 92, 231, 0.4);
+}
+
+.data-grid-header th {
+    padding: 1rem 1.25rem;
+    text-align: right;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    white-space: nowrap;
+    position: relative;
+}
+
+.data-grid-header th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-purple), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.data-grid-header th:hover::after {
+    opacity: 1;
+}
+
+/* Grid Body */
+.data-grid-body tr {
+    border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.data-grid-body tr:hover {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(237, 20, 91, 0.05));
+    transform: translateX(-5px);
+}
+
+.data-grid-body tr.expanded {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(237, 20, 91, 0.1));
+}
+
+.data-grid-body td {
+    padding: 1rem 1.25rem;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+/* Grid Cell Types */
+.grid-cell-primary {
+    font-weight: 600;
+    color: var(--accent-cyan);
+    font-size: 1rem;
+}
+
+.grid-cell-secondary {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.grid-cell-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.grid-cell-badge.male {
+    background: rgba(0, 191, 255, 0.2);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.grid-cell-badge.female {
+    background: rgba(237, 20, 91, 0.2);
+    color: var(--secondary-pink);
+    border: 1px solid rgba(237, 20, 91, 0.3);
+}
+
+.grid-cell-badge.session-count {
+    background: rgba(108, 92, 231, 0.2);
+    color: var(--primary-purple);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+}
+
+.grid-cell-badge.free-session {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.grid-cell-badge.loyal-customer {
+    background: rgba(255, 215, 0, 0.2);
+    color: gold;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Expand Toggle Button */
+.grid-expand-toggle {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(237, 20, 91, 0.2));
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-expand-toggle:hover {
+    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-pink));
+    border-color: var(--primary-purple);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+}
+
+.grid-expand-toggle i {
+    transition: transform 0.3s ease;
+    font-size: 1rem;
+}
+
+.grid-expand-toggle.expanded i {
+    transform: rotate(180deg);
+}
+
+/* Expandable Row Details */
+.grid-details-row {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(16, 16, 36, 0.8));
+    border-top: 1px solid rgba(108, 92, 231, 0.3);
+}
+
+.grid-details-cell {
+    padding: 0 !important;
+}
+
+.grid-details-content {
+    padding: 1.5rem 2rem;
+    animation: gridDetailsSlideDown 0.4s ease;
+}
+
+@keyframes gridDetailsSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.grid-details-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(108, 92, 231, 0.3);
+}
+
+.grid-details-header i {
+    color: var(--primary-purple);
+    font-size: 1.25rem;
+}
+
+.grid-details-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.grid-details-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+}
+
+.grid-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(108, 92, 231, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    transition: all 0.3s ease;
+}
+
+.grid-detail-item:hover {
+    background: rgba(108, 92, 231, 0.1);
+    border-color: rgba(108, 92, 231, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+}
+
+.grid-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.grid-detail-label i {
+    color: var(--primary-purple);
+    font-size: 0.9rem;
+}
+
+.grid-detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.grid-detail-value.highlight {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+}
+
+/* Grid Action Buttons */
+.grid-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.grid-action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Vazirmatn', sans-serif;
+    white-space: nowrap;
+}
+
+.grid-action-btn i {
+    font-size: 0.9rem;
+}
+
+.grid-action-btn.edit {
+    background: linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(0, 255, 255, 0.2));
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.grid-action-btn.edit:hover {
+    background: linear-gradient(135deg, var(--accent-cyan), #00d4ff);
+    color: var(--darker-bg);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+}
+
+.grid-action-btn.delete {
+    background: linear-gradient(135deg, rgba(237, 20, 91, 0.2), rgba(255, 0, 100, 0.2));
+    color: var(--secondary-pink);
+    border: 1px solid rgba(237, 20, 91, 0.3);
+}
+
+.grid-action-btn.delete:hover {
+    background: linear-gradient(135deg, var(--secondary-pink), #ff0064);
+    color: white;
+    border-color: var(--secondary-pink);
+    box-shadow: 0 0 15px rgba(237, 20, 91, 0.5);
+}
+
+/* Grid Empty State */
+.grid-empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.grid-empty-state i {
+    font-size: 3rem;
+    color: rgba(108, 92, 231, 0.3);
+    margin-bottom: 1rem;
+}
+
+.grid-empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Responsive Grid */
+@media (max-width: 1024px) {
+    .data-grid-header th,
+    .data-grid-body td {
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .grid-details-body {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .data-grid {
+        border-radius: 10px;
+    }
+    
+    .data-grid-header th,
+    .data-grid-body td {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.85rem;
+    }
+    
+    .grid-details-content {
+        padding: 1.25rem 1rem;
+    }
+    
+    .grid-details-body {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .grid-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .grid-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .grid-cell-primary {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .data-grid-table {
+        font-size: 0.8rem;
+    }
+    
+    .grid-expand-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .grid-action-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Grid Scroll Styling */
+.data-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.data-grid::-webkit-scrollbar-track {
+    background: rgba(26, 26, 46, 0.5);
+    border-radius: 10px;
+}
+
+.data-grid::-webkit-scrollbar-thumb {
+    background: var(--primary-purple);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+}
+
+.data-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-pink);
+}

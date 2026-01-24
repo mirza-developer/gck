@@ -9,4 +9,6 @@ public class UpdateCustomerCommand : IRequest<Unit>
     public string PhoneNumber { get; set; } = string.Empty;
     public int BirthYear { get; set; }
     public string Gender { get; set; } = string.Empty;
+    public bool IsLoyal { get; set; }
+    public int SessionsRequiredForFree { get; set; }
 }

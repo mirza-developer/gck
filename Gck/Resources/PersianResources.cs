@@ -27,6 +27,15 @@ public static class PersianResources
     public const string SaveChanges = "ذخیره تغییرات";
     public const string Close = "بستن";
     public const string Confirm = "تایید";
+    public const string Actions = "عملیات";
+    public const string Details = "جزئیات";
+    public const string FullDetails = "جزئیات کامل";
+    public const string Id = "شناسه";
+    public const string ApproximateAge = "سن تقریبی";
+    public const string Year = "سال";
+    public const string Shamsi = "شمسی";
+    public const string Count = "تعداد";
+    public const string Times = "بار";
 
     // Tables
     public const string TablesManagement = "مدیریت میزها";
@@ -75,6 +84,19 @@ public static class PersianResources
     public const string SubmitCustomer = "ثبت مشتری";
     public const string Phone = "تلفن";
     public const string Customers = "مشتریان";
+    public const string CustomerFullDetails = "جزئیات کامل مشتری";
+    public const string SessionsCount = "تعداد بازی‌ها";
+    public const string TotalSessions = "مجموع بازی‌ها";
+    public const string IsLoyal = "مشتری وفادار";
+    public const string LoyaltyProgram = "برنامه وفاداری";
+    public const string SessionsRequiredForFree = "تعداد بازی برای یک بازی رایگان";
+    public const string PaidSessionsCount = "تعداد بازی‌های پرداخت شده";
+    public const string FreeSessionAvailable = "بازی رایگان موجود است";
+    public const string SessionsUntilFree = "بازی تا رایگان";
+    public const string LoyalCustomer = "وفادار";
+    public const string RegularCustomer = "عادی";
+    public const string EnableLoyaltyProgram = "فعال‌سازی برنامه وفاداری";
+    public const string SessionsRequiredPlaceholder = "مثال: 10";
 
     // Financial Accounts
     public const string FinancialAccountsManagement = "مدیریت حساب‌های مالی";

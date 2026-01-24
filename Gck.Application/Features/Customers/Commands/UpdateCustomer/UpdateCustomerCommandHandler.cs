@@ -27,6 +27,8 @@ public class UpdateCustomerCommandHandler : IRequestHandler<UpdateCustomerComman
         customer.PhoneNumber = request.PhoneNumber;
         customer.BirthYear = request.BirthYear;
         customer.IsMale = request.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase);
+        customer.IsLoyal = request.IsLoyal;
+        customer.SessionsRequiredForFree = request.SessionsRequiredForFree;
         customer.LastModifiedDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
