@@ -9,6 +9,7 @@ public class SessionDto
     public DateTime StartDateTime { get; set; }
     public DateTime? EndDateTime { get; set; }
     public bool IsCompleted { get; set; }
+    public int AnonymousCustomersCount { get; set; } = 0;
     public decimal? RecommendedPrice { get; set; }
     public decimal? FinalPrice { get; set; }
     public List<CustomerDto> Customers { get; set; } = new();

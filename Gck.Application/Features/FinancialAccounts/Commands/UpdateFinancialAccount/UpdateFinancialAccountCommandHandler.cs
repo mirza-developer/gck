@@ -26,7 +26,7 @@ public class UpdateFinancialAccountCommandHandler : IRequestHandler<UpdateFinanc
         account.AccountName = request.AccountName;
         account.CardNumber = request.CardNumber;
         account.BankName = request.BankName;
-        account.LastModifiedDate = DateTime.UtcNow;
+        account.LastModifiedDate = DateTime.Now;
 
         await _context.SaveChangesAsync(cancellationToken);
 

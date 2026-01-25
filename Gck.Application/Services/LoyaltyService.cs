@@ -31,7 +31,7 @@ public class LoyaltyService : ILoyaltyService
         if (customer != null && customer.IsLoyal)
         {
             customer.PaidSessionsCount++;
-            customer.LastModifiedDate = DateTime.UtcNow;
+            customer.LastModifiedDate = DateTime.Now;
             await _context.SaveChangesAsync();
         }
     }
@@ -43,7 +43,7 @@ public class LoyaltyService : ILoyaltyService
         if (customer != null && customer.IsLoyal)
         {
             customer.PaidSessionsCount = 0;
-            customer.LastModifiedDate = DateTime.UtcNow;
+            customer.LastModifiedDate = DateTime.Now;
             await _context.SaveChangesAsync();
         }
     }

@@ -31,6 +31,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
                 StartDateTime = s.StartDateTime,
                 EndDateTime = s.EndDateTime,
                 IsCompleted = s.IsCompleted,
+                AnonymousCustomersCount = s.AnonymousCustomersCount,
                 RecommendedPrice = s.RecommendedPrice,
                 FinalPrice = s.FinalPrice,
                 Customers = s.SessionCustomers.Select(sc => new CustomerDto

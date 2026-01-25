@@ -45,8 +45,8 @@ public static class DbInitializer
                     Email = "admin@gckgames.ir",
                     PasswordHash = HashPassword("Admin@123"),
                     IsActive = true,
-                    CreateDate = DateTime.UtcNow,
-                    LastModifiedDate = DateTime.UtcNow,
+                    CreateDate = DateTime.Now,
+                    LastModifiedDate = DateTime.Now,
                     CreatorIdentityID = "system",
                     PhoneNumber = null,
                     Details = "حساب کاربری پیش‌فرض مدیر سیستم"

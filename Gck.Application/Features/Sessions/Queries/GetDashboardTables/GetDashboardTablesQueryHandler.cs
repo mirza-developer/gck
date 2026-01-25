@@ -17,9 +17,9 @@ public class GetDashboardTablesQueryHandler : IRequestHandler<GetDashboardTables
     public async Task<List<DashboardTableDto>> Handle(GetDashboardTablesQuery request, CancellationToken cancellationToken)
     {
         var tables = await _context.Tables
-            .Include(t => t.Sessions.Where(s => !s.IsCompleted))
+            .Include(t => t.Sessions.Where(s => !s.IsCompleted).OrderByDescending(s => s.Id))
             .ThenInclude(s => s.Fee)
-            .Include(t => t.Sessions.Where(s => !s.IsCompleted))
+            .Include(t => t.Sessions.Where(s => !s.IsCompleted).OrderByDescending(s => s.Id))
             .ThenInclude(s => s.SessionCustomers)
             .ThenInclude(sc => sc.Customer)
             .OrderBy(t => t.Name)
@@ -27,7 +27,12 @@ public class GetDashboardTablesQueryHandler : IRequestHandler<GetDashboardTables
 
         var dashboardTables = tables.Select(t =>
         {
-            var currentSession = t.Sessions.FirstOrDefault(s => !s.IsCompleted);
+            // Get the most recent incomplete session for this table
+            var currentSession = t.Sessions
+                .Where(s => !s.IsCompleted)
+                .OrderByDescending(s => s.Id)
+                .FirstOrDefault();
+                
             return new DashboardTableDto
             {
                 Id = t.Id,

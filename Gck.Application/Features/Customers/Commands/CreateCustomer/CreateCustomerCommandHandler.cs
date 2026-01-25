@@ -24,8 +24,8 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             IsLoyal = request.IsLoyal,
             SessionsRequiredForFree = request.SessionsRequiredForFree,
             PaidSessionsCount = 0,
-            CreateDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow
+            CreateDate = DateTime.Now,
+            LastModifiedDate = DateTime.Now
         };
 
         _context.Customers.Add(customer);

@@ -54,11 +54,24 @@
                     <span class="label"><i class="fas fa-money-bill-wave"></i> @PersianResources.HourlyRate:</span>
                     <span class="value">@sessionDetails.FeePerHour.ToString("N0") @PersianResources.Toman</span>
                 </div>
-                @if (sessionDetails.Customers.Any())
+                @if (sessionDetails.Customers.Any() || sessionDetails.AnonymousCustomersCount > 0)
                 {
                     <div class="summary-row">
                         <span class="label"><i class="fas fa-users"></i> @PersianResources.Customers:</span>
-                        <span class="value">@string.Join("? ", sessionDetails.Customers.Select(c => c.Name))</span>
+                        <span class="value">
+                            @if (sessionDetails.Customers.Any())
+                            {
+                                @string.Join("? ", sessionDetails.Customers.Select(c => c.Name))
+                                @if (sessionDetails.AnonymousCustomersCount > 0)
+                                {
+                                    <text> + </text>
+                                }
+                            }
+                            @if (sessionDetails.AnonymousCustomersCount > 0)
+                            {
+                                <span>@sessionDetails.AnonymousCustomersCount @PersianResources.AnonymousCustomer</span>
+                            }
+                        </span>
                     </div>
                 }
             </div>
@@ -365,6 +378,7 @@
         public string TableName { get; set; } = string.Empty;
         public DateTime StartDateTime { get; set; }
         public decimal FeePerHour { get; set; }
+        public int AnonymousCustomersCount { get; set; } = 0;
         public List<CustomerDto> Customers { get; set; } = new();
     }
 

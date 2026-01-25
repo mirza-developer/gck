@@ -17,6 +17,7 @@ public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, i
     public async Task<int> Handle(StartSessionCommand request, CancellationToken cancellationToken)
     {
         var table = await _context.Tables
+            .Include(t => t.Sessions.Where(s => !s.IsCompleted))
             .FirstOrDefaultAsync(t => t.Id == request.TableId, cancellationToken);
 
         if (table == null)
@@ -27,6 +28,15 @@ public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, i
         if (table.IsOccupied)
         {
             throw new InvalidOperationException($"Table '{table.Name}' is already occupied.");
+        }
+
+        // Clean up any incomplete sessions for this table before starting a new one
+        var incompleteSessions = table.Sessions.Where(s => !s.IsCompleted).ToList();
+        foreach (var oldSession in incompleteSessions)
+        {
+            oldSession.IsCompleted = true;
+            oldSession.EndDateTime = DateTime.Now;
+            oldSession.LastModifiedDate = DateTime.Now;
         }
 
         // Find the hourly fee based on the selected seats count
@@ -42,16 +52,17 @@ public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, i
         {
             TableId = request.TableId,
             FeeId = hourlyFee.Id,
-            StartDateTime = DateTime.UtcNow,
+            StartDateTime = DateTime.Now,
             IsCompleted = false,
-            CreateDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow
+            AnonymousCustomersCount = request.AnonymousCustomersCount,
+            CreateDate = DateTime.Now,
+            LastModifiedDate = DateTime.Now
         };
 
         _context.Sessions.Add(session);
         
         table.IsOccupied = true;
-        table.LastModifiedDate = DateTime.UtcNow;
+        table.LastModifiedDate = DateTime.Now;
 
         if (request.CustomerIds != null && request.CustomerIds.Any())
         {
@@ -66,7 +77,7 @@ public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, i
                     {
                         Session = session,
                         CustomerId = customerId,
-                        CreateDate = DateTime.UtcNow
+                        CreateDate = DateTime.Now
                     };
                     _context.SessionCustomers.Add(sessionCustomer);
                 }

@@ -39,17 +39,17 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
             throw new InvalidOperationException($"Financial account with ID '{request.FinancialAccountId}' not found.");
         }
 
-        session.EndDateTime = DateTime.UtcNow;
+        session.EndDateTime = DateTime.Now;
         session.IsCompleted = true;
         
         var duration = (session.EndDateTime.Value - session.StartDateTime).TotalHours;
         var recommendedPrice = Convert.ToDecimal(duration) * session.Fee.Fee;
         session.RecommendedPrice = recommendedPrice;
         session.FinalPrice = request.FinalPrice;
-        session.LastModifiedDate = DateTime.UtcNow;
+        session.LastModifiedDate = DateTime.Now;
 
         session.Table.IsOccupied = false;
-        session.Table.LastModifiedDate = DateTime.UtcNow;
+        session.Table.LastModifiedDate = DateTime.Now;
 
         var receipt = new AccountantReceipt
         {
@@ -57,8 +57,8 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
             FinancialAccountId = request.FinancialAccountId,
             RecommendedPrice = recommendedPrice,
             FinalPrice = request.FinalPrice,
-            ReceiptDateTime = DateTime.UtcNow,
-            CreateDate = DateTime.UtcNow
+            ReceiptDateTime = DateTime.Now,
+            CreateDate = DateTime.Now
         };
 
         _context.AccountantReceipts.Add(receipt);

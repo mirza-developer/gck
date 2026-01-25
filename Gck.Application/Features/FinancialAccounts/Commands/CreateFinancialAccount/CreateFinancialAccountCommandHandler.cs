@@ -20,8 +20,8 @@ public class CreateFinancialAccountCommandHandler : IRequestHandler<CreateFinanc
             AccountName = request.AccountName,
             CardNumber = request.CardNumber,
             BankName = request.BankName,
-            CreateDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow
+            CreateDate = DateTime.Now,
+            LastModifiedDate = DateTime.Now
         };
 
         _context.FinancialAccounts.Add(account);

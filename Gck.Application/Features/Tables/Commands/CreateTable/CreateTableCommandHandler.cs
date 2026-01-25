@@ -28,8 +28,8 @@ public class CreateTableCommandHandler : IRequestHandler<CreateTableCommand, int
         {
             Name = request.Name,
             IsOccupied = false,
-            CreateDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow
+            CreateDate = DateTime.Now,
+            LastModifiedDate = DateTime.Now
         };
 
         _context.Tables.Add(table);

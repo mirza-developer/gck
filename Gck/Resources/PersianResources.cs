@@ -151,4 +151,7 @@ public static class PersianResources
     public const string Hours = "ساعت";
     public const string Minutes = "دقیقه";
     public const string And = "و";
+    public const string AnonymousCustomersCount = "تعداد مشتریان ناشناس";
+    public const string RegisteredCustomer = "مشتری ثبت شده";
+    public const string AnonymousCustomer = "مشتری ناشناس";
 }

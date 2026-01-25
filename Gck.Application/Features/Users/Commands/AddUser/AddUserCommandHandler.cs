@@ -36,8 +36,8 @@ public class AddUserCommandHandler : IRequestHandler<AddUserCommand, string>
             Details = request.Details,
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             IsActive = true,
-            CreateDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow,
+            CreateDate = DateTime.Now,
+            LastModifiedDate = DateTime.Now,
             CreatorIdentityID = "system" // You can change this to actual user ID
         };
 

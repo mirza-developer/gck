@@ -16,6 +16,7 @@ public class ResumeSessionCommandHandler : IRequestHandler<ResumeSessionCommand,
     public async Task<Unit> Handle(ResumeSessionCommand request, CancellationToken cancellationToken)
     {
         var session = await _context.Sessions
+            .Include(s => s.Table)
             .FirstOrDefaultAsync(s => s.Id == request.SessionId, cancellationToken);
 
         if (session == null)
@@ -23,11 +24,16 @@ public class ResumeSessionCommandHandler : IRequestHandler<ResumeSessionCommand,
             throw new InvalidOperationException($"Session with ID '{request.SessionId}' not found.");
         }
 
-        // Reset end time and clear pricing to allow session to continue
+        // Reset session state to allow it to continue
         session.EndDateTime = null;
         session.RecommendedPrice = null;
         session.FinalPrice = null;
-        session.LastModifiedDate = DateTime.UtcNow;
+        session.IsCompleted = false;
+        session.LastModifiedDate = DateTime.Now;
+
+        // Mark table as occupied again
+        session.Table.IsOccupied = true;
+        session.Table.LastModifiedDate = DateTime.Now;
 
         await _context.SaveChangesAsync(cancellationToken);
 

@@ -24,6 +24,8 @@ public class Session
 
     public bool IsFreeSession { get; set; } = false;
 
+    public int AnonymousCustomersCount { get; set; } = 0;
+
     [Column(TypeName = "decimal(18,2)")]
     public decimal? RecommendedPrice { get; set; }
 

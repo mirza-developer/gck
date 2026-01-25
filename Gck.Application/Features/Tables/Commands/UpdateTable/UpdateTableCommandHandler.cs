@@ -36,7 +36,7 @@ public class UpdateTableCommandHandler : IRequestHandler<UpdateTableCommand, Uni
         }
 
         table.Name = request.Name;
-        table.LastModifiedDate = DateTime.UtcNow;
+        table.LastModifiedDate = DateTime.Now;
 
         await _context.SaveChangesAsync(cancellationToken);
 

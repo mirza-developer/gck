@@ -26,9 +26,9 @@ public class User
 
     public bool IsActive { get; set; } = true;
 
-    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreateDate { get; set; } = DateTime.Now;
 
-    public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
+    public DateTime LastModifiedDate { get; set; } = DateTime.Now;
 
     [StringLength(128)]
     public string CreatorIdentityID { get; set; } = string.Empty;
