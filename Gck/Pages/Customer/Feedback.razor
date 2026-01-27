@@ -1,0 +1,163 @@
+@page "/customer/feedback"
+@using Gck.Resources
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<section class="section">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-comment-dots"></i>
+                @PersianResources.SendFeedback
+            </h1>
+        </div>
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i>
+                @successMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+
+        <div class="gaming-card">
+            <EditForm Model="@feedbackModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-heading"></i>
+                        @PersianResources.FeedbackSubject
+                        <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputText @bind-Value="feedbackModel.Subject" 
+                               class="form-input" 
+                               placeholder="@PersianResources.FeedbackSubjectPlaceholder"
+                               maxlength="100" />
+                    <ValidationMessage For="@(() => feedbackModel.Subject)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-message"></i>
+                        @PersianResources.FeedbackMessage
+                        <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputTextArea @bind-Value="feedbackModel.Message" 
+                                   class="form-input feedback-textarea" 
+                                   placeholder="@PersianResources.FeedbackMessagePlaceholder"
+                                   maxlength="1000"
+                                   rows="8" />
+                    <ValidationMessage For="@(() => feedbackModel.Message)" />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-gaming" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>@PersianResources.Submitting</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-paper-plane"></i>
+                            <span>@PersianResources.Submit</span>
+                        }
+                    </button>
+                    <button type="button" class="btn-secondary" @onclick="Cancel">
+                        <i class="fas fa-times"></i>
+                        <span>@PersianResources.Cancel</span>
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</section>
+
+@code {
+    private FeedbackModel feedbackModel = new();
+    private bool isSubmitting = false;
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if user is a customer
+        var userRole = await LocalStorage.GetItemAsync<string>("userRole");
+        if (userRole != "customer")
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var customerIdStr = await LocalStorage.GetItemAsync<string>("currentUserId");
+            if (string.IsNullOrEmpty(customerIdStr))
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            var feedbackDto = new
+            {
+                CustomerId = int.Parse(customerIdStr),
+                Subject = feedbackModel.Subject,
+                Message = feedbackModel.Message
+            };
+
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/feedback"), feedbackDto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = PersianResources.FeedbackSubmitted;
+                feedbackModel = new(); // Reset form
+            }
+            else
+            {
+                errorMessage = PersianResources.ApiConnectionError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    public class FeedbackModel
+    {
+        [Required(ErrorMessage = "موضوع الزامی است")]
+        [StringLength(100, ErrorMessage = "موضوع نباید بیشتر از 100 کاراکتر باشد")]
+        public string Subject { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "پیام الزامی است")]
+        [StringLength(1000, ErrorMessage = "پیام نباید بیشتر از 1000 کاراکتر باشد")]
+        public string Message { get; set; } = string.Empty;
+    }
+}

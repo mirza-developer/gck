@@ -1,0 +1,227 @@
+@page "/customer/summary"
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<section class="section">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-user-circle"></i>
+                @PersianResources.MySummary
+            </h1>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>@PersianResources.Loading</p>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else if (customer != null)
+        {
+            <div class="summary-grid">
+                <!-- Customer Info Card -->
+                <div class="gaming-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user"></i> @PersianResources.CustomerFullDetails</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">@PersianResources.CustomerName:</span>
+                            <span class="info-value">@customer.Name</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">@PersianResources.Phone:</span>
+                            <span class="info-value">@customer.PhoneNumber</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">@PersianResources.BirthYear:</span>
+                            <span class="info-value">@customer.BirthYear @PersianResources.Shamsi</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">@PersianResources.Gender:</span>
+                            <span class="info-value">@(customer.IsMale ? PersianResources.Male : PersianResources.Female)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loyalty Card -->
+                @if (customer.IsLoyal)
+                {
+                    <div class="gaming-card loyalty-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-star"></i> @PersianResources.LoyaltyInfo</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">@PersianResources.TotalPaidSessions:</span>
+                                <span class="info-value">@customer.PaidSessionsCount @PersianResources.Times</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@PersianResources.SessionsRequiredForFree:</span>
+                                <span class="info-value">@customer.SessionsRequiredForFree @PersianResources.Times</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@PersianResources.FreeSessionsEarned:</span>
+                                <span class="info-value">@(customer.PaidSessionsCount / customer.SessionsRequiredForFree) @PersianResources.Times</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@PersianResources.SessionsUntilFree:</span>
+                                <span class="info-value">@(customer.SessionsRequiredForFree - (customer.PaidSessionsCount % customer.SessionsRequiredForFree)) @PersianResources.Times</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Sessions List -->
+                <div class="gaming-card full-width">
+                    <div class="card-header">
+                        <h3><i class="fas fa-gamepad"></i> @PersianResources.MySessions</h3>
+                    </div>
+                    @if (sessions != null && sessions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>@PersianResources.SessionDate</th>
+                                        <th>@PersianResources.TableUsed</th>
+                                        <th>@PersianResources.Duration</th>
+                                        <th>@PersianResources.AmountPaid</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var session in sessions)
+                                    {
+                                        <tr>
+                                            <td>@session.StartDateTime.ToString("yyyy/MM/dd HH:mm")</td>
+                                            <td>@session.TableName</td>
+                                            <td>@GetDuration(session)</td>
+                                            <td>
+                                                @if (session.IsFreeSession)
+                                                {
+                                                    <span class="badge badge-success">@PersianResources.Free</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@session.FinalPrice?.ToString("N0") @PersianResources.Toman</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="no-data">@PersianResources.NoSessionsYet</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private CustomerSummaryDto? customer;
+    private List<CustomerSessionDto> sessions = new();
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomerSummary();
+    }
+
+    private async Task LoadCustomerSummary()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            // Get customer ID from local storage
+            var customerIdStr = await LocalStorage.GetItemAsync<string>("currentUserId");
+            var userRole = await LocalStorage.GetItemAsync<string>("userRole");
+
+            if (string.IsNullOrEmpty(customerIdStr) || userRole != "customer")
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            // Load customer details
+            var customerResponse = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/customers/{customerIdStr}"));
+            if (customerResponse.IsSuccessStatusCode)
+            {
+                customer = await customerResponse.Content.ReadFromJsonAsync<CustomerSummaryDto>();
+            }
+
+            // Load customer sessions
+            var sessionsResponse = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/customers/{customerIdStr}/sessions"));
+            if (sessionsResponse.IsSuccessStatusCode)
+            {
+                sessions = await sessionsResponse.Content.ReadFromJsonAsync<List<CustomerSessionDto>>() ?? new();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.LoadingError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetDuration(CustomerSessionDto session)
+    {
+        if (!session.EndDateTime.HasValue)
+            return "-";
+
+        var duration = session.EndDateTime.Value - session.StartDateTime;
+        var hours = (int)duration.TotalHours;
+        var minutes = duration.Minutes;
+
+        if (hours > 0 && minutes > 0)
+            return $"{hours} {PersianResources.Hours} {PersianResources.And} {minutes} {PersianResources.Minutes}";
+        else if (hours > 0)
+            return $"{hours} {PersianResources.Hours}";
+        else
+            return $"{minutes} {PersianResources.Minutes}";
+    }
+
+    public class CustomerSummaryDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public int BirthYear { get; set; }
+        public bool IsMale { get; set; }
+        public bool IsLoyal { get; set; }
+        public int SessionsRequiredForFree { get; set; }
+        public int PaidSessionsCount { get; set; }
+    }
+
+    public class CustomerSessionDto
+    {
+        public int Id { get; set; }
+        public DateTime StartDateTime { get; set; }
+        public DateTime? EndDateTime { get; set; }
+        public string TableName { get; set; } = string.Empty;
+        public bool IsFreeSession { get; set; }
+        public decimal? FinalPrice { get; set; }
+    }
+}

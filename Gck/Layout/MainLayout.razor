@@ -1,4 +1,5 @@
 ﻿@using Gck.Components
+@using Gck.Resources
 @inherits LayoutComponentBase
 @inject IJSRuntime JS
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
@@ -44,6 +45,18 @@
                             خانه
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/customer/summary" class="nav-link">
+                            <i class="fas fa-user-circle"></i>
+                            @PersianResources.MyProfile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/customer/feedback" class="nav-link">
+                            <i class="fas fa-comment-dots"></i>
+                            @PersianResources.Feedback
+                        </a>
+                    </li>
                     <li class="nav-item has-dropdown">
                         <a href="/games" class="nav-link">
                             <i class="fas fa-gamepad"></i>
@@ -78,6 +91,7 @@
                             <li><a href="/tables" class="dropdown-item"><i class="fas fa-table"></i> میزها</a></li>
                             <li><a href="/customers" class="dropdown-item"><i class="fas fa-user-friends"></i> مشتریان</a></li>
                             <li><a href="/financialaccounts" class="dropdown-item"><i class="fas fa-wallet"></i> حساب‌های مالی</a></li>
+                            <li><a href="/feedbacks" class="dropdown-item"><i class="fas fa-comments"></i> @PersianResources.CustomerFeedbacks</a></li>
                         </ul>
                     </li>
                 }

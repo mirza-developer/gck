@@ -4,8 +4,10 @@ using Gck.Application.Features.Customers.Commands.DeleteCustomer;
 using Gck.Application.Features.Customers.Commands.UpdateCustomer;
 using Gck.Application.Features.Customers.Queries.GetAllCustomers;
 using Gck.Application.Features.Customers.Queries.GetCustomerById;
+using Gck.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gck.Api.Controllers;
 
@@ -15,11 +17,13 @@ public class CustomersController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<CustomersController> _logger;
+    private readonly GckDbContext _context;
 
-    public CustomersController(IMediator mediator, ILogger<CustomersController> logger)
+    public CustomersController(IMediator mediator, ILogger<CustomersController> logger, GckDbContext context)
     {
         _mediator = mediator;
         _logger = logger;
+        _context = context;
     }
 
     [HttpGet]
@@ -127,4 +131,45 @@ public class CustomersController : ControllerBase
             return StatusCode(500, "An error occurred while deleting the customer");
         }
     }
+
+    [HttpGet("{id}/sessions")]
+    [ProducesResponseType(typeof(List<CustomerSessionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<CustomerSessionDto>>> GetCustomerSessions(int id)
+    {
+        try
+        {
+            var sessions = await _context.SessionCustomers
+                .Where(sc => sc.CustomerId == id)
+                .Include(sc => sc.Session)
+                    .ThenInclude(s => s.Table)
+                .OrderByDescending(sc => sc.Session.StartDateTime)
+                .Select(sc => new CustomerSessionDto
+                {
+                    Id = sc.Session.Id,
+                    StartDateTime = sc.Session.StartDateTime,
+                    EndDateTime = sc.Session.EndDateTime,
+                    TableName = sc.Session.Table.Name,
+                    IsFreeSession = sc.Session.IsFreeSession,
+                    FinalPrice = sc.Session.FinalPrice
+                })
+                .ToListAsync();
+
+            return Ok(sessions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting customer sessions: {CustomerId}", id);
+            return StatusCode(500, "An error occurred while retrieving sessions");
+        }
+    }
+}
+
+public class CustomerSessionDto
+{
+    public int Id { get; set; }
+    public DateTime StartDateTime { get; set; }
+    public DateTime? EndDateTime { get; set; }
+    public string TableName { get; set; } = string.Empty;
+    public bool IsFreeSession { get; set; }
+    public decimal? FinalPrice { get; set; }
 }

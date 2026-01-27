@@ -187,4 +187,37 @@ public static class PersianResources
     public const string VerifyingOtp = "در حال بررسی کد...";
     public const string OtpCode = "کد تایید";
     public const string ResendOtp = "ارسال مجدد کد";
+    
+    // Customer Profile & Summary
+    public const string MyProfile = "پروفایل من";
+    public const string MySummary = "خلاصه اطلاعات من";
+    public const string MySessions = "بازی‌های من";
+    public const string MyPayments = "پرداخت‌های من";
+    public const string LoyaltyInfo = "اطلاعات وفاداری";
+    public const string TotalPaidSessions = "تعداد بازی‌های پرداخت شده";
+    public const string FreeSessionsEarned = "بازی‌های رایگان کسب شده";
+    public const string SessionDate = "تاریخ بازی";
+    public const string TableUsed = "میز استفاده شده";
+    public const string AmountPaid = "مبلغ پرداختی";
+    public const string Free = "رایگان";
+    public const string NoSessionsYet = "هنوز بازی ثبت نشده است";
+    public const string NoPaymentsYet = "هنوز پرداختی ثبت نشده است";
+    
+    // Feedback
+    public const string Feedback = "بازخورد";
+    public const string SendFeedback = "ارسال بازخورد";
+    public const string FeedbackSubject = "موضوع";
+    public const string FeedbackMessage = "پیام";
+    public const string FeedbackSubmitted = "بازخورد شما با موفقیت ارسال شد";
+    public const string FeedbackSubjectPlaceholder = "موضوع بازخورد خود را وارد کنید";
+    public const string FeedbackMessagePlaceholder = "پیام، انتقاد یا پیشنهاد خود را بنویسید...";
+    public const string Submit = "ارسال";
+    public const string CustomerFeedbacks = "بازخوردهای مشتریان";
+    public const string SubmittedAt = "تاریخ ارسال";
+    public const string ReadStatus = "وضعیت";
+    public const string Read = "خوانده شده";
+    public const string Unread = "خوانده نشده";
+    public const string MarkAsRead = "علامت به عنوان خوانده شده";
+    public const string NoFeedbacksYet = "هنوز بازخوردی ثبت نشده است";
 }
+
