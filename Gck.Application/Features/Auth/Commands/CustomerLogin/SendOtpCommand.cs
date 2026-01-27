@@ -1,0 +1,15 @@
+using MediatR;
+
+namespace Gck.Application.Features.Auth.Commands.CustomerLogin;
+
+public class SendOtpCommand : IRequest<SendOtpResponse>
+{
+    public string PhoneNumber { get; set; } = string.Empty;
+}
+
+public class SendOtpResponse
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? OtpCode { get; set; } // Only for debugging, remove in production
+}

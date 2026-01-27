@@ -169,4 +169,22 @@ public static class PersianResources
     public const string Customer = "مشتری";
     public const string Person = "نفر";
     public const string Discount = "تخفیف";
+    
+    // Customer Login with OTP
+    public const string AdminLogin = "ورود مدیر";
+    public const string CustomerLogin = "ورود مشتری";
+    public const string EnterPhoneNumber = "شماره تلفن خود را وارد کنید";
+    public const string SendOtp = "ارسال کد";
+    public const string EnterOtpCode = "کد تایید را وارد کنید";
+    public const string VerifyOtp = "تایید کد";
+    public const string OtpSent = "کد تایید برای شما ارسال شد";
+    public const string OtpSendError = "خطا در ارسال کد تایید";
+    public const string InvalidOtp = "کد تایید نامعتبر است";
+    public const string OtpExpired = "کد تایید منقضی شده است";
+    public const string CustomerNotFoundByPhone = "مشتری با این شماره تلفن یافت نشد";
+    public const string LoginSuccessful = "ورود موفقیت‌آمیز بود";
+    public const string SendingOtp = "در حال ارسال کد...";
+    public const string VerifyingOtp = "در حال بررسی کد...";
+    public const string OtpCode = "کد تایید";
+    public const string ResendOtp = "ارسال مجدد کد";
 }
