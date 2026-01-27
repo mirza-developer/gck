@@ -28,7 +28,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, VerifyO
             };
         }
 
-        // Verify OTP code length
+        // Verify OTP code length and format
         if (string.IsNullOrEmpty(request.OtpCode) || request.OtpCode.Length != 6 || !request.OtpCode.All(char.IsDigit))
         {
             return new VerifyOtpResponse
@@ -38,16 +38,46 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, VerifyO
             };
         }
 
-        // IMPORTANT: In a production environment, you should verify the OTP with the SMS provider's API
-        // or implement a secure OTP storage mechanism with expiration.
-        // Current implementation accepts any valid 6-digit code for testing purposes.
-        // 
-        // Recommended production approaches:
-        // 1. Call SMS provider's verification endpoint with phone number and OTP
-        // 2. Store OTP in a cache (Redis) with TTL and verify against it
-        // 3. Use SMS provider's built-in verification webhook
+        // Find the most recent unused OTP for this phone number
+        var otpEntity = await _context.CustomerOtps
+            .Where(o => o.PhoneNumber == request.PhoneNumber && !o.IsUsed)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        // OTP is valid (simplified for testing - see comments above)
+        if (otpEntity == null)
+        {
+            return new VerifyOtpResponse
+            {
+                Success = false,
+                Message = "کد تایید یافت نشد. لطفا ابتدا کد را درخواست کنید"
+            };
+        }
+
+        // Check if OTP has expired
+        if (otpEntity.ExpiresAt < DateTime.UtcNow)
+        {
+            return new VerifyOtpResponse
+            {
+                Success = false,
+                Message = "کد تایید منقضی شده است"
+            };
+        }
+
+        // Verify OTP code
+        if (otpEntity.OtpCode != request.OtpCode)
+        {
+            return new VerifyOtpResponse
+            {
+                Success = false,
+                Message = "کد تایید نامعتبر است"
+            };
+        }
+
+        // Mark OTP as used to prevent reuse
+        otpEntity.IsUsed = true;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // OTP is valid and verified
         return new VerifyOtpResponse
         {
             Success = true,

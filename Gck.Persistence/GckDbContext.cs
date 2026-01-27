@@ -15,6 +15,7 @@ public class GckDbContext : DbContext
     // Gaming Center Management entities
     public DbSet<Table> Tables { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<CustomerOtp> CustomerOtps { get; set; } = null!;
     public DbSet<FinancialAccount> FinancialAccounts { get; set; } = null!;
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<SessionCustomer> SessionCustomers { get; set; } = null!;
@@ -50,6 +51,13 @@ public class GckDbContext : DbContext
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.HasIndex(e => e.PhoneNumber);
+        });
+
+        // Configure CustomerOtp entity
+        modelBuilder.Entity<CustomerOtp>(entity =>
+        {
+            entity.HasIndex(e => e.PhoneNumber);
+            entity.HasIndex(e => e.ExpiresAt);
         });
 
         // Configure Session entity

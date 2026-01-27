@@ -1,3 +1,4 @@
+using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,86 +36,71 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             };
         }
 
+        // Generate 6-digit OTP
+        var random = new Random();
+        var otpCode = random.Next(100000, 999999).ToString();
+
         // Get SMS provider configuration
         var smsBaseUrl = _configuration["SmsProvider:BaseUrl"] ?? "https://console.melipayamak.com";
         var smsApiKey = _configuration["SmsProvider:ApiKey"];
         
-        if (string.IsNullOrEmpty(smsApiKey))
-        {
-            // No SMS API configured, return test mode
-            var testOtp = new Random().Next(100000, 999999).ToString();
-            return new SendOtpResponse
-            {
-                Success = true,
-                Message = "کد تایید ایجاد شد (حالت تست - SMS API پیکربندی نشده)",
-#if DEBUG
-                OtpCode = testOtp // Only include in debug builds
-#endif
-            };
-        }
+        string? actualOtpSent = null;
 
-        // Send OTP via SMS API
-        try
+        // Try to send OTP via SMS API if configured
+        if (!string.IsNullOrEmpty(smsApiKey))
         {
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(smsBaseUrl);
-            
-            var result = await client.PostAsJsonAsync($"api/send/otp/{smsApiKey}",
-                new { to = request.PhoneNumber }, cancellationToken);
-            var response = await result.Content.ReadAsStringAsync(cancellationToken);
-            
-            // Parse response to check if OTP was sent successfully
-            if (!string.IsNullOrEmpty(response))
+            try
             {
-                try
+                var client = _httpClientFactory.CreateClient();
+                client.BaseAddress = new Uri(smsBaseUrl);
+                
+                var result = await client.PostAsJsonAsync($"api/send/otp/{smsApiKey}",
+                    new { to = request.PhoneNumber }, cancellationToken);
+                var response = await result.Content.ReadAsStringAsync(cancellationToken);
+                
+                // Parse response to get the actual OTP code sent by the provider
+                if (!string.IsNullOrEmpty(response))
                 {
-                    var jsonDoc = JsonDocument.Parse(response);
-                    if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
+                    try
                     {
-                        var sentCode = codeElement.GetString();
-                        return new SendOtpResponse
+                        var jsonDoc = JsonDocument.Parse(response);
+                        if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
                         {
-                            Success = true,
-                            Message = "کد تایید برای شما ارسال شد",
-#if DEBUG
-                            OtpCode = sentCode // Only include in debug builds for testing
-#endif
-                        };
+                            actualOtpSent = codeElement.GetString();
+                        }
                     }
-                }
-                catch (JsonException)
-                {
-                    // If parsing fails, check if request was successful based on HTTP status
-                    if (result.IsSuccessStatusCode)
+                    catch (JsonException)
                     {
-                        return new SendOtpResponse
-                        {
-                            Success = true,
-                            Message = "کد تایید برای شما ارسال شد"
-                        };
+                        // If parsing fails, use our generated code
                     }
                 }
             }
+            catch (HttpRequestException)
+            {
+                // Network error - will use our generated code
+            }
+        }
 
-            return new SendOtpResponse
-            {
-                Success = true,
-                Message = "کد تایید برای شما ارسال شد"
-            };
-        }
-        catch (HttpRequestException)
+        // Use the OTP from SMS provider if available, otherwise use generated one
+        var otpToStore = actualOtpSent ?? otpCode;
+
+        // Store OTP in database with 1-minute expiration
+        var otpEntity = new CustomerOtp
         {
-            // Network or API error - fallback to test mode for development
-            var testOtp = new Random().Next(100000, 999999).ToString();
-            
-            return new SendOtpResponse
-            {
-                Success = true,
-                Message = "کد تایید ایجاد شد (حالت تست - خطا در اتصال به SMS API)",
-#if DEBUG
-                OtpCode = testOtp // Only include in debug builds
-#endif
-            };
-        }
+            PhoneNumber = request.PhoneNumber,
+            OtpCode = otpToStore,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(1),
+            IsUsed = false
+        };
+
+        _context.CustomerOtps.Add(otpEntity);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new SendOtpResponse
+        {
+            Success = true,
+            Message = "کد تایید برای شما ارسال شد"
+        };
     }
 }
