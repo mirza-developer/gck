@@ -35,12 +35,6 @@ public class Customer
 
     public int PaidSessionsCount { get; set; } = 0;
 
-    // OTP Login Fields
-    [StringLength(10)]
-    public string? LastOtpCode { get; set; }
-
-    public DateTime? OtpExpiry { get; set; }
-
     // Navigation property
     public virtual ICollection<SessionCustomer> SessionCustomers { get; set; } = new List<SessionCustomer>();
 }

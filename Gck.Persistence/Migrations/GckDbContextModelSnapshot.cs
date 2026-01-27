@@ -57,7 +57,7 @@ namespace Gck.Persistence.Migrations
                     b.HasIndex("SessionId")
                         .IsUnique();
 
-                    b.ToTable("tbl_AccountantReceipt");
+                    b.ToTable("tbl_AccountantReceipt", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
@@ -84,17 +84,10 @@ namespace Gck.Persistence.Migrations
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("LastOtpCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime?>("OtpExpiry")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("PaidSessionsCount")
                         .HasColumnType("int");
@@ -111,7 +104,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasIndex("PhoneNumber");
 
-                    b.ToTable("tbl_Customer");
+                    b.ToTable("tbl_Customer", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.FinancialAccount", b =>
@@ -145,7 +138,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tbl_FinancialAccount");
+                    b.ToTable("tbl_FinancialAccount", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>
@@ -170,7 +163,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tbl_HourlyFee");
+                    b.ToTable("tbl_HourlyFee", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
@@ -224,7 +217,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("tbl_Session");
+                    b.ToTable("tbl_Session", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.SessionCustomer", b =>
@@ -251,7 +244,7 @@ namespace Gck.Persistence.Migrations
                     b.HasIndex(new[] { "SessionId", "CustomerId" }, "IX_SessionCustomer_SessionId_CustomerId")
                         .IsUnique();
 
-                    b.ToTable("tbl_SessionCustomer");
+                    b.ToTable("tbl_SessionCustomer", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.Table", b =>
@@ -281,7 +274,7 @@ namespace Gck.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("tbl_Table");
+                    b.ToTable("tbl_Table", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.User", b =>
@@ -337,7 +330,7 @@ namespace Gck.Persistence.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("tbl_User");
+                    b.ToTable("tbl_User", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.UserClaim", b =>
@@ -363,7 +356,7 @@ namespace Gck.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("tbl_UserClaim");
+                    b.ToTable("tbl_UserClaim", (string)null);
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.AccountantReceipt", b =>

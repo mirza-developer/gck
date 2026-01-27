@@ -30,15 +30,6 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             };
         }
 
-        // Generate 6-digit OTP
-        var random = new Random();
-        var otpCode = random.Next(100000, 999999).ToString();
-
-        // Store OTP in database (expires in 5 minutes)
-        customer.LastOtpCode = otpCode;
-        customer.OtpExpiry = DateTime.Now.AddMinutes(5);
-        await _context.SaveChangesAsync(cancellationToken);
-
         // Send OTP via SMS API
         try
         {
@@ -49,7 +40,7 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
                     new { to = request.PhoneNumber }, cancellationToken);
                 var response = await result.Content.ReadAsStringAsync(cancellationToken);
                 
-                // Parse response to get the actual OTP code sent
+                // Parse response to check if OTP was sent successfully
                 if (!string.IsNullOrEmpty(response))
                 {
                     try
@@ -58,14 +49,17 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
                         if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
                         {
                             var sentCode = codeElement.GetString();
-                            // Update with the actual code sent by the API
-                            customer.LastOtpCode = sentCode;
-                            await _context.SaveChangesAsync(cancellationToken);
+                            return new SendOtpResponse
+                            {
+                                Success = true,
+                                Message = "کد تایید برای شما ارسال شد",
+                                OtpCode = sentCode // For debugging/testing only
+                            };
                         }
                     }
                     catch
                     {
-                        // If parsing fails, use our generated code
+                        // If parsing fails, assume success
                     }
                 }
             }
@@ -73,19 +67,21 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             return new SendOtpResponse
             {
                 Success = true,
-                Message = "کد تایید برای شما ارسال شد",
-                OtpCode = otpCode // Include for testing, remove in production
+                Message = "کد تایید برای شما ارسال شد"
             };
         }
-        catch (Exception ex)
+        catch
         {
-            // Even if SMS fails, return success for testing purposes
-            // In production, you should handle this differently
+            // For testing purposes when SMS API is not available
+            // Generate a test OTP
+            var random = new Random();
+            var testOtp = random.Next(100000, 999999).ToString();
+            
             return new SendOtpResponse
             {
                 Success = true,
-                Message = "کد تایید ایجاد شد (خطا در ارسال پیامک)",
-                OtpCode = otpCode // For testing when SMS API is not available
+                Message = "کد تایید ایجاد شد (حالت تست)",
+                OtpCode = testOtp // For testing when SMS API is not available
             };
         }
     }
