@@ -28,10 +28,8 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, VerifyO
             };
         }
 
-        // Verify OTP code
-        // Note: In production, you would verify the OTP with the SMS provider's API
-        // For now, we accept any 6-digit code for testing purposes
-        if (string.IsNullOrEmpty(request.OtpCode) || request.OtpCode.Length != 6)
+        // Verify OTP code length
+        if (string.IsNullOrEmpty(request.OtpCode) || request.OtpCode.Length != 6 || !request.OtpCode.All(char.IsDigit))
         {
             return new VerifyOtpResponse
             {
@@ -40,7 +38,16 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, VerifyO
             };
         }
 
-        // OTP is valid (in production, verify with SMS provider)
+        // IMPORTANT: In a production environment, you should verify the OTP with the SMS provider's API
+        // or implement a secure OTP storage mechanism with expiration.
+        // Current implementation accepts any valid 6-digit code for testing purposes.
+        // 
+        // Recommended production approaches:
+        // 1. Call SMS provider's verification endpoint with phone number and OTP
+        // 2. Store OTP in a cache (Redis) with TTL and verify against it
+        // 3. Use SMS provider's built-in verification webhook
+
+        // OTP is valid (simplified for testing - see comments above)
         return new VerifyOtpResponse
         {
             Success = true,

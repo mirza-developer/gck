@@ -18,6 +18,9 @@ builder.Services.AddMediatR(cfg =>
 // Add Application Services
 builder.Services.AddScoped<ILoyaltyService, LoyaltyService>();
 
+// Add HttpClient for SMS provider
+builder.Services.AddHttpClient();
+
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
