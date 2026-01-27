@@ -40,7 +40,10 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
                     Name = sc.Customer.Name,
                     PhoneNumber = sc.Customer.PhoneNumber,
                     BirthYear = sc.Customer.BirthYear,
-                    Gender = sc.Customer.IsMale ? "Male" : "Female"
+                    Gender = sc.Customer.IsMale ? "Male" : "Female",
+                    IsLoyal = sc.Customer.IsLoyal,
+                    SessionsRequiredForFree = sc.Customer.SessionsRequiredForFree,
+                    PaidSessionsCount = sc.Customer.PaidSessionsCount
                 }).ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);

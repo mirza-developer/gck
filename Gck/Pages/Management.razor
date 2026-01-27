@@ -3,16 +3,18 @@
 @inject ApiConfigurationService ApiConfig
 @using System.Net.Http.Json
 @using Gck.Components
+@using Gck.Resources
+@using Gck.Services
 @implements IDisposable
 
-<PageTitle>داشبورد مدیریت</PageTitle>
+<PageTitle>@PersianResources.ManagementDashboard</PageTitle>
 
 <section class="section">
     <div class="container">
         <div class="page-header fade-in-up">
             <h2 class="section-title">
                 <i class="fas fa-tachometer-alt"></i>
-                داشبورد مدیریت گیم سنتر کوثر
+                @PersianResources.ManagementDashboard
             </h2>
         </div>
 
@@ -23,7 +25,7 @@
                     <div class="loader-ring"></div>
                     <div class="loader-ring"></div>
                     <div class="loader-ring"></div>
-                    <p class="loader-text">در حال بارگذاری...</p>
+                    <p class="loader-text">@PersianResources.Loading</p>
                 </div>
             </div>
         }
@@ -31,9 +33,9 @@
         {
             <div class="gaming-card fade-in-up error-message">
                 <i class="fas fa-exclamation-triangle"></i>
-                <p><strong>خطا:</strong> @error</p>
+                <p><strong>@PersianResources.Error:</strong> @error</p>
                 <hr />
-                <p><small>برای استفاده از داشبورد، ابتدا باید سرور API را اجرا کنید.</small></p>
+                <p><small>@PersianResources.DashboardApiError</small></p>
                 <code style="display: block; background: #f5f5f5; padding: 10px; border-radius: 5px; direction: ltr; margin-top: 1rem;">
                     cd Gck.Api && dotnet run
                 </code>
@@ -44,7 +46,7 @@
             <!-- Tables Status Section -->
             <div class="gaming-card fade-in-up">
                 <div class="card-header-section">
-                    <h3><i class="fas fa-table"></i> وضعیت میزها</h3>
+                    <h3><i class="fas fa-table"></i> @PersianResources.TablesStatus</h3>
                 </div>
 
                 @if (dashboardTables.Any())
@@ -63,7 +65,7 @@
                                         {
                                             <p class="user-username">
                                                 <i class="fas fa-clock"></i> @GetSessionDuration(table.CurrentSession.StartDateTime)
-                                                | <i class="fas fa-coins"></i> @table.CurrentSession.FeePerHour.ToString("N0") تومان/ساعت
+                                                | <i class="fas fa-coins"></i> @table.CurrentSession.FeePerHour.ToString("N0") @PersianResources.TomanPerHour
                                             </p>
                                             @if (table.CurrentSession.Customers.Any())
                                             {
@@ -74,11 +76,11 @@
                                         }
                                         else
                                         {
-                                            <p class="user-username">آماده برای شروع جلسه</p>
+                                            <p class="user-username">@PersianResources.ReadyToStart</p>
                                         }
                                     </div>
                                     <div class="user-status @(table.IsOccupied ? "inactive" : "active")">
-                                        @(table.IsOccupied ? "اشغال" : "آزاد")
+                                        @(table.IsOccupied ? PersianResources.TableOccupied : PersianResources.TableAvailable)
                                     </div>
                                 </div>
 
@@ -89,12 +91,12 @@
                                             <div class="live-timer">
                                                 <i class="fas fa-stopwatch"></i>
                                                 <span class="timer-value">@GetSessionDuration(table.CurrentSession.StartDateTime)</span>
-                                                <span class="timer-label">زمان سپری شده</span>
+                                                <span class="timer-label">@PersianResources.ElapsedTime</span>
                                             </div>
                                         </div>
                                         <div class="detail-row">
-                                            <span class="detail-label"><i class="fas fa-play-circle"></i> شروع:</span>
-                                            <span class="detail-value">@table.CurrentSession.StartDateTime.ToString("HH:mm - yyyy/MM/dd")</span>
+                                            <span class="detail-label"><i class="fas fa-play-circle"></i> @PersianResources.Start:</span>
+                                            <span class="detail-value">@table.CurrentSession.StartDateTime.ToPersianDateTime()</span>
                                         </div>
                                     </div>
                                 }
@@ -104,14 +106,14 @@
                                     {
                                         <button class="btn-action btn-delete" @onclick="() => ShowFinishModal(table.CurrentSession.Id)">
                                             <i class="fas fa-stop"></i>
-                                            پایان جلسه
+                                            @PersianResources.FinishSessionButton
                                         </button>
                                     }
                                     else
                                     {
                                         <button class="btn-action btn-edit" @onclick="() => ShowStartModal(table.Id, table.Name)">
                                             <i class="fas fa-play"></i>
-                                            شروع جلسه
+                                            @PersianResources.StartSessionButton
                                         </button>
                                     }
                                 </div>
@@ -123,7 +125,7 @@
                 {
                     <div class="no-data">
                         <i class="fas fa-inbox"></i>
-                        <p>هیچ میزی یافت نشد</p>
+                        <p>@PersianResources.NoTablesFound</p>
                     </div>
                 }
             </div>
@@ -131,18 +133,18 @@
             <!-- Analytics Charts Section -->
             <div class="gaming-card fade-in-up" style="margin-top: 2rem;">
                 <div class="card-header-section">
-                    <h3><i class="fas fa-chart-line"></i> آمار و تحلیل‌ها</h3>
+                    <h3><i class="fas fa-chart-line"></i> @PersianResources.AnalyticsCharts</h3>
                 </div>
                 <div class="charts-container">
                     <div class="chart-placeholder">
                         <i class="fas fa-chart-bar"></i>
-                        <p>نمودار مقایسه روزانه</p>
-                        <small>در حال توسعه</small>
+                        <p>@PersianResources.DailyComparison</p>
+                        <small>@PersianResources.InDevelopment</small>
                     </div>
                     <div class="chart-placeholder">
                         <i class="fas fa-chart-pie"></i>
-                        <p>نمودار مقایسه ماهانه</p>
-                        <small>در حال توسعه</small>
+                        <p>@PersianResources.MonthlyComparison</p>
+                        <small>@PersianResources.InDevelopment</small>
                     </div>
                 </div>
             </div>

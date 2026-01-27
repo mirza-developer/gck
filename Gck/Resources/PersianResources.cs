@@ -2,7 +2,6 @@
 
 public static class PersianResources
 {
-    // Common
     public const string Loading = "در حال بارگذاری...";
     public const string Error = "خطا";
     public const string Success = "موفقیت";
@@ -36,8 +35,6 @@ public static class PersianResources
     public const string Shamsi = "شمسی";
     public const string Count = "تعداد";
     public const string Times = "بار";
-
-    // Tables
     public const string TablesManagement = "مدیریت میزها";
     public const string AddNewTable = "افزودن میز جدید";
     public const string EditTable = "ویرایش میز";
@@ -60,8 +57,6 @@ public static class PersianResources
     public const string ControllersPlaceholder = "مثال: 2";
     public const string HourlyFeePlaceholder = "مثال: 50000";
     public const string SubmitTable = "ثبت میز";
-
-    // Customers
     public const string CustomersManagement = "مدیریت مشتریان";
     public const string AddNewCustomer = "افزودن مشتری جدید";
     public const string EditCustomer = "ویرایش مشتری";
@@ -97,8 +92,6 @@ public static class PersianResources
     public const string RegularCustomer = "عادی";
     public const string EnableLoyaltyProgram = "فعال‌سازی برنامه وفاداری";
     public const string SessionsRequiredPlaceholder = "مثال: 10";
-
-    // Financial Accounts
     public const string FinancialAccountsManagement = "مدیریت حساب‌های مالی";
     public const string AddNewFinancialAccount = "افزودن حساب مالی جدید";
     public const string EditFinancialAccount = "ویرایش حساب مالی";
@@ -118,8 +111,8 @@ public static class PersianResources
     public const string SubmitAccount = "ثبت حساب";
     public const string Bank = "بانک";
     public const string Card = "کارت";
-
-    // Sessions
+    public const string Balance = "موجودی";
+    public const string CannotDeleteAccountWithBalance = "امکان حذف حساب با موجودی وجود ندارد. لطفاً ابتدا موجودی حساب را صفر کنید.";
     public const string StartSession = "شروع بازی جدید";
     public const string FinishSession = "پایان بازی";
     public const string ConfirmFinishSession = "تأیید پایان بازی";
@@ -154,4 +147,26 @@ public static class PersianResources
     public const string AnonymousCustomersCount = "تعداد مشتریان ناشناس";
     public const string RegisteredCustomer = "مشتری ثبت شده";
     public const string AnonymousCustomer = "مشتری ناشناس";
+    public const string LoyaltyStatus = "وضعیت وفاداری";
+    public const string LoyaltyProgress = "پیشرفت وفاداری";
+    public const string CompletedSessions = "بازی‌های انجام شده";
+    public const string FreeSessionEarned = "بازی رایگان کسب شده!";
+    public const string FreeSessionDiscount = "تخفیف بازی رایگان";
+    public const string OriginalPrice = "مبلغ اصلی";
+    public const string DiscountApplied = "تخفیف اعمال شده";
+    public const string ManagementDashboard = "داشبورد مدیریت گیم سنتر کوثر";
+    public const string TablesStatus = "وضعیت میزها";
+    public const string ReadyToStart = "آماده برای شروع جلسه";
+    public const string ElapsedTime = "زمان سپری شده";
+    public const string Start = "شروع";
+    public const string FinishSessionButton = "پایان جلسه";
+    public const string StartSessionButton = "شروع جلسه";
+    public const string AnalyticsCharts = "آمار و تحلیل‌ها";
+    public const string DailyComparison = "نمودار مقایسه روزانه";
+    public const string MonthlyComparison = "نمودار مقایسه ماهانه";
+    public const string InDevelopment = "در حال توسعه";
+    public const string DashboardApiError = "برای استفاده از داشبورد، ابتدا باید سرور API را اجرا کنید.";
+    public const string Customer = "مشتری";
+    public const string Person = "نفر";
+    public const string Discount = "تخفیف";
 }

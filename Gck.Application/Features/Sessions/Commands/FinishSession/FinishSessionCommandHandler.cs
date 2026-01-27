@@ -1,3 +1,4 @@
+using Gck.Application.Services;
 using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
@@ -8,10 +9,12 @@ namespace Gck.Application.Features.Sessions.Commands.FinishSession;
 public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand, Unit>
 {
     private readonly GckDbContext _context;
+    private readonly ILoyaltyService _loyaltyService;
 
-    public FinishSessionCommandHandler(GckDbContext context)
+    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService)
     {
         _context = context;
+        _loyaltyService = loyaltyService;
     }
 
     public async Task<Unit> Handle(FinishSessionCommand request, CancellationToken cancellationToken)
@@ -19,6 +22,8 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         var session = await _context.Sessions
             .Include(s => s.Table)
             .Include(s => s.Fee)
+            .Include(s => s.SessionCustomers)
+            .ThenInclude(sc => sc.Customer)
             .FirstOrDefaultAsync(s => s.Id == request.SessionId, cancellationToken);
 
         if (session == null)
@@ -50,6 +55,39 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
 
         session.Table.IsOccupied = false;
         session.Table.LastModifiedDate = DateTime.Now;
+
+        // Handle loyalty program - per-person basis
+        int totalPeople = session.SessionCustomers.Count + session.AnonymousCustomersCount;
+        decimal pricePerPerson = totalPeople > 0 ? recommendedPrice / totalPeople : recommendedPrice;
+        bool anyFreeSession = false;
+        
+        foreach (var sessionCustomer in session.SessionCustomers)
+        {
+            var customer = sessionCustomer.Customer;
+            
+            if (customer.IsLoyal && customer.SessionsRequiredForFree > 0)
+            {
+                bool customerGotFreeSession = await _loyaltyService.CanCustomerGetFreeSession(customer.Id);
+                
+                if (customerGotFreeSession)
+                {
+                    // Customer used their free session, reset counter
+                    await _loyaltyService.ResetPaidSessionsCount(customer.Id);
+                    anyFreeSession = true;
+                }
+                else
+                {
+                    // Increment paid sessions count for loyal customers who paid
+                    await _loyaltyService.IncrementPaidSessions(customer.Id);
+                }
+            }
+        }
+        
+        // Mark session as free if any customer got their share for free
+        if (anyFreeSession)
+        {
+            session.IsFreeSession = true;
+        }
 
         var receipt = new AccountantReceipt
         {

@@ -3,6 +3,7 @@
 @using System.Net.Http.Json
 @using Gck.Shared.Modals
 @using Gck.Resources
+@using Gck.Services
 
 <Modal @bind-IsVisible="isVisible"
        Title="@(showConfirm ? PersianResources.ConfirmFinishSession : PersianResources.FinishSession)"
@@ -40,11 +41,11 @@
                 </div>
                 <div class="summary-row">
                     <span class="label"><i class="fas fa-clock"></i> @PersianResources.StartTime:</span>
-                    <span class="value">@sessionDetails.StartDateTime.ToString("yyyy/MM/dd HH:mm")</span>
+                    <span class="value">@sessionDetails.StartDateTime.ToPersianDateTime()</span>
                 </div>
                 <div class="summary-row">
                     <span class="label"><i class="fas fa-clock"></i> @PersianResources.EndTime:</span>
-                    <span class="value">@DateTime.Now.ToString("yyyy/MM/dd HH:mm")</span>
+                    <span class="value">@DateTime.Now.ToPersianDateTime()</span>
                 </div>
                 <div class="summary-row">
                     <span class="label"><i class="fas fa-hourglass-half"></i> @PersianResources.Duration:</span>
@@ -74,14 +75,104 @@
                         </span>
                     </div>
                 }
+
+                @* Loyalty Program Display *@
+                @if (customersLoyalty.Any(c => c.IsLoyal))
+                {
+                    <div class="loyalty-section">
+                        <div class="loyalty-header">
+                            <i class="fas fa-star"></i>
+                            <span>@PersianResources.LoyaltyProgram</span>
+                        </div>
+
+                        @foreach (var customer in sessionDetails.Customers)
+                        {
+                            var loyaltyInfo = customersLoyalty.FirstOrDefault(l => l.CustomerId == customer.Id);
+                            if (loyaltyInfo != null && loyaltyInfo.IsLoyal)
+                            {
+                                <div class="customer-loyalty-card">
+                                    <div class="customer-info">
+                                        <i class="fas fa-user-circle"></i>
+                                        <span class="customer-name">@customer.Name</span>
+                                        @if (loyaltyInfo.CanGetFreeSession)
+                                        {
+                                            <span class="free-badge">
+                                                <i class="fas fa-gift"></i>
+                                                @PersianResources.FreeSessionEarned
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="loyalty-progress-container">
+                                        <div class="progress-info">
+                                            <span class="sessions-count">
+                                                @loyaltyInfo.PaidSessionsCount / @loyaltyInfo.SessionsRequiredForFree
+                                                @PersianResources.CompletedSessions
+                                            </span>
+                                            @if (!loyaltyInfo.CanGetFreeSession && loyaltyInfo.RemainingSessionsForFree > 0)
+                                            {
+                                                <span class="remaining-sessions">
+                                                    @loyaltyInfo.RemainingSessionsForFree @PersianResources.SessionsUntilFree
+                                                </span>
+                                            }
+                                        </div>
+                                        
+                                        <div class="loyalty-progress-bar">
+                                            <div class="progress-fill @(loyaltyInfo.CanGetFreeSession ? "completed" : "")" 
+                                                 style="width: @loyaltyInfo.ProgressPercentage%">
+                                            </div>
+                                            <div class="progress-circles">
+                                                @for (int i = 0; i < loyaltyInfo.SessionsRequiredForFree; i++)
+                                                {
+                                                    var isCompleted = i < loyaltyInfo.PaidSessionsCount;
+                                                    <div class="progress-circle @(isCompleted ? "completed" : "")">
+                                                        @if (isCompleted)
+                                                        {
+                                                            <i class="fas fa-check"></i>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
             </div>
 
             <div class="price-section">
-                <div class="recommended-price">
-                    <i class="fas fa-calculator"></i>
-                    <span>@PersianResources.RecommendedPrice:</span>
-                    <strong>@recommendedPrice.ToString("N0") @PersianResources.Toman</strong>
-                </div>
+                @if (hasFreeSessionDiscount)
+                {
+                    <div class="free-session-notice">
+                        <i class="fas fa-gift"></i>
+                        <span>@PersianResources.FreeSessionDiscount (@freeSessionCustomersCount @(freeSessionCustomersCount > 1 ? PersianResources.Customer : PersianResources.Customer))</span>
+                    </div>
+                    <div class="recommended-price original-price">
+                        <i class="fas fa-tag"></i>
+                        <span>@PersianResources.OriginalPrice:</span>
+                        <del>@originalRecommendedPrice.ToString("N0") @PersianResources.Toman</del>
+                    </div>
+                    <div class="recommended-price discount-price">
+                        <i class="fas fa-percent"></i>
+                        <span>@PersianResources.Discount (@freeSessionCustomersCount/@totalPeopleInSession @PersianResources.Person):</span>
+                        <strong class="discount-text">-@totalDiscountAmount.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                    <div class="recommended-price discounted-price">
+                        <i class="fas fa-calculator"></i>
+                        <span>@PersianResources.RecommendedPrice:</span>
+                        <strong class="recommended-text">@recommendedPrice.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                }
+                else
+                {
+                    <div class="recommended-price">
+                        <i class="fas fa-calculator"></i>
+                        <span>@PersianResources.RecommendedPrice:</span>
+                        <strong>@recommendedPrice.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                }
 
                 <div class="form-group">
                     <label class="form-label">
@@ -199,9 +290,15 @@
 
     private SessionDetailsDto? sessionDetails;
     private List<FinancialAccountDto> financialAccounts = new();
+    private List<CustomerLoyaltyInfo> customersLoyalty = new();
     private decimal recommendedPrice;
+    private decimal originalRecommendedPrice;
     private decimal finalPrice;
     private int selectedFinancialAccountId;
+    private bool hasFreeSessionDiscount = false;
+    private int freeSessionCustomersCount = 0;
+    private int totalPeopleInSession = 0;
+    private decimal totalDiscountAmount = 0;
 
     public async Task Show(int sessionId)
     {
@@ -237,7 +334,60 @@
                 if (sessionDetails != null)
                 {
                     var duration = (DateTime.Now - sessionDetails.StartDateTime).TotalHours;
-                    recommendedPrice = Math.Ceiling((decimal)duration * sessionDetails.FeePerHour / 1000) * 1000;
+                    originalRecommendedPrice = Math.Ceiling((decimal)duration * sessionDetails.FeePerHour / 1000) * 1000;
+                    recommendedPrice = originalRecommendedPrice;
+
+                    // Calculate loyalty info for each customer
+                    customersLoyalty.Clear();
+                    hasFreeSessionDiscount = false;
+                    freeSessionCustomersCount = 0;
+                    totalDiscountAmount = 0;
+                    
+                    // Calculate total people in session (registered customers + anonymous)
+                    totalPeopleInSession = sessionDetails.Customers.Count + sessionDetails.AnonymousCustomersCount;
+                    decimal pricePerPerson = totalPeopleInSession > 0 ? originalRecommendedPrice / totalPeopleInSession : originalRecommendedPrice;
+
+                    foreach (var customer in sessionDetails.Customers)
+                    {
+                        var loyaltyInfo = new CustomerLoyaltyInfo
+                        {
+                            CustomerId = customer.Id,
+                            IsLoyal = customer.IsLoyal,
+                            SessionsRequiredForFree = customer.SessionsRequiredForFree,
+                            PaidSessionsCount = customer.PaidSessionsCount,
+                            CanGetFreeSession = customer.IsLoyal && customer.SessionsRequiredForFree > 0 && 
+                                              customer.PaidSessionsCount >= customer.SessionsRequiredForFree,
+                            RemainingSessionsForFree = customer.IsLoyal && customer.SessionsRequiredForFree > 0
+                                ? Math.Max(0, customer.SessionsRequiredForFree - customer.PaidSessionsCount)
+                                : 0
+                        };
+
+                        if (loyaltyInfo.IsLoyal && loyaltyInfo.SessionsRequiredForFree > 0)
+                        {
+                            loyaltyInfo.ProgressPercentage = Math.Min(100, 
+                                (double)customer.PaidSessionsCount / customer.SessionsRequiredForFree * 100);
+                        }
+
+                        customersLoyalty.Add(loyaltyInfo);
+
+                        // If customer qualifies for free session, apply discount for their share only
+                        if (loyaltyInfo.CanGetFreeSession)
+                        {
+                            hasFreeSessionDiscount = true;
+                            freeSessionCustomersCount++;
+                            totalDiscountAmount += pricePerPerson; // Add this customer's share to total discount
+                        }
+                    }
+
+                    // Apply total discount from all qualifying customers
+                    if (hasFreeSessionDiscount)
+                    {
+                        recommendedPrice = Math.Max(0, originalRecommendedPrice - totalDiscountAmount);
+                        // Round to nearest 1000
+                        recommendedPrice = Math.Ceiling(recommendedPrice / 1000) * 1000;
+                        totalDiscountAmount = originalRecommendedPrice - recommendedPrice;
+                    }
+
                     finalPrice = recommendedPrice;
                 }
             }
@@ -386,6 +536,9 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public bool IsLoyal { get; set; }
+        public int SessionsRequiredForFree { get; set; }
+        public int PaidSessionsCount { get; set; }
     }
 
     private class FinancialAccountDto
@@ -394,5 +547,16 @@
         public string AccountName { get; set; } = string.Empty;
         public string BankName { get; set; } = string.Empty;
         public string CardNumber { get; set; } = string.Empty;
+    }
+
+    private class CustomerLoyaltyInfo
+    {
+        public int CustomerId { get; set; }
+        public bool IsLoyal { get; set; }
+        public int SessionsRequiredForFree { get; set; }
+        public int PaidSessionsCount { get; set; }
+        public bool CanGetFreeSession { get; set; }
+        public int RemainingSessionsForFree { get; set; }
+        public double ProgressPercentage { get; set; }
     }
 }
