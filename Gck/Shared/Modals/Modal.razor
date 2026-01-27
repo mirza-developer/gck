@@ -1,0 +1,49 @@
+@namespace Gck.Shared.Modals
+
+@if (IsVisible)
+{
+    <div class="modal-overlay @(IsVisible ? "show" : "")" @onclick="OnOverlayClick">
+        <div class="modal-container @Size.ToString().ToLower() @(IsVisible ? "show" : "")" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">@Title</h3>
+                @if (ShowCloseButton)
+                {
+                    <button class="modal-close-btn" @onclick="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                }
+            </div>
+            
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            
+            @if (ShowFooter)
+            {
+                <div class="modal-footer">
+                    @if (FooterContent != null)
+                    {
+                        @FooterContent
+                    }
+                    else
+                    {
+                        @if (ShowCancelButton)
+                        {
+                            <button class="btn-modal btn-cancel" @onclick="Cancel">
+                                <i class="fas fa-times"></i>
+                                @CancelText
+                            </button>
+                        }
+                        @if (ShowConfirmButton)
+                        {
+                            <button class="btn-modal btn-confirm" @onclick="Confirm">
+                                <i class="fas fa-check"></i>
+                                @ConfirmText
+                            </button>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

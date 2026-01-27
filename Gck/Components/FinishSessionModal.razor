@@ -1,0 +1,562 @@
+@inject HttpClient Http
+@inject ApiConfigurationService ApiConfig
+@using System.Net.Http.Json
+@using Gck.Shared.Modals
+@using Gck.Resources
+@using Gck.Services
+
+<Modal @bind-IsVisible="isVisible"
+       Title="@(showConfirm ? PersianResources.ConfirmFinishSession : PersianResources.FinishSession)"
+       ShowFooter="false"
+       CloseOnOverlayClick="@(!submitting)"
+       Size="@(showConfirm ? ModalSize.Medium : ModalSize.Large)">
+    @if (!showConfirm)
+    {
+        @if (loading)
+        {
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                <p>@PersianResources.Loading</p>
+            </div>
+        }
+        else if (errorMessage != null)
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-gaming btn-secondary" @onclick="Close">
+                    <i class="fas fa-times"></i>
+                    <span>@PersianResources.Close</span>
+                </button>
+            </div>
+        }
+        else if (sessionDetails != null)
+        {
+            <div class="session-summary">
+                <div class="summary-row">
+                    <span class="label"><i class="fas fa-table"></i> @PersianResources.Table:</span>
+                    <span class="value">@sessionDetails.TableName</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"><i class="fas fa-clock"></i> @PersianResources.StartTime:</span>
+                    <span class="value">@sessionDetails.StartDateTime.ToPersianDateTime()</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"><i class="fas fa-clock"></i> @PersianResources.EndTime:</span>
+                    <span class="value">@DateTime.Now.ToPersianDateTime()</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"><i class="fas fa-hourglass-half"></i> @PersianResources.Duration:</span>
+                    <span class="value">@GetDuration()</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"><i class="fas fa-money-bill-wave"></i> @PersianResources.HourlyRate:</span>
+                    <span class="value">@sessionDetails.FeePerHour.ToString("N0") @PersianResources.Toman</span>
+                </div>
+                @if (sessionDetails.Customers.Any() || sessionDetails.AnonymousCustomersCount > 0)
+                {
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-users"></i> @PersianResources.Customers:</span>
+                        <span class="value">
+                            @if (sessionDetails.Customers.Any())
+                            {
+                                @string.Join("? ", sessionDetails.Customers.Select(c => c.Name))
+                                @if (sessionDetails.AnonymousCustomersCount > 0)
+                                {
+                                    <text> + </text>
+                                }
+                            }
+                            @if (sessionDetails.AnonymousCustomersCount > 0)
+                            {
+                                <span>@sessionDetails.AnonymousCustomersCount @PersianResources.AnonymousCustomer</span>
+                            }
+                        </span>
+                    </div>
+                }
+
+                @* Loyalty Program Display *@
+                @if (customersLoyalty.Any(c => c.IsLoyal))
+                {
+                    <div class="loyalty-section">
+                        <div class="loyalty-header">
+                            <i class="fas fa-star"></i>
+                            <span>@PersianResources.LoyaltyProgram</span>
+                        </div>
+
+                        @foreach (var customer in sessionDetails.Customers)
+                        {
+                            var loyaltyInfo = customersLoyalty.FirstOrDefault(l => l.CustomerId == customer.Id);
+                            if (loyaltyInfo != null && loyaltyInfo.IsLoyal)
+                            {
+                                <div class="customer-loyalty-card">
+                                    <div class="customer-info">
+                                        <i class="fas fa-user-circle"></i>
+                                        <span class="customer-name">@customer.Name</span>
+                                        @if (loyaltyInfo.CanGetFreeSession)
+                                        {
+                                            <span class="free-badge">
+                                                <i class="fas fa-gift"></i>
+                                                @PersianResources.FreeSessionEarned
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="loyalty-progress-container">
+                                        <div class="progress-info">
+                                            <span class="sessions-count">
+                                                @loyaltyInfo.PaidSessionsCount / @loyaltyInfo.SessionsRequiredForFree
+                                                @PersianResources.CompletedSessions
+                                            </span>
+                                            @if (!loyaltyInfo.CanGetFreeSession && loyaltyInfo.RemainingSessionsForFree > 0)
+                                            {
+                                                <span class="remaining-sessions">
+                                                    @loyaltyInfo.RemainingSessionsForFree @PersianResources.SessionsUntilFree
+                                                </span>
+                                            }
+                                        </div>
+                                        
+                                        <div class="loyalty-progress-bar">
+                                            <div class="progress-fill @(loyaltyInfo.CanGetFreeSession ? "completed" : "")" 
+                                                 style="width: @loyaltyInfo.ProgressPercentage%">
+                                            </div>
+                                            <div class="progress-circles">
+                                                @for (int i = 0; i < loyaltyInfo.SessionsRequiredForFree; i++)
+                                                {
+                                                    var isCompleted = i < loyaltyInfo.PaidSessionsCount;
+                                                    <div class="progress-circle @(isCompleted ? "completed" : "")">
+                                                        @if (isCompleted)
+                                                        {
+                                                            <i class="fas fa-check"></i>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="price-section">
+                @if (hasFreeSessionDiscount)
+                {
+                    <div class="free-session-notice">
+                        <i class="fas fa-gift"></i>
+                        <span>@PersianResources.FreeSessionDiscount (@freeSessionCustomersCount @(freeSessionCustomersCount > 1 ? PersianResources.Customer : PersianResources.Customer))</span>
+                    </div>
+                    <div class="recommended-price original-price">
+                        <i class="fas fa-tag"></i>
+                        <span>@PersianResources.OriginalPrice:</span>
+                        <del>@originalRecommendedPrice.ToString("N0") @PersianResources.Toman</del>
+                    </div>
+                    <div class="recommended-price discount-price">
+                        <i class="fas fa-percent"></i>
+                        <span>@PersianResources.Discount (@freeSessionCustomersCount/@totalPeopleInSession @PersianResources.Person):</span>
+                        <strong class="discount-text">-@totalDiscountAmount.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                    <div class="recommended-price discounted-price">
+                        <i class="fas fa-calculator"></i>
+                        <span>@PersianResources.RecommendedPrice:</span>
+                        <strong class="recommended-text">@recommendedPrice.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                }
+                else
+                {
+                    <div class="recommended-price">
+                        <i class="fas fa-calculator"></i>
+                        <span>@PersianResources.RecommendedPrice:</span>
+                        <strong>@recommendedPrice.ToString("N0") @PersianResources.Toman</strong>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-edit"></i>
+                        @PersianResources.EditableFinalPrice
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           @bind="finalPrice" 
+                           @bind:event="oninput"
+                           step="1000"
+                           min="0" />
+                </div>
+
+                @if (finalPrice != recommendedPrice)
+                {
+                    <div class="price-difference @(finalPrice > recommendedPrice ? "increase" : "decrease")">
+                        <i class="fas @(finalPrice > recommendedPrice ? "fa-arrow-up" : "fa-arrow-down")"></i>
+                        <span>@PersianResources.PriceDifference: @Math.Abs(finalPrice - recommendedPrice).ToString("N0") @PersianResources.Toman</span>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-gaming" @onclick="ProceedToConfirm">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>@PersianResources.Confirm</span>
+                </button>
+                <button type="button" class="btn-gaming btn-warning" @onclick="ResumeSession">
+                    <i class="fas fa-undo"></i>
+                    <span>@PersianResources.ResumeSession</span>
+                </button>
+                <button type="button" class="btn-gaming btn-secondary" @onclick="Close">
+                    <i class="fas fa-times"></i>
+                    <span>@PersianResources.Cancel</span>
+                </button>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="confirm-summary">
+            <div class="summary-item">
+                <span class="label">@PersianResources.Table:</span>
+                <span class="value">@sessionDetails?.TableName</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">@PersianResources.FinalPrice:</span>
+                <span class="value highlight">@finalPrice.ToString("N0") @PersianResources.Toman</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-wallet"></i>
+                @PersianResources.FinancialAccount
+            </label>
+            <select class="form-input" @bind="selectedFinancialAccountId">
+                <option value="0">@PersianResources.SelectFinancialAccount</option>
+                @foreach (var account in financialAccounts)
+                {
+                    <option value="@account.Id">@account.AccountName - @account.BankName</option>
+                }
+            </select>
+        </div>
+
+        @if (confirmErrorMessage != null)
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @confirmErrorMessage
+            </div>
+        }
+
+        @if (successMessage != null)
+        {
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i>
+                @successMessage
+            </div>
+        }
+
+        <div class="modal-actions">
+            <button type="button" class="btn-gaming" @onclick="FinishSession" disabled="@(submitting || selectedFinancialAccountId == 0)">
+                @if (submitting)
+                {
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>@PersianResources.Submitting</span>
+                }
+                else
+                {
+                    <i class="fas fa-check"></i>
+                    <span>@PersianResources.ConfirmAndFinish</span>
+                }
+            </button>
+            <button type="button" class="btn-gaming btn-secondary" @onclick="BackToPrice" disabled="@submitting">
+                <i class="fas fa-arrow-right"></i>
+                <span>@PersianResources.Back</span>
+            </button>
+        </div>
+    }
+</Modal>
+
+@code {
+    [Parameter] public int SessionId { get; set; }
+    [Parameter] public EventCallback OnSessionFinished { get; set; }
+
+    private bool isVisible;
+    private bool loading = true;
+    private bool submitting;
+    private bool showConfirm;
+    private string? errorMessage;
+    private string? confirmErrorMessage;
+    private string? successMessage;
+
+    private SessionDetailsDto? sessionDetails;
+    private List<FinancialAccountDto> financialAccounts = new();
+    private List<CustomerLoyaltyInfo> customersLoyalty = new();
+    private decimal recommendedPrice;
+    private decimal originalRecommendedPrice;
+    private decimal finalPrice;
+    private int selectedFinancialAccountId;
+    private bool hasFreeSessionDiscount = false;
+    private int freeSessionCustomersCount = 0;
+    private int totalPeopleInSession = 0;
+    private decimal totalDiscountAmount = 0;
+
+    public async Task Show(int sessionId)
+    {
+        SessionId = sessionId;
+        showConfirm = false;
+        errorMessage = null;
+        confirmErrorMessage = null;
+        successMessage = null;
+        selectedFinancialAccountId = 0;
+        isVisible = true;
+        loading = true;
+
+        await LoadSessionDetails();
+    }
+
+    public void Close()
+    {
+        isVisible = false;
+    }
+
+    private async Task LoadSessionDetails()
+    {
+        try
+        {
+            loading = true;
+            errorMessage = null;
+
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/sessions/{SessionId}"));
+            if (response.IsSuccessStatusCode)
+            {
+                sessionDetails = await response.Content.ReadFromJsonAsync<SessionDetailsDto>();
+                
+                if (sessionDetails != null)
+                {
+                    var duration = (DateTime.Now - sessionDetails.StartDateTime).TotalHours;
+                    originalRecommendedPrice = Math.Ceiling((decimal)duration * sessionDetails.FeePerHour / 1000) * 1000;
+                    recommendedPrice = originalRecommendedPrice;
+
+                    // Calculate loyalty info for each customer
+                    customersLoyalty.Clear();
+                    hasFreeSessionDiscount = false;
+                    freeSessionCustomersCount = 0;
+                    totalDiscountAmount = 0;
+                    
+                    // Calculate total people in session (registered customers + anonymous)
+                    totalPeopleInSession = sessionDetails.Customers.Count + sessionDetails.AnonymousCustomersCount;
+                    decimal pricePerPerson = totalPeopleInSession > 0 ? originalRecommendedPrice / totalPeopleInSession : originalRecommendedPrice;
+
+                    foreach (var customer in sessionDetails.Customers)
+                    {
+                        var loyaltyInfo = new CustomerLoyaltyInfo
+                        {
+                            CustomerId = customer.Id,
+                            IsLoyal = customer.IsLoyal,
+                            SessionsRequiredForFree = customer.SessionsRequiredForFree,
+                            PaidSessionsCount = customer.PaidSessionsCount,
+                            CanGetFreeSession = customer.IsLoyal && customer.SessionsRequiredForFree > 0 && 
+                                              customer.PaidSessionsCount >= customer.SessionsRequiredForFree,
+                            RemainingSessionsForFree = customer.IsLoyal && customer.SessionsRequiredForFree > 0
+                                ? Math.Max(0, customer.SessionsRequiredForFree - customer.PaidSessionsCount)
+                                : 0
+                        };
+
+                        if (loyaltyInfo.IsLoyal && loyaltyInfo.SessionsRequiredForFree > 0)
+                        {
+                            loyaltyInfo.ProgressPercentage = Math.Min(100, 
+                                (double)customer.PaidSessionsCount / customer.SessionsRequiredForFree * 100);
+                        }
+
+                        customersLoyalty.Add(loyaltyInfo);
+
+                        // If customer qualifies for free session, apply discount for their share only
+                        if (loyaltyInfo.CanGetFreeSession)
+                        {
+                            hasFreeSessionDiscount = true;
+                            freeSessionCustomersCount++;
+                            totalDiscountAmount += pricePerPerson; // Add this customer's share to total discount
+                        }
+                    }
+
+                    // Apply total discount from all qualifying customers
+                    if (hasFreeSessionDiscount)
+                    {
+                        recommendedPrice = Math.Max(0, originalRecommendedPrice - totalDiscountAmount);
+                        // Round to nearest 1000
+                        recommendedPrice = Math.Ceiling(recommendedPrice / 1000) * 1000;
+                        totalDiscountAmount = originalRecommendedPrice - recommendedPrice;
+                    }
+
+                    finalPrice = recommendedPrice;
+                }
+            }
+            else
+            {
+                errorMessage = PersianResources.ErrorLoadingSessionDetails;
+            }
+
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.LoadingError}: {ex.Message}";
+            loading = false;
+        }
+    }
+
+    private async Task ProceedToConfirm()
+    {
+        try
+        {
+            loading = true;
+            confirmErrorMessage = null;
+
+            // Load financial accounts
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/financialaccounts"));
+            if (response.IsSuccessStatusCode)
+            {
+                financialAccounts = await response.Content.ReadFromJsonAsync<List<FinancialAccountDto>>() ?? new();
+                showConfirm = true;
+            }
+            else
+            {
+                confirmErrorMessage = PersianResources.ErrorLoadingFinancialAccounts;
+            }
+
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            confirmErrorMessage = $"{PersianResources.Error}: {ex.Message}";
+            loading = false;
+        }
+    }
+
+    private void BackToPrice()
+    {
+        showConfirm = false;
+        confirmErrorMessage = null;
+    }
+
+    private async Task ResumeSession()
+    {
+        try
+        {
+            submitting = true;
+            errorMessage = null;
+
+            var response = await Http.PostAsync(ApiConfig.GetApiUrl($"/api/sessions/{SessionId}/resume"), null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                await OnSessionFinished.InvokeAsync();
+                Close();
+            }
+            else
+            {
+                errorMessage = PersianResources.ErrorResumingSession;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.Error}: {ex.Message}";
+        }
+        finally
+        {
+            submitting = false;
+        }
+    }
+
+    private async Task FinishSession()
+    {
+        try
+        {
+            submitting = true;
+            confirmErrorMessage = null;
+
+            var command = new
+            {
+                sessionId = SessionId,
+                finalPrice = finalPrice,
+                financialAccountId = selectedFinancialAccountId
+            };
+
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl($"/api/sessions/{SessionId}/finish"), command);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = PersianResources.SessionFinishedSuccess;
+                await Task.Delay(1500);
+                await OnSessionFinished.InvokeAsync();
+                Close();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                confirmErrorMessage = $"{PersianResources.ErrorFinishingSession}: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            confirmErrorMessage = $"{PersianResources.Error}: {ex.Message}";
+        }
+        finally
+        {
+            submitting = false;
+        }
+    }
+
+    private string GetDuration()
+    {
+        if (sessionDetails == null) return "--";
+        
+        var duration = DateTime.Now - sessionDetails.StartDateTime;
+        var hours = (int)duration.TotalHours;
+        var minutes = duration.Minutes;
+        
+        if (hours > 0)
+            return $"{hours} {PersianResources.Hours} {PersianResources.And} {minutes} {PersianResources.Minutes}";
+        else
+            return $"{minutes} {PersianResources.Minutes}";
+    }
+
+    // DTOs
+    private class SessionDetailsDto
+    {
+        public int Id { get; set; }
+        public string TableName { get; set; } = string.Empty;
+        public DateTime StartDateTime { get; set; }
+        public decimal FeePerHour { get; set; }
+        public int AnonymousCustomersCount { get; set; } = 0;
+        public List<CustomerDto> Customers { get; set; } = new();
+    }
+
+    private class CustomerDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public bool IsLoyal { get; set; }
+        public int SessionsRequiredForFree { get; set; }
+        public int PaidSessionsCount { get; set; }
+    }
+
+    private class FinancialAccountDto
+    {
+        public int Id { get; set; }
+        public string AccountName { get; set; } = string.Empty;
+        public string BankName { get; set; } = string.Empty;
+        public string CardNumber { get; set; } = string.Empty;
+    }
+
+    private class CustomerLoyaltyInfo
+    {
+        public int CustomerId { get; set; }
+        public bool IsLoyal { get; set; }
+        public int SessionsRequiredForFree { get; set; }
+        public int PaidSessionsCount { get; set; }
+        public bool CanGetFreeSession { get; set; }
+        public int RemainingSessionsForFree { get; set; }
+        public double ProgressPercentage { get; set; }
+    }
+}

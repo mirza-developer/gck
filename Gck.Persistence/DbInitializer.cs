@@ -35,7 +35,6 @@ public static class DbInitializer
                 logger.LogInformation("Database migrations applied successfully");
             }
 
-            // Seed default admin user if no users exist
             if (!await context.Users.AnyAsync())
             {
                 var adminUser = new User
@@ -46,8 +45,8 @@ public static class DbInitializer
                     Email = "admin@gckgames.ir",
                     PasswordHash = HashPassword("Admin@123"),
                     IsActive = true,
-                    CreateDate = DateTime.UtcNow,
-                    LastModifiedDate = DateTime.UtcNow,
+                    CreateDate = DateTime.Now,
+                    LastModifiedDate = DateTime.Now,
                     CreatorIdentityID = "system",
                     PhoneNumber = null,
                     Details = "حساب کاربری پیش‌فرض مدیر سیستم"
@@ -55,10 +54,6 @@ public static class DbInitializer
 
                 context.Users.Add(adminUser);
                 await context.SaveChangesAsync();
-
-                logger.LogInformation("Default admin user created successfully");
-                logger.LogInformation("Username: admin");
-                logger.LogInformation("Password: Admin@123");
             }
         }
         catch (Exception ex)

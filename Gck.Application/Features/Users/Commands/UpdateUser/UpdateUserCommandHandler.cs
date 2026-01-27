@@ -41,7 +41,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
         user.PhoneNumber = request.PhoneNumber;
         user.IsActive = request.IsActive;
         user.Details = request.Details;
-        user.LastModifiedDate = DateTime.UtcNow;
+        user.LastModifiedDate = DateTime.Now;
         user.LastModifierIdentityID = "system"; // You can change this to actual user ID
 
         await _context.SaveChangesAsync(cancellationToken);

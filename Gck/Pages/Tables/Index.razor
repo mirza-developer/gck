@@ -1,0 +1,189 @@
+@page "/tables"
+@using Gck.Application.DTOs
+@using Gck.Resources
+@using Gck.Shared.Modals
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-table"></i>
+                @PersianResources.TablesManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewTable
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchTables" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredTables.Any())
+                {
+                    <div class="users-grid">
+                        @foreach (var table in FilteredTables)
+                        {
+                            <div class="user-card fade-in-up">
+                                <div class="user-header">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-table"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        <h3 class="user-name">@table.Name</h3>
+                                        <p class="user-username">@PersianResources.ControllersCount: @table.NumberOfControllers - @PersianResources.HourlyFee: @table.HourlyFeePerController.ToString("N0") @PersianResources.Toman</p>
+                                    </div>
+                                    <div class="user-status @(table.IsOccupied ? "inactive" : "active")">
+                                        @(table.IsOccupied ? PersianResources.TableOccupied : PersianResources.TableAvailable)
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(table.Id)">
+                                        <i class="fas fa-edit"></i>
+                                        @PersianResources.Edit
+                                    </button>
+                                    <button class="btn-action btn-delete" @onclick="() => ShowDeleteConfirmation(table.Id)">
+                                        <i class="fas fa-trash"></i>
+                                        @PersianResources.Delete
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoTablesFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<Modal @bind-IsVisible="showDeleteModal"
+       Title="@PersianResources.DeleteTableConfirm"
+       ConfirmText="@PersianResources.Delete"
+       CancelText="@PersianResources.Cancel"
+       OnConfirm="ConfirmDelete"
+       Size="ModalSize.Small">
+    <p style="text-align: center; color: var(--text-primary);">
+        ??? ???? ????? ?????? ?? ??? ??? ????? ????
+    </p>
+</Modal>
+
+@code {
+    private List<TableDto> tables = new();
+    private string searchText = string.Empty;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+    private bool showDeleteModal = false;
+    private int tableToDeleteId = 0;
+
+    private List<TableDto> FilteredTables =>
+        tables.Where(t =>
+            string.IsNullOrEmpty(searchText) ||
+            t.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTables();
+    }
+
+    private async Task LoadTables()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/tables"));
+            if (response.IsSuccessStatusCode)
+            {
+                tables = await response.Content.ReadFromJsonAsync<List<TableDto>>() ?? new();
+            }
+            else
+            {
+                errorMessage = PersianResources.LoadTablesError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/tables/add");
+    }
+
+    private void NavigateToEdit(int id)
+    {
+        Navigation.NavigateTo($"/tables/edit/{id}");
+    }
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        tableToDeleteId = id;
+        showDeleteModal = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/tables/{tableToDeleteId}"));
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadTables();
+            }
+            else
+            {
+                errorMessage = PersianResources.DeleteTableError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.Error}: {ex.Message}";
+        }
+    }
+}

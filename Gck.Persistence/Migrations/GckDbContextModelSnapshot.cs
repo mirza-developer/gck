@@ -22,6 +22,261 @@ namespace Gck.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Gck.Domain.Entities.AccountantReceipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("FinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("FinancialAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReceiptDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("RecommendedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinancialAccountId");
+
+                    b.HasIndex("ReceiptDateTime");
+
+                    b.HasIndex("SessionId")
+                        .IsUnique();
+
+                    b.ToTable("tbl_AccountantReceipt");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BirthYear")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsLoyal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsMale")
+                        .HasMaxLength(20)
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("PaidSessionsCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("SessionsRequiredForFree")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber");
+
+                    b.ToTable("tbl_Customer");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.FinancialAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tbl_FinancialAccount");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeatsCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tbl_HourlyFee");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnonymousCustomersCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FeeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("FinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFreeSession")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("RecommendedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TableId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeeId");
+
+                    b.HasIndex("IsCompleted");
+
+                    b.HasIndex("StartDateTime");
+
+                    b.HasIndex("TableId");
+
+                    b.ToTable("tbl_Session");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.SessionCustomer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex(new[] { "SessionId", "CustomerId" }, "IX_SessionCustomer_SessionId_CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("tbl_SessionCustomer");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Table", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("tbl_Table");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -104,6 +359,63 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_UserClaim");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.AccountantReceipt", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.FinancialAccount", "FinancialAccount")
+                        .WithMany("AccountantReceipts")
+                        .HasForeignKey("FinancialAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Gck.Domain.Entities.Session", "Session")
+                        .WithOne("AccountantReceipt")
+                        .HasForeignKey("Gck.Domain.Entities.AccountantReceipt", "SessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FinancialAccount");
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.HourlyFee", "Fee")
+                        .WithMany("Sessions")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gck.Domain.Entities.Table", "Table")
+                        .WithMany("Sessions")
+                        .HasForeignKey("TableId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Fee");
+
+                    b.Navigation("Table");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.SessionCustomer", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.Customer", "Customer")
+                        .WithMany("SessionCustomers")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gck.Domain.Entities.Session", "Session")
+                        .WithMany("SessionCustomers")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Session");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.UserClaim", b =>
                 {
                     b.HasOne("Gck.Domain.Entities.User", "User")
@@ -113,6 +425,33 @@ namespace Gck.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
+                {
+                    b.Navigation("SessionCustomers");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.FinancialAccount", b =>
+                {
+                    b.Navigation("AccountantReceipts");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
+                {
+                    b.Navigation("AccountantReceipt");
+
+                    b.Navigation("SessionCustomers");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Table", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.User", b =>

@@ -11,16 +11,54 @@
                 <i class="fas fa-gamepad"></i>
                 گیم سنتر کوثر
             </a>
-            
+
             <ul class="nav-menu">
-                <li><a href="/" class="nav-link">خانه</a></li>
-                <li><a href="/games" class="nav-link">بازی‌ها</a></li>
-                @if (isLoggedIn)
+                @if (!isLoggedIn)
                 {
-                    <li><a href="/users" class="nav-link">کاربران</a></li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            خانه
+                        </a>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="/games" class="nav-link">
+                            <i class="fas fa-gamepad"></i>
+                            بازی‌ها
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/games/action" class="dropdown-item"><i class="fas fa-fist-raised"></i> اکشن</a></li>
+                            <li><a href="/games/sports" class="dropdown-item"><i class="fas fa-futbol"></i> ورزشی</a></li>
+                            <li><a href="/games/racing" class="dropdown-item"><i class="fas fa-car"></i> مسابقه‌ای</a></li>
+                            <li><a href="/games/adventure" class="dropdown-item"><i class="fas fa-compass"></i> ماجراجویی</a></li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a href="/management" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            داشبورد
+                        </a>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="#" class="nav-link" @onclick:preventDefault>
+                            <i class="fas fa-cog"></i>
+                            مدیریت
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/users" class="dropdown-item"><i class="fas fa-users"></i> کاربران</a></li>
+                            <li><a href="/tables" class="dropdown-item"><i class="fas fa-table"></i> میزها</a></li>
+                            <li><a href="/customers" class="dropdown-item"><i class="fas fa-user-friends"></i> مشتریان</a></li>
+                            <li><a href="/financialaccounts" class="dropdown-item"><i class="fas fa-wallet"></i> حساب‌های مالی</a></li>
+                        </ul>
+                    </li>
                 }
             </ul>
-            
+
             <div class="nav-actions">
                 @if (isLoggedIn)
                 {
@@ -38,8 +76,8 @@
                     </a>
                 }
             </div>
-            
-            <button class="mobile-menu-toggle">
+
+            <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -48,49 +86,52 @@
     <main class="main-content">
         @Body
     </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>گیم سنتر کوثر</h3>
-                    <p>بهترین تجربه گیمینگ با جدیدترین بازی‌های روز دنیا</p>
-                    <div class="social-links">
-                        <a href="https://instagram.com/kowsar_gc" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="https://t.me/kowsar_gc" class="social-link"><i class="fab fa-telegram"></i></a>
+    @if (!isLoggedIn)
+    {
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>گیم سنتر کوثر</h3>
+                        <p>بهترین تجربه گیمینگ با جدیدترین بازی‌های روز دنیا</p>
+                        <div class="social-links">
+                            <a href="https://instagram.com/kowsar_gc" class="social-link" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="https://t.me/kowsar_gc" class="social-link" target="_blank"><i class="fab fa-telegram"></i></a>
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <h4>دسته‌بندی بازی‌ها</h4>
+                        <ul class="footer-links">
+                            <li>اکشن</li>
+                            <li>ورزشی</li>
+                            <li>مسابقه‌ای</li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>پشتیبانی</h4>
+                        <ul class="footer-links">
+                            <li><a href="/help">راهنما</a></li>
+                            <li><a href="/contact">تماس با ما</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>موقعیت ما روی نقشه</h4>
+                        <div id="footer-map" style="width:100%;height:220px;border-radius:16px;overflow:hidden;"></div>
                     </div>
                 </div>
-                <div class="footer-section">
-                    <h4>دسته‌بندی بازی‌ها</h4>
-                    <ul class="footer-links">
-                        <li>اکشن</li>
-                        <li>ورزشی</li>
-                        <li>مسابقه‌ای</li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>پشتیبانی</h4>
-                    <ul class="footer-links">
-                        <li><a href="/help">راهنما</a></li>
-                        <li><a href="/contact">تماس با ما</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>موقعیت ما روی نقشه</h4>
-                    <div id="footer-map" style="width:100%;height:220px;border-radius:16px;overflow:hidden;"></div>
+
+                <div class="footer-bottom">
+                    <p>&copy; ۱۴۰۴ گیم سنتر کوثر. تمامی حقوق محفوظ است.</p>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; ۱۴۰۴ گیم سنتر کوثر. تمامی حقوق محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
+        </footer>
+    }
 </div>
 
 @code {
     private bool isLoggedIn = false;
     private string currentUserName = string.Empty;
+    private bool isMobileMenuOpen = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,6 +167,11 @@
         await LocalStorage.RemoveItemAsync("currentUserId");
         await LocalStorage.RemoveItemAsync("currentUserName");
         Navigation.NavigateTo("/login", true);
+    }
+
+    private void ToggleMobileMenu()
+    {
+        isMobileMenuOpen = !isMobileMenuOpen;
     }
 
     public void Dispose()

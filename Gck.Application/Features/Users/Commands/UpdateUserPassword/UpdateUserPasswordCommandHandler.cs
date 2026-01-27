@@ -32,7 +32,7 @@ public class UpdateUserPasswordCommandHandler : IRequestHandler<UpdateUserPasswo
 
         // Update to new password
         user.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
-        user.LastModifiedDate = DateTime.UtcNow;
+        user.LastModifiedDate = DateTime.Now;
         user.LastModifierIdentityID = "system"; // You can change this to actual user ID
 
         await _context.SaveChangesAsync(cancellationToken);

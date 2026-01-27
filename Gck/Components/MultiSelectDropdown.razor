@@ -1,0 +1,429 @@
+@typeparam TItem
+@typeparam TValue
+
+<div class="multiselect-dropdown" @ref="dropdownRef">
+    <div class="multiselect-input" @onclick="ToggleDropdown">
+        <div class="multiselect-selected">
+            @if (IsMultiSelect)
+            {
+                @if (SelectedValues.Any())
+                {
+                    @foreach (var value in SelectedValues)
+                    {
+                        var item = Items.FirstOrDefault(i => GetValue(i).Equals(value));
+                        if (item != null)
+                        {
+                            <span class="multiselect-tag">
+                                @GetDisplayText(item)
+                                <i class="fas fa-times" @onclick="@(e => RemoveValue(value))" @onclick:stopPropagation="true"></i>
+                            </span>
+                        }
+                    }
+                }
+                else
+                {
+                    <span class="multiselect-placeholder">@Placeholder</span>
+                }
+            }
+            else
+            {
+                @if (SelectedValue != null && !SelectedValue.Equals(default(TValue)))
+                {
+                    var item = Items.FirstOrDefault(i => GetValue(i).Equals(SelectedValue));
+                    if (item != null)
+                    {
+                        <span class="multiselect-single-value">@GetDisplayText(item)</span>
+                    }
+                }
+                else
+                {
+                    <span class="multiselect-placeholder">@Placeholder</span>
+                }
+            }
+        </div>
+        <i class="fas @(isDropdownOpen ? "fa-chevron-up" : "fa-chevron-down") multiselect-arrow"></i>
+    </div>
+    
+    @if (isDropdownOpen)
+    {
+        <div class="multiselect-options">
+            @if (EnableSearch)
+            {
+                <div class="multiselect-search">
+                    <i class="fas fa-search multiselect-search-icon"></i>
+                    <input type="text" 
+                           class="multiselect-search-input" 
+                           placeholder="@SearchPlaceholder"
+                           @bind="searchText"
+                           @bind:event="oninput"
+                           @onclick:stopPropagation="true" />
+                    @if (!string.IsNullOrWhiteSpace(searchText))
+                    {
+                        <i class="fas fa-times multiselect-search-clear" @onclick="ClearSearch" @onclick:stopPropagation="true"></i>
+                    }
+                </div>
+            }
+            
+            <div class="multiselect-options-list">
+                @if (FilteredItems.Any())
+                {
+                    @foreach (var item in FilteredItems)
+                    {
+                        var itemValue = GetValue(item);
+                        var isSelected = IsMultiSelect 
+                            ? SelectedValues.Contains(itemValue) 
+                            : SelectedValue != null && SelectedValue.Equals(itemValue);
+                        
+                        <div class="multiselect-option @(isSelected ? "selected" : "")"
+                             @onclick="@(() => HandleItemClick(itemValue))">
+                            @if (IsMultiSelect)
+                            {
+                                <input type="checkbox" 
+                                       checked="@isSelected"
+                                       @onclick:stopPropagation="true"
+                                       @onchange="@(e => HandleItemClick(itemValue))" />
+                            }
+                            <span>@GetDisplayText(item)</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="multiselect-no-results">
+                        <i class="fas fa-search"></i>
+                        <span>@NoResultsText</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .multiselect-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .multiselect-input {
+        width: 100%;
+        min-height: 3rem;
+        padding: 0.5rem 2.5rem 0.5rem 1.2rem;
+        background: rgba(26, 26, 46, 0.6);
+        border: 1px solid rgba(108, 92, 231, 0.3);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .multiselect-input:hover {
+        border-color: var(--primary-purple);
+    }
+
+    .multiselect-input:focus-within {
+        outline: none;
+        border-color: var(--primary-purple);
+        background: rgba(26, 26, 46, 0.9);
+        box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+    }
+
+    .multiselect-selected {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .multiselect-placeholder {
+        color: var(--text-secondary);
+    }
+
+    .multiselect-single-value {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .multiselect-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, rgba(108, 92, 231, 0.3), rgba(253, 121, 168, 0.3));
+        color: var(--text-primary);
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid rgba(108, 92, 231, 0.4);
+    }
+
+    .multiselect-tag i {
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: color 0.2s;
+    }
+
+    .multiselect-tag i:hover {
+        color: var(--secondary-pink);
+    }
+
+    .multiselect-arrow {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-secondary);
+        transition: transform 0.3s ease;
+        pointer-events: none;
+    }
+
+    .multiselect-options {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        right: 0;
+        max-height: 300px;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(108, 92, 231, 0.4);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: dropdownSlide 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @@keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .multiselect-search {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(108, 92, 231, 0.2);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(26, 26, 46, 0.8);
+        border-radius: 12px 12px 0 0;
+    }
+
+    .multiselect-search-icon {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .multiselect-search-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-primary);
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 0.95rem;
+        padding: 0.25rem;
+    }
+
+    .multiselect-search-input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .multiselect-search-clear {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        transition: color 0.2s;
+    }
+
+    .multiselect-search-clear:hover {
+        color: var(--secondary-pink);
+    }
+
+    .multiselect-options-list {
+        overflow-y: auto;
+        max-height: 250px;
+    }
+
+    .multiselect-options-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .multiselect-options-list::-webkit-scrollbar-track {
+        background: rgba(26, 26, 46, 0.5);
+        border-radius: 10px;
+    }
+
+    .multiselect-options-list::-webkit-scrollbar-thumb {
+        background: var(--primary-purple);
+        border-radius: 10px;
+    }
+
+    .multiselect-option {
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+    }
+
+    .multiselect-option:last-child {
+        border-bottom: none;
+    }
+
+    .multiselect-option:hover {
+        background: rgba(108, 92, 231, 0.2);
+    }
+
+    .multiselect-option.selected {
+        background: rgba(108, 92, 231, 0.3);
+    }
+
+    .multiselect-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-purple);
+    }
+
+    .multiselect-option span {
+        flex: 1;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+
+    .multiselect-no-results {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .multiselect-no-results i {
+        font-size: 2rem;
+        opacity: 0.5;
+    }
+
+    .multiselect-no-results span {
+        font-size: 0.95rem;
+    }
+</style>
+
+@code {
+    [Parameter] public List<TItem> Items { get; set; } = new();
+    [Parameter] public bool IsMultiSelect { get; set; } = true;
+    [Parameter] public bool EnableSearch { get; set; } = false;
+    [Parameter] public string Placeholder { get; set; } = "?????? ????...";
+    [Parameter] public string SearchPlaceholder { get; set; } = "?????...";
+    [Parameter] public string NoResultsText { get; set; } = "???????? ???? ???";
+    
+    // For multi-select mode
+    [Parameter] public List<TValue> SelectedValues { get; set; } = new();
+    [Parameter] public EventCallback<List<TValue>> SelectedValuesChanged { get; set; }
+    
+    // For single-select mode
+    [Parameter] public TValue? SelectedValue { get; set; }
+    [Parameter] public EventCallback<TValue?> SelectedValueChanged { get; set; }
+    
+    [Parameter] public Func<TItem, TValue> ValueSelector { get; set; } = null!;
+    [Parameter] public Func<TItem, string> DisplayTextSelector { get; set; } = null!;
+
+    private bool isDropdownOpen;
+    private string searchText = string.Empty;
+    private ElementReference dropdownRef;
+
+    private List<TItem> FilteredItems
+    {
+        get
+        {
+            if (!EnableSearch || string.IsNullOrWhiteSpace(searchText))
+            {
+                return Items;
+            }
+
+            var searchLower = searchText.ToLower();
+            return Items.Where(item => 
+                GetDisplayText(item).ToLower().Contains(searchLower)
+            ).ToList();
+        }
+    }
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+        if (!isDropdownOpen)
+        {
+            searchText = string.Empty;
+        }
+    }
+
+    public void CloseDropdown()
+    {
+        isDropdownOpen = false;
+        searchText = string.Empty;
+    }
+
+    private void ClearSearch()
+    {
+        searchText = string.Empty;
+    }
+
+    private TValue GetValue(TItem item)
+    {
+        return ValueSelector(item);
+    }
+
+    private string GetDisplayText(TItem item)
+    {
+        return DisplayTextSelector(item);
+    }
+
+    private async Task HandleItemClick(TValue value)
+    {
+        if (IsMultiSelect)
+        {
+            if (SelectedValues.Contains(value))
+            {
+                SelectedValues.Remove(value);
+            }
+            else
+            {
+                SelectedValues.Add(value);
+            }
+            await SelectedValuesChanged.InvokeAsync(SelectedValues);
+        }
+        else
+        {
+            SelectedValue = value;
+            await SelectedValueChanged.InvokeAsync(SelectedValue);
+            isDropdownOpen = false;
+            searchText = string.Empty;
+        }
+    }
+
+    private async Task RemoveValue(TValue value)
+    {
+        if (IsMultiSelect)
+        {
+            SelectedValues.Remove(value);
+            await SelectedValuesChanged.InvokeAsync(SelectedValues);
+        }
+    }
+}

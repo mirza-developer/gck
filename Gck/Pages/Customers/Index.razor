@@ -1,0 +1,355 @@
+@page "/customers"
+@using Gck.Application.DTOs
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i>
+                @PersianResources.CustomersManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewCustomer
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchCustomers" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredCustomers.Any())
+                {
+                    <div class="data-grid">
+                        <table class="data-grid-table">
+                            <thead class="data-grid-header">
+                                <tr>
+                                    <th></th>
+                                    <th>@PersianResources.CustomerName</th>
+                                    <th>@PersianResources.Phone</th>
+                                    <th>@PersianResources.BirthYear</th>
+                                    <th>@PersianResources.Gender</th>
+                                    <th>@PersianResources.SessionsCount</th>
+                                    <th>@PersianResources.LoyaltyProgram</th>
+                                    <th>@PersianResources.Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="data-grid-body">
+                                @foreach (var customer in FilteredCustomers)
+                                {
+                                    var isExpanded = expandedRowId == customer.Id;
+                                    <tr class="@(isExpanded ? "expanded" : "")">
+                                        <td>
+                                            <button class="grid-expand-toggle @(isExpanded ? "expanded" : "")" 
+                                                    @onclick="() => ToggleRow(customer.Id)">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-primary">@customer.Name</span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-secondary">@customer.PhoneNumber</span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-secondary">@customer.BirthYear</span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-badge @(customer.Gender == "Male" ? "male" : "female")">
+                                                <i class="fas @(customer.Gender == "Male" ? "fa-mars" : "fa-venus")"></i>
+                                                @(customer.Gender == "Male" ? PersianResources.Male : PersianResources.Female)
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-badge session-count">
+                                                <i class="fas fa-gamepad"></i>
+                                                @customer.SessionCount @PersianResources.Times
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (customer.IsLoyal)
+                                            {
+                                                var sessionsUntilFree = customer.SessionsRequiredForFree - (customer.PaidSessionsCount % customer.SessionsRequiredForFree);
+                                                var canGetFree = sessionsUntilFree == customer.SessionsRequiredForFree || customer.PaidSessionsCount >= customer.SessionsRequiredForFree;
+                                                
+                                                @if (canGetFree && customer.PaidSessionsCount > 0)
+                                                {
+                                                    <span class="grid-cell-badge" style="background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid rgba(0, 255, 0, 0.3);">
+                                                        <i class="fas fa-gift"></i>
+                                                        @PersianResources.FreeSessionAvailable
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="grid-cell-badge" style="background: rgba(255, 215, 0, 0.2); color: gold; border: 1px solid rgba(255, 215, 0, 0.3);">
+                                                        <i class="fas fa-star"></i>
+                                                        @sessionsUntilFree @PersianResources.SessionsUntilFree
+                                                    </span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="grid-cell-secondary">@PersianResources.RegularCustomer</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="grid-actions">
+                                                <button class="grid-action-btn edit" @onclick="() => NavigateToEdit(customer.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                    @PersianResources.Edit
+                                                </button>
+                                                <button class="grid-action-btn delete" @onclick="() => DeleteCustomer(customer.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                    @PersianResources.Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @if (isExpanded)
+                                    {
+                                        <tr class="grid-details-row">
+                                            <td colspan="8" class="grid-details-cell">
+                                                <div class="grid-details-content">
+                                                    <div class="grid-details-header">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        <h4>@PersianResources.CustomerFullDetails</h4>
+                                                    </div>
+                                                    <div class="grid-details-body">
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-id-card"></i>
+                                                                @PersianResources.Id
+                                                            </div>
+                                                            <div class="grid-detail-value highlight">
+                                                                #@customer.Id
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-user"></i>
+                                                                @PersianResources.CustomerName
+                                                            </div>
+                                                            <div class="grid-detail-value">
+                                                                @customer.Name
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-phone"></i>
+                                                                @PersianResources.Phone
+                                                            </div>
+                                                            <div class="grid-detail-value">
+                                                                @customer.PhoneNumber
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-calendar-alt"></i>
+                                                                @PersianResources.BirthYear
+                                                            </div>
+                                                            <div class="grid-detail-value">
+                                                                @customer.BirthYear @PersianResources.Shamsi
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas @(customer.Gender == "Male" ? "fa-mars" : "fa-venus")"></i>
+                                                                @PersianResources.Gender
+                                                            </div>
+                                                            <div class="grid-detail-value">
+                                                                @(customer.Gender == "Male" ? PersianResources.Male : PersianResources.Female)
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-calculator"></i>
+                                                                @PersianResources.ApproximateAge
+                                                            </div>
+                                                            <div class="grid-detail-value highlight">
+                                                                @CalculateAge(customer.BirthYear) @PersianResources.Year
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-detail-item">
+                                                            <div class="grid-detail-label">
+                                                                <i class="fas fa-gamepad"></i>
+                                                                @PersianResources.TotalSessions
+                                                            </div>
+                                                            <div class="grid-detail-value highlight">
+                                                                @customer.SessionCount @PersianResources.Times
+                                                            </div>
+                                                        </div>
+                                                        @if (customer.IsLoyal)
+                                                        {
+                                                            <div class="grid-detail-item">
+                                                                <div class="grid-detail-label">
+                                                                    <i class="fas fa-star"></i>
+                                                                    @PersianResources.IsLoyal
+                                                                </div>
+                                                                <div class="grid-detail-value highlight">
+                                                                    @PersianResources.LoyalCustomer
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid-detail-item">
+                                                                <div class="grid-detail-label">
+                                                                    <i class="fas fa-gift"></i>
+                                                                    @PersianResources.SessionsRequiredForFree
+                                                                </div>
+                                                                <div class="grid-detail-value">
+                                                                    @customer.SessionsRequiredForFree @PersianResources.Times
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid-detail-item">
+                                                                <div class="grid-detail-label">
+                                                                    <i class="fas fa-coins"></i>
+                                                                    @PersianResources.PaidSessionsCount
+                                                                </div>
+                                                                <div class="grid-detail-value">
+                                                                    @customer.PaidSessionsCount @PersianResources.Times
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoCustomersFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<CustomerDto> customers = new();
+    private string searchText = string.Empty;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+    private int? expandedRowId = null;
+
+    private List<CustomerDto> FilteredCustomers =>
+        customers.Where(c =>
+            string.IsNullOrEmpty(searchText) ||
+            c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            c.PhoneNumber.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
+            if (response.IsSuccessStatusCode)
+            {
+                customers = await response.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
+            }
+            else
+            {
+                errorMessage = PersianResources.LoadCustomersError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ToggleRow(int customerId)
+    {
+        expandedRowId = expandedRowId == customerId ? null : customerId;
+    }
+
+    private int CalculateAge(int birthYear)
+    {
+        var currentPersianYear = 1403; // You can use a Persian calendar library for accurate calculation
+        return currentPersianYear - birthYear;
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/customers/add");
+    }
+
+    private void NavigateToEdit(int id)
+    {
+        Navigation.NavigateTo($"/customers/edit/{id}");
+    }
+
+    private async Task DeleteCustomer(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteCustomerConfirm);
+        
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadCustomers();
+                }
+                else
+                {
+                    errorMessage = PersianResources.DeleteCustomerError;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"{PersianResources.Error}: {ex.Message}";
+            }
+        }
+    }
+}
