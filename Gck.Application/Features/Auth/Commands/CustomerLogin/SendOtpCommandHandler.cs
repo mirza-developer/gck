@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Gck.Application.Features.Auth.Commands.CustomerLogin;
@@ -36,9 +37,8 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             };
         }
 
-        // Generate 6-digit OTP
-        var random = new Random();
-        var otpCode = random.Next(100000, 999999).ToString();
+        // Generate cryptographically secure 6-digit OTP
+        var otpCode = GenerateSecureOtp();
 
         // Get SMS provider configuration
         var smsBaseUrl = _configuration["SmsProvider:BaseUrl"] ?? "https://console.melipayamak.com";
@@ -84,6 +84,16 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
         // Use the OTP from SMS provider if available, otherwise use generated one
         var otpToStore = actualOtpSent ?? otpCode;
 
+        // Clean up old expired OTPs for this phone number to prevent database bloat
+        var expiredOtps = await _context.CustomerOtps
+            .Where(o => o.PhoneNumber == request.PhoneNumber && o.ExpiresAt < DateTime.UtcNow)
+            .ToListAsync(cancellationToken);
+        
+        if (expiredOtps.Any())
+        {
+            _context.CustomerOtps.RemoveRange(expiredOtps);
+        }
+
         // Store OTP in database with 1-minute expiration
         var otpEntity = new CustomerOtp
         {
@@ -102,5 +112,12 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             Success = true,
             Message = "کد تایید برای شما ارسال شد"
         };
+    }
+
+    private static string GenerateSecureOtp()
+    {
+        // Generate cryptographically secure random 6-digit OTP
+        var randomNumber = RandomNumberGenerator.GetInt32(100000, 1000000);
+        return randomNumber.ToString();
     }
 }
