@@ -34,12 +34,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    // Initialize dropdown menu
+    initDropdownMenu();
+    
     // Gaming cursor effect
     createGamingCursor();
     
     // Particle background
     createParticleBackground();
 });
+
+// Dropdown menu functionality
+function initDropdownMenu() {
+    // Handle mobile menu toggle
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (mobileMenuToggle && navMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('mobile-open');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            }
+        });
+    }
+    
+    // Handle dropdown clicks on mobile
+    const dropdownItems = document.querySelectorAll('.nav-item.has-dropdown');
+    
+    dropdownItems.forEach(item => {
+        const link = item.querySelector('.nav-link');
+        
+        // On mobile, toggle dropdown on click
+        if (window.innerWidth <= 768 && link) {
+            link.addEventListener('click', (e) => {
+                if (link.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    item.classList.toggle('open');
+                }
+            });
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-item.has-dropdown')) {
+            dropdownItems.forEach(item => {
+                item.classList.remove('open');
+            });
+        }
+    });
+    
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (window.innerWidth > 768) {
+                navMenu.classList.remove('mobile-open');
+                const icon = mobileMenuToggle?.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                }
+                dropdownItems.forEach(item => {
+                    item.classList.remove('open');
+                });
+            }
+        }, 250);
+    });
+}
 
 // Helper function to safely check if element matches selector
 function elementMatches(element, selector) {

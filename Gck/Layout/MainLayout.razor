@@ -15,16 +15,47 @@
             <ul class="nav-menu">
                 @if (!isLoggedIn)
                 {
-                    <li><a href="/" class="nav-link">خانه</a></li>
-                    <li><a href="/games" class="nav-link">بازی‌ها</a></li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            خانه
+                        </a>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="/games" class="nav-link">
+                            <i class="fas fa-gamepad"></i>
+                            بازی‌ها
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/games/action" class="dropdown-item"><i class="fas fa-fist-raised"></i> اکشن</a></li>
+                            <li><a href="/games/sports" class="dropdown-item"><i class="fas fa-futbol"></i> ورزشی</a></li>
+                            <li><a href="/games/racing" class="dropdown-item"><i class="fas fa-car"></i> مسابقه‌ای</a></li>
+                            <li><a href="/games/adventure" class="dropdown-item"><i class="fas fa-compass"></i> ماجراجویی</a></li>
+                        </ul>
+                    </li>
                 }
                 else
                 {
-                    <li><a href="/management" class="nav-link">داشبورد</a></li>
-                    <li><a href="/users" class="nav-link">کاربران</a></li>
-                    <li><a href="/tables" class="nav-link">میزها</a></li>
-                    <li><a href="/customers" class="nav-link">مشتریان</a></li>
-                    <li><a href="/financialaccounts" class="nav-link">حساب‌های مالی</a></li>
+                    <li class="nav-item">
+                        <a href="/management" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            داشبورد
+                        </a>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="#" class="nav-link" @onclick:preventDefault>
+                            <i class="fas fa-cog"></i>
+                            مدیریت
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/users" class="dropdown-item"><i class="fas fa-users"></i> کاربران</a></li>
+                            <li><a href="/tables" class="dropdown-item"><i class="fas fa-table"></i> میزها</a></li>
+                            <li><a href="/customers" class="dropdown-item"><i class="fas fa-user-friends"></i> مشتریان</a></li>
+                            <li><a href="/financialaccounts" class="dropdown-item"><i class="fas fa-wallet"></i> حساب‌های مالی</a></li>
+                        </ul>
+                    </li>
                 }
             </ul>
 
@@ -46,7 +77,7 @@
                 }
             </div>
 
-            <button class="mobile-menu-toggle">
+            <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -100,6 +131,7 @@
 @code {
     private bool isLoggedIn = false;
     private string currentUserName = string.Empty;
+    private bool isMobileMenuOpen = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,6 +167,11 @@
         await LocalStorage.RemoveItemAsync("currentUserId");
         await LocalStorage.RemoveItemAsync("currentUserName");
         Navigation.NavigateTo("/login", true);
+    }
+
+    private void ToggleMobileMenu()
+    {
+        isMobileMenuOpen = !isMobileMenuOpen;
     }
 
     public void Dispose()
