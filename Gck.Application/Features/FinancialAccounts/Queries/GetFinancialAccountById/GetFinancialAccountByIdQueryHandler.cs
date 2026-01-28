@@ -17,13 +17,18 @@ public class GetFinancialAccountByIdQueryHandler : IRequestHandler<GetFinancialA
     public async Task<FinancialAccountDto?> Handle(GetFinancialAccountByIdQuery request, CancellationToken cancellationToken)
     {
         var account = await _context.FinancialAccounts
+            .Include(a => a.AccountantReceipts)
+            .Include(a => a.Transactions)
             .Where(a => a.Id == request.Id)
             .Select(a => new FinancialAccountDto
             {
                 Id = a.Id,
                 AccountName = a.AccountName,
                 CardNumber = a.CardNumber,
-                BankName = a.BankName
+                BankName = a.BankName,
+                Balance = a.AccountantReceipts.Sum(r => r.FinalPrice) + 
+                          a.Transactions.Where(t => t.Type == "Income").Sum(t => t.Amount) -
+                          a.Transactions.Where(t => t.Type == "Outcome").Sum(t => t.Amount)
             })
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -25,6 +25,7 @@ public class FinancialAccount
 
     public DateTime LastModifiedDate { get; set; }
 
-    // Navigation property
+    // Navigation properties
     public virtual ICollection<AccountantReceipt> AccountantReceipts { get; set; } = new List<AccountantReceipt>();
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

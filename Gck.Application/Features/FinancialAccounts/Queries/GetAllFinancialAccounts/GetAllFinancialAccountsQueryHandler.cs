@@ -18,6 +18,7 @@ public class GetAllFinancialAccountsQueryHandler : IRequestHandler<GetAllFinanci
     {
         var accounts = await _context.FinancialAccounts
             .Include(a => a.AccountantReceipts)
+            .Include(a => a.Transactions)
             .OrderBy(a => a.AccountName)
             .Select(a => new FinancialAccountDto
             {
@@ -25,7 +26,9 @@ public class GetAllFinancialAccountsQueryHandler : IRequestHandler<GetAllFinanci
                 AccountName = a.AccountName,
                 CardNumber = a.CardNumber,
                 BankName = a.BankName,
-                Balance = a.AccountantReceipts.Sum(r => r.FinalPrice)
+                Balance = a.AccountantReceipts.Sum(r => r.FinalPrice) + 
+                          a.Transactions.Where(t => t.Type == "Income").Sum(t => t.Amount) -
+                          a.Transactions.Where(t => t.Type == "Outcome").Sum(t => t.Amount)
             })
             .ToListAsync(cancellationToken);
 

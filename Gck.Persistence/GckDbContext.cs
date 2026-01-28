@@ -22,6 +22,7 @@ public class GckDbContext : DbContext
     public DbSet<SessionCustomer> SessionCustomers { get; set; } = null!;
     public DbSet<AccountantReceipt> AccountantReceipts { get; set; } = null!;
     public DbSet<HourlyFee> Fees { get; set; } = null!;
+    public DbSet<Transaction> Transactions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -118,6 +119,19 @@ public class GckDbContext : DbContext
 
             entity.HasIndex(e => e.SessionId).IsUnique();
             entity.HasIndex(e => e.ReceiptDateTime);
+        });
+
+        // Configure Transaction entity
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasOne(e => e.FinancialAccount)
+                  .WithMany(f => f.Transactions)
+                  .HasForeignKey(e => e.FinancialAccountId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.FinancialAccountId);
+            entity.HasIndex(e => e.TransactionDate);
+            entity.HasIndex(e => e.Type);
         });
     }
 }
