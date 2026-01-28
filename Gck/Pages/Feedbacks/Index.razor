@@ -1,0 +1,169 @@
+@page "/feedbacks"
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ApiConfigurationService ApiConfig
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<section class="section">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-comments"></i>
+                @PersianResources.CustomerFeedbacks
+            </h1>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>@PersianResources.Loading</p>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else if (feedbacks != null && feedbacks.Any())
+        {
+            <div class="feedbacks-grid">
+                @foreach (var feedback in feedbacks)
+                {
+                    <div class="gaming-card feedback-card @(feedback.IsRead ? "read" : "unread")">
+                        <div class="feedback-header">
+                            <div class="feedback-info">
+                                <h3>@feedback.Subject</h3>
+                                <p class="customer-info">
+                                    <i class="fas fa-user"></i>
+                                    @feedback.CustomerName
+                                    <span class="separator">•</span>
+                                    <i class="fas fa-phone"></i>
+                                    @feedback.CustomerPhone
+                                </p>
+                                <p class="submitted-date">
+                                    <i class="fas fa-calendar"></i>
+                                    @feedback.SubmittedAt.ToString("yyyy/MM/dd HH:mm")
+                                </p>
+                            </div>
+                            <div class="feedback-status">
+                                @if (feedback.IsRead)
+                                {
+                                    <span class="badge badge-read">
+                                        <i class="fas fa-check-circle"></i>
+                                        @PersianResources.Read
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-unread">
+                                        <i class="fas fa-circle"></i>
+                                        @PersianResources.Unread
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="feedback-message">
+                            <p>@feedback.Message</p>
+                        </div>
+                        @if (!feedback.IsRead)
+                        {
+                            <div class="feedback-actions">
+                                <button class="btn-gaming btn-sm" @onclick="() => MarkAsRead(feedback.Id)">
+                                    <i class="fas fa-check"></i>
+                                    @PersianResources.MarkAsRead
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card">
+                <p class="no-data">@PersianResources.NoFeedbacksYet</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<FeedbackDto> feedbacks = new();
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if user is admin
+        var userRole = await LocalStorage.GetItemAsync<string>("userRole");
+        if (userRole != "admin")
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        await LoadFeedbacks();
+    }
+
+    private async Task LoadFeedbacks()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/feedback"));
+            if (response.IsSuccessStatusCode)
+            {
+                feedbacks = await response.Content.ReadFromJsonAsync<List<FeedbackDto>>() ?? new();
+            }
+            else
+            {
+                errorMessage = PersianResources.LoadingError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.LoadingError}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task MarkAsRead(int feedbackId)
+    {
+        try
+        {
+            var response = await Http.PutAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), null);
+            if (response.IsSuccessStatusCode)
+            {
+                var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+                if (feedback != null)
+                {
+                    feedback.IsRead = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.Error}: {ex.Message}";
+        }
+    }
+
+    public class FeedbackDto
+    {
+        public int Id { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public DateTime SubmittedAt { get; set; }
+        public bool IsRead { get; set; }
+    }
+}

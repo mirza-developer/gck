@@ -1,9 +1,12 @@
 @page "/login"
 @using Gck.Application.Features.Auth.Commands.Login
+@using Gck.Application.Features.Auth.Commands.CustomerLogin
+@using Gck.Resources
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@implements IDisposable
 
 <section class="section login-section">
     <div class="container">
@@ -19,6 +22,18 @@
                     <p class="login-subtitle">
                         گیم سنتر کوثر
                     </p>
+                </div>
+
+                <!-- Tabs for Admin/Customer selection -->
+                <div class="login-tabs">
+                    <button class="tab-button @(isAdminTab ? "active" : "")" @onclick="() => SwitchTab(true)">
+                        <i class="fas fa-user-shield"></i>
+                        @PersianResources.AdminLogin
+                    </button>
+                    <button class="tab-button @(!isAdminTab ? "active" : "")" @onclick="() => SwitchTab(false)">
+                        <i class="fas fa-user"></i>
+                        @PersianResources.CustomerLogin
+                    </button>
                 </div>
 
                 @if (!string.IsNullOrEmpty(errorMessage))
@@ -37,56 +52,180 @@
                     </div>
                 }
 
-                <EditForm Model="@loginCommand" OnValidSubmit="HandleLogin">
-                    <DataAnnotationsValidator />
+                @if (isAdminTab)
+                {
+                    <!-- Admin Login Form -->
+                    <EditForm Model="@loginCommand" OnValidSubmit="HandleAdminLogin">
+                        <DataAnnotationsValidator />
 
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-user"></i>
-                            نام کاربری
-                        </label>
-                        <InputText @bind-Value="loginCommand.Username" 
-                                   class="form-input" 
-                                   placeholder="نام کاربری خود را وارد کنید"
-                                   autofocus />
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                نام کاربری
+                            </label>
+                            <InputText @bind-Value="loginCommand.Username" 
+                                       class="form-input" 
+                                       placeholder="نام کاربری خود را وارد کنید"
+                                       autofocus />
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-lock"></i>
-                            رمز عبور
-                        </label>
-                        <InputText type="password" 
-                                   @bind-Value="loginCommand.Password" 
-                                   class="form-input" 
-                                   placeholder="رمز عبور خود را وارد کنید" />
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>
+                                رمز عبور
+                            </label>
+                            <InputText type="password" 
+                                       @bind-Value="loginCommand.Password" 
+                                       class="form-input" 
+                                       placeholder="رمز عبور خود را وارد کنید" />
+                        </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-gaming btn-login" disabled="@isLoggingIn">
-                            @if (isLoggingIn)
-                            {
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <span>در حال ورود...</span>
-                            }
-                            else
-                            {
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>ورود</span>
-                            }
-                        </button>
-                    </div>
-                </EditForm>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-gaming btn-login" disabled="@isLoggingIn">
+                                @if (isLoggingIn)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>در حال ورود...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>ورود</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+                else
+                {
+                    <!-- Customer Login Form -->
+                    @if (!otpSent)
+                    {
+                        <EditForm Model="@sendOtpCommand" OnValidSubmit="HandleSendOtp">
+                            <DataAnnotationsValidator />
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    @PersianResources.PhoneNumber
+                                </label>
+                                <InputText @bind-Value="sendOtpCommand.PhoneNumber" 
+                                           class="form-input" 
+                                           placeholder="@PersianResources.EnterPhoneNumber"
+                                           autofocus />
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-gaming btn-login" disabled="@isSendingOtp">
+                                    @if (isSendingOtp)
+                                    {
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>@PersianResources.SendingOtp</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-paper-plane"></i>
+                                        <span>@PersianResources.SendOtp</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        <EditForm Model="@verifyOtpCommand" OnValidSubmit="HandleVerifyOtp">
+                            <DataAnnotationsValidator />
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    @PersianResources.PhoneNumber
+                                </label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       value="@verifyOtpCommand.PhoneNumber" 
+                                       disabled />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-key"></i>
+                                    @PersianResources.OtpCode
+                                </label>
+                                <InputText @bind-Value="verifyOtpCommand.OtpCode" 
+                                           class="form-input" 
+                                           placeholder="@PersianResources.EnterOtpCode"
+                                           maxlength="6"
+                                           autofocus />
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-gaming btn-login" disabled="@isVerifyingOtp">
+                                    @if (isVerifyingOtp)
+                                    {
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>@PersianResources.VerifyingOtp</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-check"></i>
+                                        <span>@PersianResources.VerifyOtp</span>
+                                    }
+                                </button>
+                            </div>
+
+                            <div class="form-actions" style="margin-top: 1rem;">
+                                <button type="button" class="btn-gaming btn-secondary" @onclick="HandleResendOtp" disabled="@(!canResendOtp || isSendingOtp)" style="width: 100%;">
+                                    @if (isSendingOtp)
+                                    {
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>@PersianResources.SendingOtp</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-redo"></i>
+                                        <span>
+                                            @if (resendCountdown > 0)
+                                            {
+                                                @($"{PersianResources.ResendOtp} ({resendCountdown} ثانیه)")
+                                            }
+                                            else
+                                            {
+                                                @PersianResources.ResendOtp
+                                            }
+                                        </span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                }
             </div>
         </div>
     </div>
 </section>
 
 @code {
+    private bool isAdminTab = true;
+    private bool otpSent = false;
+
+    // Admin login
     private LoginCommand loginCommand = new();
     private bool isLoggingIn = false;
+
+    // Customer OTP login
+    private SendOtpCommand sendOtpCommand = new();
+    private VerifyOtpCommand verifyOtpCommand = new();
+    private bool isSendingOtp = false;
+    private bool isVerifyingOtp = false;
+
     private string errorMessage = string.Empty;
     private string successMessage = string.Empty;
+
+    // OTP resend timer
+    private int resendCountdown = 0;
+    private bool canResendOtp = false;
+    private System.Threading.Timer? resendTimer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,7 +237,68 @@
         }
     }
 
-    private async Task HandleLogin()
+    private void SwitchTab(bool isAdmin)
+    {
+        isAdminTab = isAdmin;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+        otpSent = false;
+        
+        // Reset forms
+        loginCommand = new();
+        sendOtpCommand = new();
+        verifyOtpCommand = new();
+        
+        // Stop timer if running
+        StopResendTimer();
+    }
+
+    private void ResetOtpForm()
+    {
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+        sendOtpCommand = new() { PhoneNumber = verifyOtpCommand.PhoneNumber };
+        verifyOtpCommand = new();
+        
+        // Reset to send OTP form
+        otpSent = false;
+        
+        // Stop timer (will restart when new OTP is sent)
+        StopResendTimer();
+    }
+
+    private void StartResendTimer()
+    {
+        resendCountdown = 60;
+        canResendOtp = false;
+        
+        resendTimer?.Dispose();
+        resendTimer = new System.Threading.Timer(async _ =>
+        {
+            if (resendCountdown > 0)
+            {
+                resendCountdown--;
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                canResendOtp = true;
+                resendTimer?.Dispose();
+                resendTimer = null;
+                await InvokeAsync(StateHasChanged);
+            }
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private void StopResendTimer()
+    {
+        resendTimer?.Dispose();
+        resendTimer = null;
+        resendCountdown = 0;
+        canResendOtp = false;
+    }
+
+    private async Task HandleAdminLogin()
     {
         isLoggingIn = true;
         errorMessage = string.Empty;
@@ -118,6 +318,7 @@
                     await LocalStorage.SetItemAsync("currentUser", result.Username);
                     await LocalStorage.SetItemAsync("currentUserId", result.UserId);
                     await LocalStorage.SetItemAsync("currentUserName", result.Name);
+                    await LocalStorage.SetItemAsync("userRole", "admin");
 
                     successMessage = result.Message;
                     await Task.Delay(1000);
@@ -138,12 +339,156 @@
         catch (Exception ex)
         {
             errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
-
-            throw;
         }
         finally
         {
             isLoggingIn = false;
         }
+    }
+
+    private async Task HandleSendOtp()
+    {
+        isSendingOtp = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), sendOtpCommand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<SendOtpResponse>();
+
+                if (result != null && result.Success)
+                {
+                    successMessage = result.Message;
+                    otpSent = true;
+                    verifyOtpCommand.PhoneNumber = sendOtpCommand.PhoneNumber;
+                    
+                    // Start the resend countdown timer
+                    StartResendTimer();
+                }
+                else
+                {
+                    errorMessage = result?.Message ?? PersianResources.OtpSendError;
+                }
+            }
+            else
+            {
+                errorMessage = PersianResources.ApiConnectionError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isSendingOtp = false;
+        }
+    }
+
+    private async Task HandleVerifyOtp()
+    {
+        isVerifyingOtp = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/verify-otp"), verifyOtpCommand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<VerifyOtpResponse>();
+
+                if (result != null && result.Success)
+                {
+                    // Store customer info in local storage
+                    await LocalStorage.SetItemAsync("currentUser", result.PhoneNumber);
+                    await LocalStorage.SetItemAsync("currentUserId", result.CustomerId.ToString());
+                    await LocalStorage.SetItemAsync("currentUserName", result.CustomerName);
+                    await LocalStorage.SetItemAsync("userRole", "customer");
+
+                    successMessage = result.Message;
+                    
+                    // Stop timer on successful login
+                    StopResendTimer();
+                    
+                    await Task.Delay(1000);
+
+                    // Redirect to home page
+                    Navigation.NavigateTo("/", true);
+                }
+                else
+                {
+                    errorMessage = result?.Message ?? PersianResources.InvalidOtp;
+                }
+            }
+            else
+            {
+                errorMessage = PersianResources.ApiConnectionError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isVerifyingOtp = false;
+        }
+    }
+
+    private async Task HandleResendOtp()
+    {
+        isSendingOtp = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            // Use the phone number from the verify command
+            var resendCommand = new SendOtpCommand { PhoneNumber = verifyOtpCommand.PhoneNumber };
+            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), resendCommand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<SendOtpResponse>();
+
+                if (result != null && result.Success)
+                {
+                    successMessage = result.Message;
+                    
+                    // Clear the OTP field for the new code
+                    verifyOtpCommand.OtpCode = string.Empty;
+                    
+                    // Restart the countdown timer
+                    StartResendTimer();
+                }
+                else
+                {
+                    errorMessage = result?.Message ?? PersianResources.OtpSendError;
+                }
+            }
+            else
+            {
+                errorMessage = PersianResources.ApiConnectionError;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+        }
+        finally
+        {
+            isSendingOtp = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        StopResendTimer();
     }
 }

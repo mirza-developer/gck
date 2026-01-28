@@ -169,4 +169,55 @@ public static class PersianResources
     public const string Customer = "مشتری";
     public const string Person = "نفر";
     public const string Discount = "تخفیف";
+    
+    // Customer Login with OTP
+    public const string AdminLogin = "ورود مدیر";
+    public const string CustomerLogin = "ورود مشتری";
+    public const string EnterPhoneNumber = "شماره تلفن خود را وارد کنید";
+    public const string SendOtp = "ارسال کد";
+    public const string EnterOtpCode = "کد تایید را وارد کنید";
+    public const string VerifyOtp = "تایید کد";
+    public const string OtpSent = "کد تایید برای شما ارسال شد";
+    public const string OtpSendError = "خطا در ارسال کد تایید";
+    public const string InvalidOtp = "کد تایید نامعتبر است";
+    public const string OtpExpired = "کد تایید منقضی شده است";
+    public const string CustomerNotFoundByPhone = "مشتری با این شماره تلفن یافت نشد";
+    public const string LoginSuccessful = "ورود موفقیت‌آمیز بود";
+    public const string SendingOtp = "در حال ارسال کد...";
+    public const string VerifyingOtp = "در حال بررسی کد...";
+    public const string OtpCode = "کد تایید";
+    public const string ResendOtp = "ارسال مجدد کد";
+    
+    // Customer Profile & Summary
+    public const string MyProfile = "پروفایل من";
+    public const string MySummary = "خلاصه اطلاعات من";
+    public const string MySessions = "بازی‌های من";
+    public const string MyPayments = "پرداخت‌های من";
+    public const string LoyaltyInfo = "اطلاعات وفاداری";
+    public const string TotalPaidSessions = "تعداد بازی‌های پرداخت شده";
+    public const string FreeSessionsEarned = "بازی‌های رایگان کسب شده";
+    public const string SessionDate = "تاریخ بازی";
+    public const string TableUsed = "میز استفاده شده";
+    public const string AmountPaid = "مبلغ پرداختی";
+    public const string Free = "رایگان";
+    public const string NoSessionsYet = "هنوز بازی ثبت نشده است";
+    public const string NoPaymentsYet = "هنوز پرداختی ثبت نشده است";
+    
+    // Feedback
+    public const string Feedback = "بازخورد";
+    public const string SendFeedback = "ارسال بازخورد";
+    public const string FeedbackSubject = "موضوع";
+    public const string FeedbackMessage = "پیام";
+    public const string FeedbackSubmitted = "بازخورد شما با موفقیت ارسال شد";
+    public const string FeedbackSubjectPlaceholder = "موضوع بازخورد خود را وارد کنید";
+    public const string FeedbackMessagePlaceholder = "پیام، انتقاد یا پیشنهاد خود را بنویسید...";
+    public const string Submit = "ارسال";
+    public const string CustomerFeedbacks = "بازخوردهای مشتریان";
+    public const string SubmittedAt = "تاریخ ارسال";
+    public const string ReadStatus = "وضعیت";
+    public const string Read = "خوانده شده";
+    public const string Unread = "خوانده نشده";
+    public const string MarkAsRead = "علامت به عنوان خوانده شده";
+    public const string NoFeedbacksYet = "هنوز بازخوردی ثبت نشده است";
 }
+

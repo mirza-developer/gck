@@ -1,4 +1,5 @@
 ﻿@using Gck.Components
+@using Gck.Resources
 @inherits LayoutComponentBase
 @inject IJSRuntime JS
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
@@ -35,8 +36,44 @@
                         </ul>
                     </li>
                 }
+                else if (userRole == "customer")
+                {
+                    <!-- Customer menu -->
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            خانه
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/customer/summary" class="nav-link">
+                            <i class="fas fa-user-circle"></i>
+                            @PersianResources.MyProfile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/customer/feedback" class="nav-link">
+                            <i class="fas fa-comment-dots"></i>
+                            @PersianResources.Feedback
+                        </a>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="/games" class="nav-link">
+                            <i class="fas fa-gamepad"></i>
+                            بازی‌ها
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/games/action" class="dropdown-item"><i class="fas fa-fist-raised"></i> اکشن</a></li>
+                            <li><a href="/games/sports" class="dropdown-item"><i class="fas fa-futbol"></i> ورزشی</a></li>
+                            <li><a href="/games/racing" class="dropdown-item"><i class="fas fa-car"></i> مسابقه‌ای</a></li>
+                            <li><a href="/games/adventure" class="dropdown-item"><i class="fas fa-compass"></i> ماجراجویی</a></li>
+                        </ul>
+                    </li>
+                }
                 else
                 {
+                    <!-- Admin menu -->
                     <li class="nav-item">
                         <a href="/management" class="nav-link">
                             <i class="fas fa-chart-line"></i>
@@ -54,6 +91,7 @@
                             <li><a href="/tables" class="dropdown-item"><i class="fas fa-table"></i> میزها</a></li>
                             <li><a href="/customers" class="dropdown-item"><i class="fas fa-user-friends"></i> مشتریان</a></li>
                             <li><a href="/financialaccounts" class="dropdown-item"><i class="fas fa-wallet"></i> حساب‌های مالی</a></li>
+                            <li><a href="/feedbacks" class="dropdown-item"><i class="fas fa-comments"></i> @PersianResources.CustomerFeedbacks</a></li>
                         </ul>
                     </li>
                 }
@@ -131,6 +169,7 @@
 @code {
     private bool isLoggedIn = false;
     private string currentUserName = string.Empty;
+    private string userRole = string.Empty;
     private bool isMobileMenuOpen = false;
 
     protected override async Task OnInitializedAsync()
@@ -157,8 +196,10 @@
     {
         var user = await LocalStorage.GetItemAsync<string>("currentUser");
         var name = await LocalStorage.GetItemAsync<string>("currentUserName");
+        var role = await LocalStorage.GetItemAsync<string>("userRole");
         isLoggedIn = !string.IsNullOrEmpty(user);
         currentUserName = name ?? user ?? string.Empty;
+        userRole = role ?? "admin"; // Default to admin for backward compatibility
     }
 
     private async Task HandleLogout()
@@ -166,6 +207,7 @@
         await LocalStorage.RemoveItemAsync("currentUser");
         await LocalStorage.RemoveItemAsync("currentUserId");
         await LocalStorage.RemoveItemAsync("currentUserName");
+        await LocalStorage.RemoveItemAsync("userRole");
         Navigation.NavigateTo("/login", true);
     }
 

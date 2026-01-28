@@ -4,6 +4,7 @@ using Gck.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gck.Persistence.Migrations
 {
     [DbContext(typeof(GckDbContext))]
-    partial class GckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260127123608_AddCustomerOtpTable")]
+    partial class AddCustomerOtpTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,44 +108,6 @@ namespace Gck.Persistence.Migrations
                     b.HasIndex("PhoneNumber");
 
                     b.ToTable("tbl_Customer");
-                });
-
-            modelBuilder.Entity("Gck.Domain.Entities.CustomerFeedback", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("IsRead");
-
-                    b.HasIndex("SubmittedAt");
-
-                    b.ToTable("tbl_CustomerFeedback");
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.CustomerOtp", b =>
@@ -450,17 +415,6 @@ namespace Gck.Persistence.Migrations
                     b.Navigation("FinancialAccount");
 
                     b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("Gck.Domain.Entities.CustomerFeedback", b =>
-                {
-                    b.HasOne("Gck.Domain.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.Session", b =>
