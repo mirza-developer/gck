@@ -1,7 +1,9 @@
-using Gck.Domain.Entities;
-using Gck.Persistence;
+using Gck.Application.DTOs;
+using Gck.Application.Features.Feedbacks.Commands.MarkFeedbackAsRead;
+using Gck.Application.Features.Feedbacks.Commands.SubmitFeedback;
+using Gck.Application.Features.Feedbacks.Queries.GetAllFeedbacks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Gck.Api.Controllers;
 
@@ -9,12 +11,12 @@ namespace Gck.Api.Controllers;
 [Route("api/[controller]")]
 public class FeedbackController : ControllerBase
 {
-    private readonly GckDbContext _context;
+    private readonly IMediator _mediator;
     private readonly ILogger<FeedbackController> _logger;
 
-    public FeedbackController(GckDbContext context, ILogger<FeedbackController> logger)
+    public FeedbackController(IMediator mediator, ILogger<FeedbackController> logger)
     {
-        _context = context;
+        _mediator = mediator;
         _logger = logger;
     }
 
@@ -23,19 +25,16 @@ public class FeedbackController : ControllerBase
     {
         try
         {
-            var feedback = new CustomerFeedback
+            var command = new SubmitFeedbackCommand
             {
                 CustomerId = dto.CustomerId,
                 Subject = dto.Subject,
-                Message = dto.Message,
-                SubmittedAt = DateTime.UtcNow,
-                IsRead = false
+                Message = dto.Message
             };
 
-            _context.CustomerFeedbacks.Add(feedback);
-            await _context.SaveChangesAsync();
+            var feedbackId = await _mediator.Send(command);
 
-            return Ok(new { success = true });
+            return Ok(new { success = true, id = feedbackId });
         }
         catch (Exception ex)
         {
@@ -49,20 +48,8 @@ public class FeedbackController : ControllerBase
     {
         try
         {
-            var feedbacks = await _context.CustomerFeedbacks
-                .Include(f => f.Customer)
-                .OrderByDescending(f => f.SubmittedAt)
-                .Select(f => new FeedbackDto
-                {
-                    Id = f.Id,
-                    CustomerName = f.Customer.Name,
-                    CustomerPhone = f.Customer.PhoneNumber,
-                    Subject = f.Subject,
-                    Message = f.Message,
-                    SubmittedAt = f.SubmittedAt,
-                    IsRead = f.IsRead
-                })
-                .ToListAsync();
+            var query = new GetAllFeedbacksQuery();
+            var feedbacks = await _mediator.Send(query);
 
             return Ok(feedbacks);
         }
@@ -78,12 +65,11 @@ public class FeedbackController : ControllerBase
     {
         try
         {
-            var feedback = await _context.CustomerFeedbacks.FindAsync(id);
-            if (feedback == null)
-                return NotFound();
+            var command = new MarkFeedbackAsReadCommand { Id = id };
+            var success = await _mediator.Send(command);
 
-            feedback.IsRead = true;
-            await _context.SaveChangesAsync();
+            if (!success)
+                return NotFound();
 
             return Ok(new { success = true });
         }
@@ -93,22 +79,4 @@ public class FeedbackController : ControllerBase
             return StatusCode(500, new { success = false, message = "خطا در به‌روزرسانی وضعیت" });
         }
     }
-}
-
-public class SubmitFeedbackDto
-{
-    public int CustomerId { get; set; }
-    public string Subject { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
-}
-
-public class FeedbackDto
-{
-    public int Id { get; set; }
-    public string CustomerName { get; set; } = string.Empty;
-    public string CustomerPhone { get; set; } = string.Empty;
-    public string Subject { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
-    public DateTime SubmittedAt { get; set; }
-    public bool IsRead { get; set; }
 }

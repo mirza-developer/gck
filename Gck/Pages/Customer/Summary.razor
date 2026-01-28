@@ -17,118 +17,175 @@
         @if (isLoading)
         {
             <div class="loading-container">
-                <div class="spinner"></div>
-                <p>@PersianResources.Loading</p>
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
             </div>
         }
         else if (!string.IsNullOrEmpty(errorMessage))
         {
-            <div class="error-message">
+            <div class="gaming-card fade-in-up error-message">
                 <i class="fas fa-exclamation-triangle"></i>
                 @errorMessage
             </div>
         }
         else if (customer != null)
         {
-            <div class="summary-grid">
-                <!-- Customer Info Card -->
-                <div class="gaming-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-user"></i> @PersianResources.CustomerFullDetails</h3>
+            <div class="gaming-card fade-in-up">
+                <!-- Customer Info Section -->
+                <div class="grid-details-content" style="margin-bottom: 2rem;">
+                    <div class="grid-details-header">
+                        <i class="fas fa-user"></i>
+                        <h4>@PersianResources.CustomerFullDetails</h4>
                     </div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">@PersianResources.CustomerName:</span>
-                            <span class="info-value">@customer.Name</span>
+                    <div class="grid-details-body">
+                        <div class="grid-detail-item">
+                            <div class="grid-detail-label">
+                                <i class="fas fa-user"></i>
+                                @PersianResources.CustomerName
+                            </div>
+                            <div class="grid-detail-value">
+                                @customer.Name
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">@PersianResources.Phone:</span>
-                            <span class="info-value">@customer.PhoneNumber</span>
+                        <div class="grid-detail-item">
+                            <div class="grid-detail-label">
+                                <i class="fas fa-phone"></i>
+                                @PersianResources.Phone
+                            </div>
+                            <div class="grid-detail-value">
+                                @customer.PhoneNumber
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">@PersianResources.BirthYear:</span>
-                            <span class="info-value">@customer.BirthYear @PersianResources.Shamsi</span>
+                        <div class="grid-detail-item">
+                            <div class="grid-detail-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                @PersianResources.BirthYear
+                            </div>
+                            <div class="grid-detail-value">
+                                @customer.BirthYear @PersianResources.Shamsi
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">@PersianResources.Gender:</span>
-                            <span class="info-value">@(customer.IsMale ? PersianResources.Male : PersianResources.Female)</span>
+                        <div class="grid-detail-item">
+                            <div class="grid-detail-label">
+                                <i class="fas @(customer.IsMale ? "fa-mars" : "fa-venus")"></i>
+                                @PersianResources.Gender
+                            </div>
+                            <div class="grid-detail-value">
+                                @(customer.IsMale ? PersianResources.Male : PersianResources.Female)
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Loyalty Card -->
+                <!-- Loyalty Info Section -->
                 @if (customer.IsLoyal)
                 {
-                    <div class="gaming-card loyalty-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-star"></i> @PersianResources.LoyaltyInfo</h3>
+                    <div class="grid-details-content" style="margin-bottom: 2rem;">
+                        <div class="grid-details-header">
+                            <i class="fas fa-star"></i>
+                            <h4>@PersianResources.LoyaltyInfo</h4>
                         </div>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="info-label">@PersianResources.TotalPaidSessions:</span>
-                                <span class="info-value">@customer.PaidSessionsCount @PersianResources.Times</span>
+                        <div class="grid-details-body">
+                            <div class="grid-detail-item">
+                                <div class="grid-detail-label">
+                                    <i class="fas fa-coins"></i>
+                                    @PersianResources.TotalPaidSessions
+                                </div>
+                                <div class="grid-detail-value highlight">
+                                    @customer.PaidSessionsCount @PersianResources.Times
+                                </div>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">@PersianResources.SessionsRequiredForFree:</span>
-                                <span class="info-value">@customer.SessionsRequiredForFree @PersianResources.Times</span>
+                            <div class="grid-detail-item">
+                                <div class="grid-detail-label">
+                                    <i class="fas fa-gift"></i>
+                                    @PersianResources.SessionsRequiredForFree
+                                </div>
+                                <div class="grid-detail-value">
+                                    @customer.SessionsRequiredForFree @PersianResources.Times
+                                </div>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">@PersianResources.FreeSessionsEarned:</span>
-                                <span class="info-value">@(customer.PaidSessionsCount / customer.SessionsRequiredForFree) @PersianResources.Times</span>
+                            <div class="grid-detail-item">
+                                <div class="grid-detail-label">
+                                    <i class="fas fa-trophy"></i>
+                                    @PersianResources.FreeSessionsEarned
+                                </div>
+                                <div class="grid-detail-value highlight">
+                                    @(customer.PaidSessionsCount / customer.SessionsRequiredForFree) @PersianResources.Times
+                                </div>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">@PersianResources.SessionsUntilFree:</span>
-                                <span class="info-value">@(customer.SessionsRequiredForFree - (customer.PaidSessionsCount % customer.SessionsRequiredForFree)) @PersianResources.Times</span>
+                            <div class="grid-detail-item">
+                                <div class="grid-detail-label">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    @PersianResources.SessionsUntilFree
+                                </div>
+                                <div class="grid-detail-value highlight">
+                                    @(customer.SessionsRequiredForFree - (customer.PaidSessionsCount % customer.SessionsRequiredForFree)) @PersianResources.Times
+                                </div>
                             </div>
                         </div>
                     </div>
                 }
 
                 <!-- Sessions List -->
-                <div class="gaming-card full-width">
-                    <div class="card-header">
-                        <h3><i class="fas fa-gamepad"></i> @PersianResources.MySessions</h3>
-                    </div>
-                    @if (sessions != null && sessions.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>@PersianResources.SessionDate</th>
-                                        <th>@PersianResources.TableUsed</th>
-                                        <th>@PersianResources.Duration</th>
-                                        <th>@PersianResources.AmountPaid</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var session in sessions)
-                                    {
-                                        <tr>
-                                            <td>@session.StartDateTime.ToString("yyyy/MM/dd HH:mm")</td>
-                                            <td>@session.TableName</td>
-                                            <td>@GetDuration(session)</td>
-                                            <td>
-                                                @if (session.IsFreeSession)
-                                                {
-                                                    <span class="badge badge-success">@PersianResources.Free</span>
-                                                }
-                                                else
-                                                {
-                                                    <span>@session.FinalPrice?.ToString("N0") @PersianResources.Toman</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="no-data">@PersianResources.NoSessionsYet</p>
-                    }
+                <div class="grid-details-header">
+                    <i class="fas fa-gamepad"></i>
+                    <h4>@PersianResources.MySessions</h4>
                 </div>
+                @if (sessions != null && sessions.Any())
+                {
+                    <div class="data-grid">
+                        <table class="data-grid-table">
+                            <thead class="data-grid-header">
+                                <tr>
+                                    <th>@PersianResources.SessionDate</th>
+                                    <th>@PersianResources.TableUsed</th>
+                                    <th>@PersianResources.Duration</th>
+                                    <th>@PersianResources.AmountPaid</th>
+                                </tr>
+                            </thead>
+                            <tbody class="data-grid-body">
+                                @foreach (var session in sessions)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="grid-cell-primary">@session.StartDateTime.ToString("yyyy/MM/dd HH:mm")</span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-secondary">@session.TableName</span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-secondary">@GetDuration(session)</span>
+                                        </td>
+                                        <td>
+                                            @if (session.IsFreeSession)
+                                            {
+                                                <span class="grid-cell-badge" style="background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid rgba(0, 255, 0, 0.3);">
+                                                    <i class="fas fa-gift"></i>
+                                                    @PersianResources.Free
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="grid-cell-primary">@session.FinalPrice?.ToString("N0") @PersianResources.Toman</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoSessionsYet</p>
+                    </div>
+                }
             </div>
         }
     </div>
