@@ -1,6 +1,7 @@
 using Gck.Persistence;
 using Gck.Application.Services;
 using Microsoft.EntityFrameworkCore;
+using Gck.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,21 +47,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Use centralized exception handling middleware (must be first)
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 // Initialize database and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<GckDbContext>();
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        await DbInitializer.InitializeAsync(context, logger);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database");
-    }
+    var context = services.GetRequiredService<GckDbContext>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    await DbInitializer.InitializeAsync(context, logger);
 }
 
 // Configure the HTTP request pipeline.
