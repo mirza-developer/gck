@@ -124,22 +124,20 @@ public static class PersianDateHelper
     /// </summary>
     public static DateTime? FromPersianDate(string persianDate)
     {
-        try
-        {
-            var parts = persianDate.Split('/');
-            if (parts.Length != 3)
-                return null;
-
-            var year = int.Parse(parts[0]);
-            var month = int.Parse(parts[1]);
-            var day = int.Parse(parts[2]);
-
-            return PersianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
-        }
-        catch
-        {
+        var parts = persianDate.Split('/');
+        if (parts.Length != 3)
             return null;
-        }
+
+        if (!int.TryParse(parts[0], out var year) ||
+            !int.TryParse(parts[1], out var month) ||
+            !int.TryParse(parts[2], out var day))
+            return null;
+
+        // Validate Persian date ranges
+        if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31)
+            return null;
+
+        return PersianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
     }
 
     /// <summary>
