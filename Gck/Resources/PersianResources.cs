@@ -260,5 +260,9 @@ public static class PersianResources
     public const string ApplyFilters = "اعمال فیلترها";
     public const string ClearFilters = "پاک کردن فیلترها";
     public const string ShowReport = "نمایش گزارش";
+    public const string PleaseSelectFinancialAccount = "لطفا حساب مالی را انتخاب کنید";
+    public const string PleaseSelectTransactionType = "لطفا نوع تراکنش را انتخاب کنید";
+    public const string ErrorSavingTransaction = "خطا در ثبت تراکنش";
+    public const string ErrorUpdatingTransaction = "خطا در ویرایش تراکنش";
 }
 

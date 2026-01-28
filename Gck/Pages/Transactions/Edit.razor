@@ -206,13 +206,13 @@
 
         if (transaction.FinancialAccountId == 0)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "لطفا حساب مالی را انتخاب کنید");
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.PleaseSelectFinancialAccount);
             return;
         }
 
         if (string.IsNullOrEmpty(transaction.Type))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "لطفا نوع تراکنش را انتخاب کنید");
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.PleaseSelectTransactionType);
             return;
         }
 
@@ -231,7 +231,7 @@
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"خطا در ویرایش تراکنش: {error}";
+                errorMessage = $"{PersianResources.ErrorUpdatingTransaction}: {error}";
             }
         }
         catch (Exception ex)

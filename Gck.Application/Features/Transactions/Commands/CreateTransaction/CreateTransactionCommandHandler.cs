@@ -31,6 +31,29 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             throw new InvalidOperationException("Transaction type must be either 'Income' or 'Outcome'.");
         }
 
+        // Validate amount
+        if (request.Amount <= 0)
+        {
+            throw new InvalidOperationException("Transaction amount must be greater than zero.");
+        }
+
+        // Validate description
+        if (string.IsNullOrWhiteSpace(request.Description))
+        {
+            throw new InvalidOperationException("Transaction description is required.");
+        }
+
+        if (request.Description.Length > 500)
+        {
+            throw new InvalidOperationException("Transaction description cannot exceed 500 characters.");
+        }
+
+        // Validate transaction date
+        if (request.TransactionDate > DateTime.Now)
+        {
+            throw new InvalidOperationException("Transaction date cannot be in the future.");
+        }
+
         var transaction = new Transaction
         {
             FinancialAccountId = request.FinancialAccountId,

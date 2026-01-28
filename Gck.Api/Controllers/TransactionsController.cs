@@ -6,12 +6,14 @@ using Gck.Application.Features.Transactions.Queries.GetAllTransactions;
 using Gck.Application.Features.Transactions.Queries.GetTransactionById;
 using Gck.Application.Features.Transactions.Queries.GetTransactionReport;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gck.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Add authorization to protect financial endpoints
 public class TransactionsController : ControllerBase
 {
     private readonly IMediator _mediator;
