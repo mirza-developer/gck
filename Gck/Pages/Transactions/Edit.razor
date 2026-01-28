@@ -2,6 +2,7 @@
 @using Gck.Application.DTOs
 @using Gck.Resources
 @using System.Net.Http.Json
+@using Gck.Components
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -103,11 +104,7 @@
                             @PersianResources.TransactionDate
                             <span class="required">@PersianResources.Required</span>
                         </label>
-                        <input type="datetime-local" 
-                               id="date" 
-                               @bind="transaction.TransactionDate" 
-                               class="form-control"
-                               required />
+                        <PersianDatePicker @bind-Value="transaction.TransactionDate" />
                     </div>
 
                     <div class="form-group">

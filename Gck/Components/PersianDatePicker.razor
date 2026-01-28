@@ -1,0 +1,238 @@
+@inject IJSRuntime JS
+
+<div class="persian-datepicker-container">
+    <div class="form-input datepicker-input" @onclick="TogglePicker">
+        <i class="fas fa-calendar-alt"></i>
+        <span>@GetDisplayText()</span>
+    </div>
+    
+    @if (isOpen)
+    {
+        <div class="datepicker-overlay" @onclick="ClosePicker"></div>
+        <div class="datepicker-popup">
+            <div class="datepicker-header">
+                <button type="button" class="nav-btn" @onclick="PreviousMonth">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="current-month">@CurrentMonthName @CurrentYear</div>
+                <button type="button" class="nav-btn" @onclick="NextMonth">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="datepicker-body">
+                <div class="weekday-headers">
+                    @foreach (var day in weekDays)
+                    {
+                        <div class="weekday">@day</div>
+                    }
+                </div>
+                
+                <div class="days-grid">
+                    @foreach (var day in GetCalendarDays())
+                    {
+                        <button type="button" 
+                                class="day-cell @(day.IsCurrentMonth ? "current-month" : "other-month") @(day.IsToday ? "today" : "") @(day.IsSelected ? "selected" : "")"
+                                @onclick="() => SelectDate(day)"
+                                disabled="@(!day.IsCurrentMonth)">
+                            @day.Day
+                        </button>
+                    }
+                </div>
+            </div>
+            
+            <div class="datepicker-time">
+                <div class="time-section">
+                    <label>ساعت</label>
+                    <input type="number" 
+                           min="0" 
+                           max="23" 
+                           @bind="selectedHour" 
+                           @bind:event="oninput"
+                           class="time-input" />
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-section">
+                    <label>دقیقه</label>
+                    <input type="number" 
+                           min="0" 
+                           max="59" 
+                           @bind="selectedMinute"
+                           @bind:event="oninput"
+                           class="time-input" />
+                </div>
+            </div>
+            
+            <div class="datepicker-actions">
+                <button type="button" class="btn-cancel" @onclick="ClosePicker">انصراف</button>
+                <button type="button" class="btn-confirm" @onclick="ConfirmSelection">تایید</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DateTime Value { get; set; } = DateTime.Now;
+    
+    [Parameter]
+    public EventCallback<DateTime> ValueChanged { get; set; }
+    
+    private bool isOpen = false;
+    private int currentYear;
+    private int currentMonth;
+    private int selectedHour;
+    private int selectedMinute;
+    private DateTime tempSelectedDate;
+    
+    private string[] weekDays = { "ش", "ی", "د", "س", "چ", "پ", "ج" };
+    private string[] monthNames = { 
+        "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+        "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+    };
+    
+    protected override void OnInitialized()
+    {
+        var persian = ToPersianDate(Value);
+        currentYear = persian.Year;
+        currentMonth = persian.Month;
+        selectedHour = Value.Hour;
+        selectedMinute = Value.Minute;
+        tempSelectedDate = Value;
+    }
+    
+    private void TogglePicker()
+    {
+        isOpen = !isOpen;
+    }
+    
+    private void ClosePicker()
+    {
+        isOpen = false;
+    }
+    
+    private void PreviousMonth()
+    {
+        currentMonth--;
+        if (currentMonth < 1)
+        {
+            currentMonth = 12;
+            currentYear--;
+        }
+    }
+    
+    private void NextMonth()
+    {
+        currentMonth++;
+        if (currentMonth > 12)
+        {
+            currentMonth = 1;
+            currentYear++;
+        }
+    }
+    
+    private void SelectDate(DayInfo day)
+    {
+        if (!day.IsCurrentMonth) return;
+        
+        var gregorian = ToGregorianDate(currentYear, currentMonth, day.Day);
+        tempSelectedDate = new DateTime(gregorian.Year, gregorian.Month, gregorian.Day, selectedHour, selectedMinute, 0);
+    }
+    
+    private async Task ConfirmSelection()
+    {
+        var finalDate = new DateTime(tempSelectedDate.Year, tempSelectedDate.Month, tempSelectedDate.Day, selectedHour, selectedMinute, 0);
+        await ValueChanged.InvokeAsync(finalDate);
+        isOpen = false;
+    }
+    
+    private string GetDisplayText()
+    {
+        var persian = ToPersianDate(Value);
+        return $"{persian.Year}/{persian.Month:00}/{persian.Day:00} - {Value.Hour:00}:{Value.Minute:00}";
+    }
+    
+    private string CurrentMonthName => monthNames[currentMonth - 1];
+    private string CurrentYear => currentYear.ToString();
+    
+    private List<DayInfo> GetCalendarDays()
+    {
+        var days = new List<DayInfo>();
+        var firstDayOfMonth = ToGregorianDate(currentYear, currentMonth, 1);
+        var persianFirstDay = ToPersianDate(firstDayOfMonth);
+        
+        // Get day of week (0 = Saturday in Persian calendar)
+        var dayOfWeek = ((int)firstDayOfMonth.DayOfWeek + 1) % 7; // Convert to Persian week
+        
+        // Add previous month's days
+        var daysInPrevMonth = currentMonth == 1 ? GetDaysInMonth(currentYear - 1, 12) : GetDaysInMonth(currentYear, currentMonth - 1);
+        for (int i = dayOfWeek - 1; i >= 0; i--)
+        {
+            days.Add(new DayInfo { Day = daysInPrevMonth - i, IsCurrentMonth = false });
+        }
+        
+        // Add current month's days
+        var daysInMonth = GetDaysInMonth(currentYear, currentMonth);
+        var today = ToPersianDate(DateTime.Now);
+        var selected = ToPersianDate(Value);
+        
+        for (int i = 1; i <= daysInMonth; i++)
+        {
+            days.Add(new DayInfo 
+            { 
+                Day = i, 
+                IsCurrentMonth = true,
+                IsToday = today.Year == currentYear && today.Month == currentMonth && today.Day == i,
+                IsSelected = selected.Year == currentYear && selected.Month == currentMonth && selected.Day == i
+            });
+        }
+        
+        // Add next month's days to complete the grid
+        var remainingCells = 42 - days.Count; // 6 rows * 7 days
+        for (int i = 1; i <= remainingCells; i++)
+        {
+            days.Add(new DayInfo { Day = i, IsCurrentMonth = false });
+        }
+        
+        return days;
+    }
+    
+    private int GetDaysInMonth(int year, int month)
+    {
+        if (month <= 6) return 31;
+        if (month <= 11) return 30;
+        return IsLeapYear(year) ? 30 : 29;
+    }
+    
+    private bool IsLeapYear(int year)
+    {
+        var cycle = year % 128;
+        return cycle == 1 || cycle == 5 || cycle == 9 || cycle == 13 || cycle == 17 || 
+               cycle == 22 || cycle == 26 || cycle == 30 || cycle == 34 || cycle == 38 || 
+               cycle == 43 || cycle == 47 || cycle == 51 || cycle == 55 || cycle == 59 || 
+               cycle == 64 || cycle == 68 || cycle == 72 || cycle == 76 || cycle == 80 || 
+               cycle == 85 || cycle == 89 || cycle == 93 || cycle == 97 || cycle == 101 || 
+               cycle == 105 || cycle == 109 || cycle == 113 || cycle == 118 || cycle == 122 || 
+               cycle == 126;
+    }
+    
+    private (int Year, int Month, int Day) ToPersianDate(DateTime gregorian)
+    {
+        var calendar = new System.Globalization.PersianCalendar();
+        return (calendar.GetYear(gregorian), calendar.GetMonth(gregorian), calendar.GetDayOfMonth(gregorian));
+    }
+    
+    private DateTime ToGregorianDate(int persianYear, int persianMonth, int persianDay)
+    {
+        var calendar = new System.Globalization.PersianCalendar();
+        return calendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
+    }
+    
+    private class DayInfo
+    {
+        public int Day { get; set; }
+        public bool IsCurrentMonth { get; set; }
+        public bool IsToday { get; set; }
+        public bool IsSelected { get; set; }
+    }
+}
