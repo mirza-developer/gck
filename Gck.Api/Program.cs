@@ -70,9 +70,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+// CORS must come before UseHttpsRedirection and UseAuthorization
 app.UseCors("AllowBlazorClient");
+
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
