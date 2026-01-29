@@ -26,16 +26,8 @@ public class FinancialAccountsController : ControllerBase
     [ProducesResponseType(typeof(List<FinancialAccountDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<FinancialAccountDto>>> GetAll()
     {
-        try
-        {
-            var accounts = await _mediator.Send(new GetAllFinancialAccountsQuery());
-            return Ok(accounts);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting all financial accounts");
-            return StatusCode(500, "An error occurred while retrieving financial accounts");
-        }
+        var accounts = await _mediator.Send(new GetAllFinancialAccountsQuery());
+        return Ok(accounts);
     }
 
     [HttpGet("{id}")]
@@ -43,20 +35,12 @@ public class FinancialAccountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FinancialAccountDto>> GetById(int id)
     {
-        try
-        {
-            var account = await _mediator.Send(new GetFinancialAccountByIdQuery { Id = id });
-            if (account == null)
+        var account = await _mediator.Send(new GetFinancialAccountByIdQuery { Id = id });
+        if (account == null)
             {
                 return NotFound($"Financial account with ID '{id}' not found");
             }
-            return Ok(account);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting financial account by ID: {Id}", id);
-            return StatusCode(500, "An error occurred while retrieving the financial account");
-        }
+        return Ok(account);
     }
 
     [HttpPost]
@@ -64,20 +48,8 @@ public class FinancialAccountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create([FromBody] CreateFinancialAccountCommand command)
     {
-        try
-        {
-            var accountId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = accountId }, accountId);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating financial account");
-            return StatusCode(500, "An error occurred while creating the financial account");
-        }
+        var accountId = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = accountId }, accountId);
     }
 
     [HttpPut("{id}")]
@@ -88,23 +60,11 @@ public class FinancialAccountsController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating financial account: {Id}", id);
-            return StatusCode(500, "An error occurred while updating the financial account");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -112,19 +72,7 @@ public class FinancialAccountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            await _mediator.Send(new DeleteFinancialAccountCommand { Id = id });
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting financial account: {Id}", id);
-            return StatusCode(500, "An error occurred while deleting the financial account");
-        }
+        await _mediator.Send(new DeleteFinancialAccountCommand { Id = id });
+        return NoContent();
     }
 }

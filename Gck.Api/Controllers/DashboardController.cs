@@ -22,15 +22,7 @@ public class DashboardController : ControllerBase
     [ProducesResponseType(typeof(List<DashboardTableDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<DashboardTableDto>>> GetDashboardTables()
     {
-        try
-        {
-            var tables = await _mediator.Send(new GetDashboardTablesQuery());
-            return Ok(tables);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting dashboard tables");
-            return StatusCode(500, "An error occurred while retrieving dashboard tables");
-        }
+        var tables = await _mediator.Send(new GetDashboardTablesQuery());
+        return Ok(tables);
     }
 }

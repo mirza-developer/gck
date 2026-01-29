@@ -34,7 +34,7 @@ public class TransactionsController : ControllerBase
         var transaction = await _mediator.Send(new GetTransactionByIdQuery { Id = id });
         
         if (transaction == null)
-            return NotFound();
+        return NotFound();
 
         return Ok(transaction);
     }
@@ -48,10 +48,10 @@ public class TransactionsController : ControllerBase
     {
         var report = await _mediator.Send(new GetTransactionReportQuery
         {
-            FinancialAccountId = financialAccountId,
-            StartDate = startDate,
-            EndDate = endDate,
-            Type = type
+        FinancialAccountId = financialAccountId,
+        StartDate = startDate,
+        EndDate = endDate,
+        Type = type
         });
         
         return Ok(report);
@@ -62,11 +62,11 @@ public class TransactionsController : ControllerBase
     {
         var command = new CreateTransactionCommand
         {
-            FinancialAccountId = dto.FinancialAccountId,
-            Type = dto.Type,
-            Amount = dto.Amount,
-            Description = dto.Description,
-            TransactionDate = dto.TransactionDate
+        FinancialAccountId = dto.FinancialAccountId,
+        Type = dto.Type,
+        Amount = dto.Amount,
+        Description = dto.Description,
+        TransactionDate = dto.TransactionDate
         };
 
         var id = await _mediator.Send(command);
@@ -77,16 +77,16 @@ public class TransactionsController : ControllerBase
     public async Task<ActionResult> Update(int id, [FromBody] UpdateTransactionDto dto)
     {
         if (id != dto.Id)
-            return BadRequest("ID mismatch");
+        return BadRequest("ID mismatch");
 
         var command = new UpdateTransactionCommand
         {
-            Id = dto.Id,
-            FinancialAccountId = dto.FinancialAccountId,
-            Type = dto.Type,
-            Amount = dto.Amount,
-            Description = dto.Description,
-            TransactionDate = dto.TransactionDate
+        Id = dto.Id,
+        FinancialAccountId = dto.FinancialAccountId,
+        Type = dto.Type,
+        Amount = dto.Amount,
+        Description = dto.Description,
+        TransactionDate = dto.TransactionDate
         };
 
         await _mediator.Send(command);

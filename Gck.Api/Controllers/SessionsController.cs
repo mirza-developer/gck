@@ -27,20 +27,12 @@ public class SessionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<SessionDto>> GetById(int id)
     {
-        try
-        {
-            var session = await _mediator.Send(new GetSessionByIdQuery { Id = id });
-            if (session == null)
+        var session = await _mediator.Send(new GetSessionByIdQuery { Id = id });
+        if (session == null)
             {
                 return NotFound($"Session with ID '{id}' not found");
             }
-            return Ok(session);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting session by ID: {Id}", id);
-            return StatusCode(500, "An error occurred while retrieving the session");
-        }
+        return Ok(session);
     }
 
     [HttpPost("start")]
@@ -48,20 +40,8 @@ public class SessionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> StartSession([FromBody] StartSessionCommand command)
     {
-        try
-        {
-            var sessionId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = sessionId }, sessionId);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error starting session");
-            return StatusCode(500, "An error occurred while starting the session");
-        }
+        var sessionId = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = sessionId }, sessionId);
     }
 
     [HttpPost("{id}/finish")]
@@ -72,23 +52,11 @@ public class SessionsController : ControllerBase
     {
         if (id != command.SessionId)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error finishing session: {Id}", id);
-            return StatusCode(500, "An error occurred while finishing the session");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 
     [HttpPost("{id}/resume")]
@@ -96,19 +64,7 @@ public class SessionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ResumeSession(int id)
     {
-        try
-        {
-            await _mediator.Send(new ResumeSessionCommand { SessionId = id });
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error resuming session: {Id}", id);
-            return StatusCode(500, "An error occurred while resuming the session");
-        }
+        await _mediator.Send(new ResumeSessionCommand { SessionId = id });
+        return NoContent();
     }
 }
