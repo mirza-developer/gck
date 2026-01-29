@@ -208,23 +208,13 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        try
-        {
-            // Load financial accounts
-            accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
-            
-            // Load report with initial filters
-            await ApplyFilters();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = PersianResources.LoadTransactionsError;
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        // Load financial accounts
+        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        
+        // Load report with initial filters
+        await ApplyFilters();
+
+        isLoading = false;
     }
 
     private async Task ApplyFilters()
@@ -232,34 +222,24 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        try
-        {
-            var queryParams = new List<string>();
+        var queryParams = new List<string>();
 
-            if (!string.IsNullOrEmpty(filterAccountId))
-                queryParams.Add($"financialAccountId={filterAccountId}");
-            
-            if (!string.IsNullOrEmpty(filterType))
-                queryParams.Add($"type={filterType}");
-            
-            if (filterStartDate.HasValue)
-                queryParams.Add($"startDate={filterStartDate.Value:yyyy-MM-dd}");
-            
-            if (filterEndDate.HasValue)
-                queryParams.Add($"endDate={filterEndDate.Value:yyyy-MM-dd}");
+        if (!string.IsNullOrEmpty(filterAccountId))
+            queryParams.Add($"financialAccountId={filterAccountId}");
+        
+        if (!string.IsNullOrEmpty(filterType))
+            queryParams.Add($"type={filterType}");
+        
+        if (filterStartDate.HasValue)
+            queryParams.Add($"startDate={filterStartDate.Value:yyyy-MM-dd}");
+        
+        if (filterEndDate.HasValue)
+            queryParams.Add($"endDate={filterEndDate.Value:yyyy-MM-dd}");
 
-            var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
-            report = await Http.GetFromJsonAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
-        }
-        catch (Exception ex)
-        {
-            errorMessage = PersianResources.LoadTransactionsError;
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
+        report = await Http.GetFromJsonAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
+
+        isLoading = false;
     }
 
     private async Task ClearFilters()
@@ -286,24 +266,16 @@
         if (!await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteTransactionConfirm))
             return;
 
-        try
+        var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
+        
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
-            
-            if (response.IsSuccessStatusCode)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", PersianResources.DeleteSuccess);
-                await ApplyFilters(); // Reload data
-            }
-            else
-            {
-                errorMessage = PersianResources.DeleteTransactionError;
-            }
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.DeleteSuccess);
+            await ApplyFilters(); // Reload data
         }
-        catch (Exception ex)
+        else
         {
             errorMessage = PersianResources.DeleteTransactionError;
-            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 }

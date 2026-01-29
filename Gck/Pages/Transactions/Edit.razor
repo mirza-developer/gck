@@ -165,36 +165,26 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        try
+        // Load financial accounts
+        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        
+        // Load transaction
+        var transactionDto = await Http.GetFromJsonAsync<TransactionDto>(ApiConfig.GetApiUrl($"/api/transactions/{Id}"));
+        
+        if (transactionDto != null)
         {
-            // Load financial accounts
-            accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
-            
-            // Load transaction
-            var transactionDto = await Http.GetFromJsonAsync<TransactionDto>(ApiConfig.GetApiUrl($"/api/transactions/{Id}"));
-            
-            if (transactionDto != null)
+            transaction = new UpdateTransactionDto
             {
-                transaction = new UpdateTransactionDto
-                {
-                    Id = transactionDto.Id,
-                    FinancialAccountId = transactionDto.FinancialAccountId,
-                    Type = transactionDto.Type,
-                    Amount = transactionDto.Amount,
-                    Description = transactionDto.Description,
-                    TransactionDate = transactionDto.TransactionDate
-                };
-            }
+                Id = transactionDto.Id,
+                FinancialAccountId = transactionDto.FinancialAccountId,
+                Type = transactionDto.Type,
+                Amount = transactionDto.Amount,
+                Description = transactionDto.Description,
+                TransactionDate = transactionDto.TransactionDate
+            };
         }
-        catch (Exception ex)
-        {
-            errorMessage = PersianResources.LoadTransactionsError;
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+
+        isLoading = false;
     }
 
     private async Task HandleSubmit()
@@ -216,30 +206,20 @@
         isSaving = true;
         errorMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.PutAsJsonAsync(ApiConfig.GetApiUrl($"/api/transactions/{Id}"), transaction);
+        var response = await Http.PutAsJsonAsync(ApiConfig.GetApiUrl($"/api/transactions/{Id}"), transaction);
 
-            if (response.IsSuccessStatusCode)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", PersianResources.SaveSuccess);
-                Navigation.NavigateTo("/transactions");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.ErrorUpdatingTransaction}: {error}";
-            }
-        }
-        catch (Exception ex)
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = PersianResources.ApiConnectionError;
-            Console.WriteLine($"Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.SaveSuccess);
+            Navigation.NavigateTo("/transactions");
         }
-        finally
+        else
         {
-            isSaving = false;
+            var error = await response.Content.ReadAsStringAsync();
+            errorMessage = $"{PersianResources.ErrorUpdatingTransaction}: {error}";
         }
+
+        isSaving = false;
     }
 
     private void GoBack()

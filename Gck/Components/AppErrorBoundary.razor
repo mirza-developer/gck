@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components.Web
+@using System.Diagnostics
 @inherits ErrorBoundaryBase
 @inject IJSRuntime JS
 
@@ -63,6 +64,11 @@
 
     protected override Task OnErrorAsync(Exception exception)
     {
+        if (IsDebugMode)
+        {
+            Debugger.Break();
+        }
+
         // Log to console in development
         Console.Error.WriteLine($"Error caught by ErrorBoundary: {exception.Message}");
         Console.Error.WriteLine($"Stack Trace: {exception.StackTrace}");

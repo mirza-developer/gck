@@ -114,45 +114,29 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        try
+        var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/feedback"));
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/feedback"));
-            if (response.IsSuccessStatusCode)
-            {
-                feedbacks = await response.Content.ReadFromJsonAsync<List<FeedbackDto>>() ?? new();
-            }
-            else
-            {
-                errorMessage = PersianResources.LoadingError;
-            }
+            feedbacks = await response.Content.ReadFromJsonAsync<List<FeedbackDto>>() ?? new();
         }
-        catch (Exception ex)
+        else
         {
-            errorMessage = $"{PersianResources.LoadingError}: {ex.Message}";
+            errorMessage = PersianResources.LoadingError;
         }
-        finally
-        {
-            isLoading = false;
-        }
+
+        isLoading = false;
     }
 
     private async Task MarkAsRead(int feedbackId)
     {
-        try
+        var response = await Http.PutAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), null);
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.PutAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), null);
-            if (response.IsSuccessStatusCode)
+            var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+            if (feedback != null)
             {
-                var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
-                if (feedback != null)
-                {
-                    feedback.IsRead = true;
-                }
+                feedback.IsRead = true;
             }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.Error}: {ex.Message}";
         }
     }
 

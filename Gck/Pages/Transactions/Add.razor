@@ -158,19 +158,9 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        try
-        {
-            accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = PersianResources.LoadFinancialAccountsError;
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+
+        isLoading = false;
     }
 
     private async Task HandleSubmit()
@@ -190,30 +180,20 @@
         isSaving = true;
         errorMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/transactions"), transaction);
+        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/transactions"), transaction);
 
-            if (response.IsSuccessStatusCode)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", PersianResources.TransactionAddSuccess);
-                Navigation.NavigateTo("/transactions");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.ErrorSavingTransaction}: {error}";
-            }
-        }
-        catch (Exception ex)
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = PersianResources.ApiConnectionError;
-            Console.WriteLine($"Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.TransactionAddSuccess);
+            Navigation.NavigateTo("/transactions");
         }
-        finally
+        else
         {
-            isSaving = false;
+            var error = await response.Content.ReadAsStringAsync();
+            errorMessage = $"{PersianResources.ErrorSavingTransaction}: {error}";
         }
+
+        isSaving = false;
     }
 
     private void GoBack()

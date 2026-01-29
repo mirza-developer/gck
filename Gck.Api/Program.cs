@@ -34,15 +34,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient",
         policy => policy
-            .WithOrigins(
-                "https://localhost:5001", 
-                "http://localhost:5000", 
-                "https://localhost:7001",
-                "http://localhost:5193",   // Added: Blazor WASM client
-                "https://localhost:7193")  // Added: HTTPS version
+            .AllowAnyOrigin()  // Added: HTTPS version
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+            .AllowAnyHeader());
 });
 
 var app = builder.Build();
