@@ -1,0 +1,49 @@
+name: Build and Deploy to FTP
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish Blazor WebAssembly
+      run: dotnet publish Gck/Gck.csproj --configuration Release --output ./publish/client --no-build
+
+    - name: Publish API
+      run: dotnet publish Gck.Api/Gck.Api.csproj --configuration Release --output ./publish/api --no-build
+
+    - name: Deploy Client to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/client/
+        server-dir: ./wwwroot/
+
+    - name: Deploy API to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/api/
+        server-dir: ./api/
