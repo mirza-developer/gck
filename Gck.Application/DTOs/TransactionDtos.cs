@@ -8,7 +8,7 @@ public class TransactionDto
     public string Type { get; set; } = string.Empty; // "Income" or "Outcome"
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
-    public DateTime TransactionDate { get; set; }
+    public string TransactionDate { get; set; } = string.Empty;
 }
 
 public class CreateTransactionDto
@@ -17,7 +17,7 @@ public class CreateTransactionDto
     public string Type { get; set; } = string.Empty; // "Income" or "Outcome"
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
-    public DateTime TransactionDate { get; set; }
+    public string TransactionDate { get; set; } = string.Empty;
 }
 
 public class UpdateTransactionDto
@@ -27,7 +27,7 @@ public class UpdateTransactionDto
     public string Type { get; set; } = string.Empty; // "Income" or "Outcome"
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
-    public DateTime TransactionDate { get; set; }
+    public string TransactionDate { get; set; } = string.Empty;
 }
 
 public class TransactionReportDto

@@ -44,14 +44,12 @@
             <div class="gaming-card form-card fade-in-up">
                 <form @onsubmit="HandleSubmit">
                     <div class="form-group">
-                        <label for="accountId">
+                        <label for="accountId" class="form-label">
+                            <i class="fas fa-university"></i>
                             @PersianResources.FinancialAccount
                             <span class="required">@PersianResources.Required</span>
                         </label>
-                        <select id="accountId" 
-                                @bind="transaction.FinancialAccountId" 
-                                class="form-control"
-                                required>
+                        <InputSelect @bind-Value="transaction.FinancialAccountId" class="form-input" id="accountId">
                             <option value="0">@PersianResources.SelectFinancialAccount</option>
                             @foreach (var account in accounts)
                             {
@@ -59,41 +57,34 @@
                                     @account.AccountName (@account.BankName)
                                 </option>
                             }
-                        </select>
+                        </InputSelect>
                     </div>
 
                     <div class="form-group">
-                        <label for="type">
+                        <label for="type" class="form-label">
+                            <i class="fas fa-exchange-alt"></i>
                             @PersianResources.TransactionType
                             <span class="required">@PersianResources.Required</span>
                         </label>
-                        <select id="type" 
-                                @bind="transaction.Type" 
-                                class="form-control"
-                                required>
+                        <InputSelect @bind-Value="transaction.Type" class="form-input" id="type">
                             <option value="">@PersianResources.SelectTransactionType</option>
                             <option value="Income">@PersianResources.Income</option>
                             <option value="Outcome">@PersianResources.Outcome</option>
-                        </select>
+                        </InputSelect>
                     </div>
 
                     <div class="form-group">
-                        <label for="amount">
+                        <label for="amount" class="form-label">
+                            <i class="fas fa-money-bill-wave"></i>
                             @PersianResources.Amount (@PersianResources.Toman)
                             <span class="required">@PersianResources.Required</span>
                         </label>
-                        <input type="number" 
-                               id="amount" 
-                               @bind="transaction.Amount" 
-                               class="form-control"
-                               placeholder="@PersianResources.AmountPlaceholder"
-                               min="0"
-                               step="1000"
-                               required />
+                        <InputNumber @bind-Value="transaction.Amount" class="form-input" id="amount" placeholder="@PersianResources.AmountPlaceholder" />
                     </div>
 
                     <div class="form-group">
-                        <label for="date">
+                        <label for="date" class="form-label">
+                            <i class="fas fa-calendar-alt"></i>
                             @PersianResources.TransactionDate
                             <span class="required">@PersianResources.Required</span>
                         </label>
@@ -101,13 +92,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i>
                             @PersianResources.Description
                             <span class="required">@PersianResources.Required</span>
                         </label>
                         <textarea id="description" 
                                   @bind="transaction.Description" 
-                                  class="form-control"
+                                  class="form-input"
                                   placeholder="@PersianResources.DescriptionPlaceholder"
                                   rows="4"
                                   maxlength="500"
@@ -139,19 +131,27 @@
 </section>
 
 @code {
-    private CreateTransactionDto transaction = new() 
-    { 
-        TransactionDate = DateTime.Now 
-    };
-    private List<FinancialAccountDto> accounts = new();
-    private bool isLoading = true;
-    private bool isSaving = false;
-    private string errorMessage = string.Empty;
+private CreateTransactionDto transaction = new();
+private List<FinancialAccountDto> accounts = new();
+private bool isLoading = true;
+private bool isSaving = false;
+private string errorMessage = string.Empty;
+private readonly System.Globalization.PersianCalendar _persianCalendar = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadFinancialAccounts();
-    }
+private string GetCurrentPersianDate()
+{
+    var now = DateTime.Now;
+    var year = _persianCalendar.GetYear(now);
+    var month = _persianCalendar.GetMonth(now);
+    var day = _persianCalendar.GetDayOfMonth(now);
+    return $"{year:0000}/{month:00}/{day:00}";
+}
+
+protected override async Task OnInitializedAsync()
+{
+    transaction.TransactionDate = GetCurrentPersianDate();
+    await LoadFinancialAccounts();
+}
 
     private async Task LoadFinancialAccounts()
     {

@@ -8,5 +8,5 @@ public class CreateTransactionCommand : IRequest<int>
     public string Type { get; set; } = string.Empty; // "Income" or "Outcome"
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
-    public DateTime TransactionDate { get; set; }
+    public string TransactionDate { get; set; } = string.Empty;
 }

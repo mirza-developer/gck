@@ -8,6 +8,7 @@ namespace Gck.Application.Features.Transactions.Commands.CreateTransaction;
 public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, int>
 {
     private readonly GckDbContext _context;
+    private readonly System.Globalization.PersianCalendar _persianCalendar = new();
 
     public CreateTransactionCommandHandler(GckDbContext context)
     {
@@ -49,7 +50,8 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
         }
 
         // Validate transaction date
-        if (request.TransactionDate > DateTime.Now)
+        var transactionDateTime = ParsePersianDate(request.TransactionDate);
+        if (transactionDateTime > DateTime.Now)
         {
             throw new InvalidOperationException("Transaction date cannot be in the future.");
         }
@@ -60,7 +62,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             Type = request.Type,
             Amount = request.Amount,
             Description = request.Description,
-            TransactionDate = request.TransactionDate,
+            TransactionDate = transactionDateTime,
             CreateDate = DateTime.Now,
             LastModifiedDate = DateTime.Now
         };
@@ -69,5 +71,20 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
         await _context.SaveChangesAsync(cancellationToken);
 
         return transaction.Id;
+    }
+
+    private DateTime ParsePersianDate(string persianDate)
+    {
+        var parts = persianDate.Split('/');
+        if (parts.Length >= 3)
+        {
+            if (int.TryParse(parts[0], out int year) &&
+                int.TryParse(parts[1], out int month) &&
+                int.TryParse(parts[2], out int day))
+            {
+                return _persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+            }
+        }
+        return DateTime.Now;
     }
 }

@@ -8,6 +8,7 @@ namespace Gck.Application.Features.Transactions.Queries.GetTransactionById;
 public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionByIdQuery, TransactionDto?>
 {
     private readonly GckDbContext _context;
+    private readonly System.Globalization.PersianCalendar _persianCalendar = new();
 
     public GetTransactionByIdQueryHandler(GckDbContext context)
     {
@@ -18,19 +19,28 @@ public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionById
     {
         var transaction = await _context.Transactions
             .Include(t => t.FinancialAccount)
-            .Where(t => t.Id == request.Id)
-            .Select(t => new TransactionDto
-            {
-                Id = t.Id,
-                FinancialAccountId = t.FinancialAccountId,
-                FinancialAccountName = t.FinancialAccount.AccountName,
-                Type = t.Type,
-                Amount = t.Amount,
-                Description = t.Description,
-                TransactionDate = t.TransactionDate
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
-        return transaction;
+        if (transaction == null)
+            return null;
+
+        return new TransactionDto
+        {
+            Id = transaction.Id,
+            FinancialAccountId = transaction.FinancialAccountId,
+            FinancialAccountName = transaction.FinancialAccount.AccountName,
+            Type = transaction.Type,
+            Amount = transaction.Amount,
+            Description = transaction.Description,
+            TransactionDate = ToPersianDateString(transaction.TransactionDate)
+        };
+    }
+
+    private string ToPersianDateString(DateTime dateTime)
+    {
+        var year = _persianCalendar.GetYear(dateTime);
+        var month = _persianCalendar.GetMonth(dateTime);
+        var day = _persianCalendar.GetDayOfMonth(dateTime);
+        return $"{year:0000}/{month:00}/{day:00}";
     }
 }

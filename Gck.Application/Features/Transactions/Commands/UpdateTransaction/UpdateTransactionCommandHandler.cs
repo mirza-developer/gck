@@ -7,6 +7,7 @@ namespace Gck.Application.Features.Transactions.Commands.UpdateTransaction;
 public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransactionCommand, Unit>
 {
     private readonly GckDbContext _context;
+    private readonly System.Globalization.PersianCalendar _persianCalendar = new();
 
     public UpdateTransactionCommandHandler(GckDbContext context)
     {
@@ -56,7 +57,8 @@ public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransaction
         }
 
         // Validate transaction date
-        if (request.TransactionDate > DateTime.Now)
+        var transactionDateTime = ParsePersianDate(request.TransactionDate);
+        if (transactionDateTime > DateTime.Now)
         {
             throw new InvalidOperationException("Transaction date cannot be in the future.");
         }
@@ -65,11 +67,26 @@ public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransaction
         transaction.Type = request.Type;
         transaction.Amount = request.Amount;
         transaction.Description = request.Description;
-        transaction.TransactionDate = request.TransactionDate;
+        transaction.TransactionDate = transactionDateTime;
         transaction.LastModifiedDate = DateTime.Now;
 
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
+    }
+
+    private DateTime ParsePersianDate(string persianDate)
+    {
+        var parts = persianDate.Split('/');
+        if (parts.Length >= 3)
+        {
+            if (int.TryParse(parts[0], out int year) &&
+                int.TryParse(parts[1], out int month) &&
+                int.TryParse(parts[2], out int day))
+            {
+                return _persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+            }
+        }
+        return DateTime.Now;
     }
 }

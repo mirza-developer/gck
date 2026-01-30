@@ -49,32 +49,39 @@
                 <div class="filter-row">
                     <div class="filter-item">
                         <label>@PersianResources.FilterByAccount</label>
-                        <select @bind="filterAccountId" class="select-input">
-                            <option value="">@PersianResources.AllAccounts</option>
-                            @foreach (var account in accounts)
-                            {
-                                <option value="@account.Id">@account.AccountName</option>
-                            }
-                        </select>
+                        <MultiSelectDropdown TItem="FinancialAccountDto" 
+                                           TValue="string"
+                                           Items="@allAccounts"
+                                           IsMultiSelect="false"
+                                           EnableSearch="true"
+                                           Placeholder="@PersianResources.AllAccounts"
+                                           SelectedValue="@filterAccountId"
+                                           SelectedValueChanged="@OnAccountSelected"
+                                           ValueSelector="@(a => a.Id.ToString())"
+                                           DisplayTextSelector="@(a => a.AccountName)" />
                     </div>
 
                     <div class="filter-item">
                         <label>@PersianResources.FilterByType</label>
-                        <select @bind="filterType" class="select-input">
-                            <option value="">@PersianResources.AllTypes</option>
-                            <option value="Income">@PersianResources.Income</option>
-                            <option value="Outcome">@PersianResources.Outcome</option>
-                        </select>
+                        <MultiSelectDropdown TItem="TransactionTypeOption" 
+                                           TValue="string"
+                                           Items="@transactionTypes"
+                                           IsMultiSelect="false"
+                                           Placeholder="@PersianResources.AllTypes"
+                                           SelectedValue="@filterType"
+                                           SelectedValueChanged="@OnTypeSelected"
+                                           ValueSelector="@(t => t.Value)"
+                                           DisplayTextSelector="@(t => t.Display)" />
                     </div>
 
                     <div class="filter-item">
                         <label>@PersianResources.StartDate</label>
-                        <input type="date" @bind="filterStartDate" class="input-field" />
+                        <PersianDatePicker Value="@filterStartDate" ValueChanged="@OnStartDateChanged" />
                     </div>
 
                     <div class="filter-item">
                         <label>@PersianResources.EndDate</label>
-                        <input type="date" @bind="filterEndDate" class="input-field" />
+                        <PersianDatePicker Value="@filterEndDate" ValueChanged="@OnEndDateChanged" />
                     </div>
 
                     <div class="filter-actions">
@@ -142,7 +149,7 @@
                                 @foreach (var transaction in FilteredTransactions)
                                 {
                                     <tr class="fade-in-up">
-                                        <td>@transaction.TransactionDate.ToString("yyyy/MM/dd HH:mm")</td>
+                                        <td>@transaction.TransactionDate</td>
                                         <td>@transaction.FinancialAccountName</td>
                                         <td>
                                             <span class="type-badge @(transaction.Type == "Income" ? "income" : "outcome")">
@@ -180,16 +187,24 @@
 </section>
 
 @code {
-    private List<TransactionDto> transactions = new();
-    private List<FinancialAccountDto> accounts = new();
-    private TransactionReportDto? report;
-    private string searchText = string.Empty;
-    private string filterType = string.Empty;
-    private string filterAccountId = string.Empty;
-    private DateTime? filterStartDate;
-    private DateTime? filterEndDate;
-    private bool isLoading = true;
-    private string errorMessage = string.Empty;
+private List<TransactionDto> transactions = new();
+private List<FinancialAccountDto> accounts = new();
+private List<FinancialAccountDto> allAccounts = new();
+private List<TransactionTypeOption> transactionTypes = new();
+private TransactionReportDto? report;
+private string searchText = string.Empty;
+private string filterType = string.Empty;
+private string filterAccountId = string.Empty;
+private string filterStartDate = string.Empty;
+private string filterEndDate = string.Empty;
+private bool isLoading = true;
+private string errorMessage = string.Empty;
+
+private class TransactionTypeOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Display { get; set; } = string.Empty;
+}
 
     private IEnumerable<TransactionDto> FilteredTransactions => 
         report?.Transactions
@@ -210,6 +225,15 @@
 
         // Load financial accounts
         accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        allAccounts = new List<FinancialAccountDto>(accounts);
+        
+        // Initialize transaction types
+        transactionTypes = new List<TransactionTypeOption>
+        {
+            new TransactionTypeOption { Value = "", Display = PersianResources.AllTypes },
+            new TransactionTypeOption { Value = "Income", Display = PersianResources.Income },
+            new TransactionTypeOption { Value = "Outcome", Display = PersianResources.Outcome }
+        };
         
         // Load report with initial filters
         await ApplyFilters();
@@ -230,11 +254,19 @@
         if (!string.IsNullOrEmpty(filterType))
             queryParams.Add($"type={filterType}");
         
-        if (filterStartDate.HasValue)
-            queryParams.Add($"startDate={filterStartDate.Value:yyyy-MM-dd}");
+        if (!string.IsNullOrEmpty(filterStartDate))
+        {
+            var startDate = ConvertPersianToGregorian(filterStartDate);
+            if (startDate.HasValue)
+                queryParams.Add($"startDate={startDate.Value:yyyy-MM-dd}");
+        }
         
-        if (filterEndDate.HasValue)
-            queryParams.Add($"endDate={filterEndDate.Value:yyyy-MM-dd}");
+        if (!string.IsNullOrEmpty(filterEndDate))
+        {
+            var endDate = ConvertPersianToGregorian(filterEndDate);
+            if (endDate.HasValue)
+                queryParams.Add($"endDate={endDate.Value:yyyy-MM-dd}");
+        }
 
         var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
         report = await Http.GetFromJsonAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
@@ -246,9 +278,51 @@
     {
         filterAccountId = string.Empty;
         filterType = string.Empty;
-        filterStartDate = null;
-        filterEndDate = null;
+        filterStartDate = string.Empty;
+        filterEndDate = string.Empty;
         await ApplyFilters();
+    }
+
+    private async Task OnAccountSelected(string? value)
+    {
+        filterAccountId = value ?? string.Empty;
+    }
+
+    private async Task OnTypeSelected(string? value)
+    {
+        filterType = value ?? string.Empty;
+    }
+
+    private async Task OnStartDateChanged(string value)
+    {
+        filterStartDate = value;
+    }
+
+    private async Task OnEndDateChanged(string value)
+    {
+        filterEndDate = value;
+    }
+
+    private DateTime? ConvertPersianToGregorian(string persianDate)
+    {
+        if (string.IsNullOrEmpty(persianDate)) return null;
+
+        try
+        {
+            var parts = persianDate.Split('/');
+            if (parts.Length != 3) return null;
+
+            var year = int.Parse(parts[0]);
+            var month = int.Parse(parts[1]);
+            var day = int.Parse(parts[2]);
+
+            var calendar = new System.Globalization.PersianCalendar();
+            return calendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private void NavigateToAdd()
