@@ -68,7 +68,7 @@ public class SmsService : ISmsService
     public async Task SendMessageAsync(string phoneNumber, string message, CancellationToken cancellationToken = default)
     {
         var smsBaseUrl = _configuration["SmsProvider:BaseUrl"] ?? "https://console.melipayamak.com";
-        var smsApiKey = _configuration["SmsProvider:SimpleMessageApiKey"];
+        var smsApiKey = _configuration["SmsProvider:ApiKey"];
         var fromNumber = _configuration["SmsProvider:FromNumber"];
         
         if (string.IsNullOrEmpty(fromNumber))
@@ -79,7 +79,7 @@ public class SmsService : ISmsService
 
         if (string.IsNullOrEmpty(smsApiKey))
         {
-            _logger.LogWarning("SMS Simple Message API Key is not configured. Message will not be sent.");
+            _logger.LogWarning("SMS API Key is not configured. Message will not be sent.");
             return;
         }
 
