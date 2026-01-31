@@ -351,6 +351,50 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_Table");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("FinancialAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinancialAccountId");
+
+                    b.HasIndex("TransactionDate");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("tbl_Transaction");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -501,6 +545,17 @@ namespace Gck.Persistence.Migrations
                     b.Navigation("Session");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.Transaction", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.FinancialAccount", "FinancialAccount")
+                        .WithMany("Transactions")
+                        .HasForeignKey("FinancialAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FinancialAccount");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.UserClaim", b =>
                 {
                     b.HasOne("Gck.Domain.Entities.User", "User")
@@ -520,6 +575,8 @@ namespace Gck.Persistence.Migrations
             modelBuilder.Entity("Gck.Domain.Entities.FinancialAccount", b =>
                 {
                     b.Navigation("AccountantReceipts");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Gck.Domain.Entities.HourlyFee", b =>

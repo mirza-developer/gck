@@ -1,0 +1,90 @@
+@using Microsoft.AspNetCore.Components.Web
+@using System.Diagnostics
+@inherits ErrorBoundaryBase
+@inject IJSRuntime JS
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@if (CurrentException is not null)
+{
+    <div class="error-boundary-container">
+        <div class="error-boundary-card">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <h1 class="error-title">خطایی رخ داده است</h1>
+            
+            <p class="error-message">
+                متأسفانه مشکلی پیش آمده است. لطفاً صفحه را بارگیری مجدد کنید یا با پشتیبانی تماس بگیرید.
+            </p>
+
+            @if (IsDebugMode)
+            {
+                <div class="error-details">
+                    <details>
+                        <summary>جزئیات خطا (حالت توسعه)</summary>
+                        <div class="error-details-content">
+                            <p><strong>نوع خطا:</strong> @CurrentException.GetType().Name</p>
+                            <p><strong>پیام:</strong> @CurrentException.Message</p>
+                            @if (!string.IsNullOrEmpty(CurrentException.StackTrace))
+                            {
+                                <p><strong>Stack Trace:</strong></p>
+                                <pre>@CurrentException.StackTrace</pre>
+                            }
+                        </div>
+                    </details>
+                </div>
+            }
+            
+            <div class="error-actions">
+                <button class="btn-reload" @onclick="Recover">
+                    <i class="fas fa-redo"></i>
+                    <span>بارگیری مجدد</span>
+                </button>
+                
+                <button class="btn-home" @onclick="NavigateToHome">
+                    <i class="fas fa-home"></i>
+                    <span>بازگشت به خانه</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool IsDebugMode => 
+#if DEBUG
+        true;
+#else
+        false;
+#endif
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        if (IsDebugMode)
+        {
+            Debugger.Break();
+        }
+
+        // Log to console in development
+        Console.Error.WriteLine($"Error caught by ErrorBoundary: {exception.Message}");
+        Console.Error.WriteLine($"Stack Trace: {exception.StackTrace}");
+        
+        return Task.CompletedTask;
+    }
+
+    private new void Recover()
+    {
+        // Reset the error state to allow the user to retry
+        base.Recover();
+    }
+
+    private async Task NavigateToHome()
+    {
+        // Navigate to home page
+        await JS.InvokeVoidAsync("eval", "window.location.href = '/'");
+    }
+}

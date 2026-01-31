@@ -30,16 +30,8 @@ public class CustomersController : ControllerBase
     [ProducesResponseType(typeof(List<CustomerDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<CustomerDto>>> GetAll()
     {
-        try
-        {
-            var customers = await _mediator.Send(new GetAllCustomersQuery());
-            return Ok(customers);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting all customers");
-            return StatusCode(500, "An error occurred while retrieving customers");
-        }
+        var customers = await _mediator.Send(new GetAllCustomersQuery());
+        return Ok(customers);
     }
 
     [HttpGet("{id}")]
@@ -47,20 +39,12 @@ public class CustomersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CustomerDto>> GetById(int id)
     {
-        try
-        {
-            var customer = await _mediator.Send(new GetCustomerByIdQuery { Id = id });
-            if (customer == null)
+        var customer = await _mediator.Send(new GetCustomerByIdQuery { Id = id });
+        if (customer == null)
             {
                 return NotFound($"Customer with ID '{id}' not found");
             }
-            return Ok(customer);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting customer by ID: {Id}", id);
-            return StatusCode(500, "An error occurred while retrieving the customer");
-        }
+        return Ok(customer);
     }
 
     [HttpPost]
@@ -68,20 +52,8 @@ public class CustomersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create([FromBody] CreateCustomerCommand command)
     {
-        try
-        {
-            var customerId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = customerId }, customerId);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating customer");
-            return StatusCode(500, "An error occurred while creating the customer");
-        }
+        var customerId = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = customerId }, customerId);
     }
 
     [HttpPut("{id}")]
@@ -92,23 +64,11 @@ public class CustomersController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating customer: {Id}", id);
-            return StatusCode(500, "An error occurred while updating the customer");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -116,29 +76,15 @@ public class CustomersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            await _mediator.Send(new DeleteCustomerCommand { Id = id });
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting customer: {Id}", id);
-            return StatusCode(500, "An error occurred while deleting the customer");
-        }
+        await _mediator.Send(new DeleteCustomerCommand { Id = id });
+        return NoContent();
     }
 
     [HttpGet("{id}/sessions")]
     [ProducesResponseType(typeof(List<CustomerSessionDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<CustomerSessionDto>>> GetCustomerSessions(int id)
     {
-        try
-        {
-            var sessions = await _context.SessionCustomers
+        var sessions = await _context.SessionCustomers
                 .Where(sc => sc.CustomerId == id)
                 .Include(sc => sc.Session)
                     .ThenInclude(s => s.Table)
@@ -154,13 +100,7 @@ public class CustomersController : ControllerBase
                 })
                 .ToListAsync();
 
-            return Ok(sessions);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting customer sessions: {CustomerId}", id);
-            return StatusCode(500, "An error occurred while retrieving sessions");
-        }
+        return Ok(sessions);
     }
 }
 

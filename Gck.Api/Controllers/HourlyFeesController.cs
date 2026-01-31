@@ -25,15 +25,7 @@ public class HourlyFeesController : ControllerBase
     [ProducesResponseType(typeof(List<HourlyFeeDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<HourlyFeeDto>>> GetAllHourlyFees()
     {
-        try
-        {
-            var fees = await _mediator.Send(new GetAllHourlyFeesQuery());
-            return Ok(fees);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting hourly fees");
-            return StatusCode(500, "An error occurred while retrieving hourly fees");
-        }
+        var fees = await _mediator.Send(new GetAllHourlyFeesQuery());
+        return Ok(fees);
     }
 }

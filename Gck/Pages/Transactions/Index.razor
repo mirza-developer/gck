@@ -1,0 +1,355 @@
+@page "/transactions"
+@using Gck.Application.DTOs
+@using Gck.Resources
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ApiConfigurationService ApiConfig
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-exchange-alt"></i>
+                @PersianResources.TransactionsManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewTransaction
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="gaming-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <p class="loader-text">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="gaming-card fade-in-up error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                @errorMessage
+            </div>
+        }
+        else
+        {
+            <!-- Filters Section -->
+            <div class="gaming-card fade-in-up">
+                <h3 class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    @PersianResources.TransactionReport
+                </h3>
+                
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>@PersianResources.FilterByAccount</label>
+                        <MultiSelectDropdown TItem="FinancialAccountDto" 
+                                           TValue="string"
+                                           Items="@allAccounts"
+                                           IsMultiSelect="false"
+                                           EnableSearch="true"
+                                           Placeholder="@PersianResources.AllAccounts"
+                                           SelectedValue="@filterAccountId"
+                                           SelectedValueChanged="@OnAccountSelected"
+                                           ValueSelector="@(a => a.Id.ToString())"
+                                           DisplayTextSelector="@(a => a.AccountName)" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label>@PersianResources.FilterByType</label>
+                        <MultiSelectDropdown TItem="TransactionTypeOption" 
+                                           TValue="string"
+                                           Items="@transactionTypes"
+                                           IsMultiSelect="false"
+                                           Placeholder="@PersianResources.AllTypes"
+                                           SelectedValue="@filterType"
+                                           SelectedValueChanged="@OnTypeSelected"
+                                           ValueSelector="@(t => t.Value)"
+                                           DisplayTextSelector="@(t => t.Display)" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label>@PersianResources.StartDate</label>
+                        <PersianDatePicker Value="@filterStartDate" ValueChanged="@OnStartDateChanged" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label>@PersianResources.EndDate</label>
+                        <PersianDatePicker Value="@filterEndDate" ValueChanged="@OnEndDateChanged" />
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-filter" @onclick="ApplyFilters">
+                            <i class="fas fa-check"></i>
+                            @PersianResources.ApplyFilters
+                        </button>
+                        <button class="btn-clear" @onclick="ClearFilters">
+                            <i class="fas fa-times"></i>
+                            @PersianResources.ClearFilters
+                        </button>
+                    </div>
+                </div>
+
+                @if (report != null)
+                {
+                    <div class="report-summary">
+                        <div class="summary-item income">
+                            <i class="fas fa-arrow-up"></i>
+                            <span class="label">@PersianResources.TotalIncome</span>
+                            <span class="value">@report.TotalIncome.ToString("N0") @PersianResources.Toman</span>
+                        </div>
+                        <div class="summary-item outcome">
+                            <i class="fas fa-arrow-down"></i>
+                            <span class="label">@PersianResources.TotalOutcome</span>
+                            <span class="value">@report.TotalOutcome.ToString("N0") @PersianResources.Toman</span>
+                        </div>
+                        <div class="summary-item net">
+                            <i class="fas fa-balance-scale"></i>
+                            <span class="label">@PersianResources.NetAmount</span>
+                            <span class="value @(report.NetAmount >= 0 ? "positive" : "negative")">
+                                @report.NetAmount.ToString("N0") @PersianResources.Toman
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Transactions List -->
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchTransactions" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredTransactions.Any())
+                {
+                    <div class="transactions-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>@PersianResources.TransactionDate</th>
+                                    <th>@PersianResources.FinancialAccount</th>
+                                    <th>@PersianResources.TransactionType</th>
+                                    <th>@PersianResources.Amount</th>
+                                    <th>@PersianResources.Description</th>
+                                    <th>@PersianResources.Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in FilteredTransactions)
+                                {
+                                    <tr class="fade-in-up">
+                                        <td>@transaction.TransactionDate</td>
+                                        <td>@transaction.FinancialAccountName</td>
+                                        <td>
+                                            <span class="type-badge @(transaction.Type == "Income" ? "income" : "outcome")">
+                                                @(transaction.Type == "Income" ? PersianResources.Income : PersianResources.Outcome)
+                                            </span>
+                                        </td>
+                                        <td class="amount @(transaction.Type == "Income" ? "income-text" : "outcome-text")">
+                                            @(transaction.Type == "Income" ? "+" : "-")@transaction.Amount.ToString("N0") @PersianResources.Toman
+                                        </td>
+                                        <td>@transaction.Description</td>
+                                        <td>
+                                            <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(transaction.Id)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" @onclick="() => DeleteTransaction(transaction.Id)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoTransactionsFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+private List<TransactionDto> transactions = new();
+private List<FinancialAccountDto> accounts = new();
+private List<FinancialAccountDto> allAccounts = new();
+private List<TransactionTypeOption> transactionTypes = new();
+private TransactionReportDto? report;
+private string searchText = string.Empty;
+private string filterType = string.Empty;
+private string filterAccountId = string.Empty;
+private string filterStartDate = string.Empty;
+private string filterEndDate = string.Empty;
+private bool isLoading = true;
+private string errorMessage = string.Empty;
+
+private class TransactionTypeOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Display { get; set; } = string.Empty;
+}
+
+    private IEnumerable<TransactionDto> FilteredTransactions => 
+        report?.Transactions
+            .Where(t => string.IsNullOrEmpty(searchText) || 
+                       t.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                       t.FinancialAccountName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        ?? Enumerable.Empty<TransactionDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        // Load financial accounts
+        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        allAccounts = new List<FinancialAccountDto>(accounts);
+        
+        // Initialize transaction types
+        transactionTypes = new List<TransactionTypeOption>
+        {
+            new TransactionTypeOption { Value = "", Display = PersianResources.AllTypes },
+            new TransactionTypeOption { Value = "Income", Display = PersianResources.Income },
+            new TransactionTypeOption { Value = "Outcome", Display = PersianResources.Outcome }
+        };
+        
+        // Load report with initial filters
+        await ApplyFilters();
+
+        isLoading = false;
+    }
+
+    private async Task ApplyFilters()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        var queryParams = new List<string>();
+
+        if (!string.IsNullOrEmpty(filterAccountId))
+            queryParams.Add($"financialAccountId={filterAccountId}");
+        
+        if (!string.IsNullOrEmpty(filterType))
+            queryParams.Add($"type={filterType}");
+        
+        if (!string.IsNullOrEmpty(filterStartDate))
+        {
+            var startDate = ConvertPersianToGregorian(filterStartDate);
+            if (startDate.HasValue)
+                queryParams.Add($"startDate={startDate.Value:yyyy-MM-dd}");
+        }
+        
+        if (!string.IsNullOrEmpty(filterEndDate))
+        {
+            var endDate = ConvertPersianToGregorian(filterEndDate);
+            if (endDate.HasValue)
+                queryParams.Add($"endDate={endDate.Value:yyyy-MM-dd}");
+        }
+
+        var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
+        report = await Http.GetFromJsonAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
+
+        isLoading = false;
+    }
+
+    private async Task ClearFilters()
+    {
+        filterAccountId = string.Empty;
+        filterType = string.Empty;
+        filterStartDate = string.Empty;
+        filterEndDate = string.Empty;
+        await ApplyFilters();
+    }
+
+    private async Task OnAccountSelected(string? value)
+    {
+        filterAccountId = value ?? string.Empty;
+    }
+
+    private async Task OnTypeSelected(string? value)
+    {
+        filterType = value ?? string.Empty;
+    }
+
+    private async Task OnStartDateChanged(string value)
+    {
+        filterStartDate = value;
+    }
+
+    private async Task OnEndDateChanged(string value)
+    {
+        filterEndDate = value;
+    }
+
+    private DateTime? ConvertPersianToGregorian(string persianDate)
+    {
+        if (string.IsNullOrEmpty(persianDate)) return null;
+
+        try
+        {
+            var parts = persianDate.Split('/');
+            if (parts.Length != 3) return null;
+
+            var year = int.Parse(parts[0]);
+            var month = int.Parse(parts[1]);
+            var day = int.Parse(parts[2]);
+
+            var calendar = new System.Globalization.PersianCalendar();
+            return calendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void NavigateToAdd()
+    {
+        Navigation.NavigateTo("/transactions/add");
+    }
+
+    private void NavigateToEdit(int id)
+    {
+        Navigation.NavigateTo($"/transactions/edit/{id}");
+    }
+
+    private async Task DeleteTransaction(int id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteTransactionConfirm))
+            return;
+
+        var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
+        
+        if (response.IsSuccessStatusCode)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", PersianResources.DeleteSuccess);
+            await ApplyFilters(); // Reload data
+        }
+        else
+        {
+            errorMessage = PersianResources.DeleteTransactionError;
+        }
+    }
+}

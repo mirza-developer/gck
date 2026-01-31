@@ -219,5 +219,55 @@ public static class PersianResources
     public const string Unread = "خوانده نشده";
     public const string MarkAsRead = "علامت به عنوان خوانده شده";
     public const string NoFeedbacksYet = "هنوز بازخوردی ثبت نشده است";
+    
+    // Financial Management
+    public const string Financial = "مالی";
+    public const string FinancialManagement = "مدیریت مالی";
+    
+    // Transactions
+    public const string Transactions = "تراکنش‌ها";
+    public const string TransactionsManagement = "مدیریت تراکنش‌ها";
+    public const string AddNewTransaction = "افزودن تراکنش جدید";
+    public const string EditTransaction = "ویرایش تراکنش";
+    public const string TransactionType = "نوع تراکنش";
+    public const string Income = "درآمد";
+    public const string Outcome = "هزینه";
+    public const string Amount = "مبلغ";
+    public const string Description = "توضیحات";
+    public const string TransactionDate = "تاریخ تراکنش";
+    public const string SearchTransactions = "جستجوی تراکنش...";
+    public const string NoTransactionsFound = "تراکنشی یافت نشد";
+    public const string TransactionNotFound = "تراکنش یافت نشد";
+    public const string DeleteTransactionConfirm = "آیا از حذف این تراکنش اطمینان دارید؟";
+    public const string TransactionAddSuccess = "تراکنش با موفقیت ثبت شد";
+    public const string LoadTransactionsError = "خطا در دریافت لیست تراکنش‌ها. لطفاً اطمینان حاصل کنید که API در حال اجرا است.";
+    public const string DeleteTransactionError = "خطا در حذف تراکنش";
+    public const string SubmitTransaction = "ثبت تراکنش";
+    public const string AmountPlaceholder = "مبلغ را به تومان وارد کنید";
+    public const string DescriptionPlaceholder = "توضیحات تراکنش را وارد کنید...";
+    public const string SelectTransactionType = "-- انتخاب نوع تراکنش --";
+    public const string TransactionReport = "گزارش تراکنش‌ها";
+    public const string TotalIncome = "کل درآمدها";
+    public const string TotalOutcome = "کل هزینه‌ها";
+    public const string NetAmount = "خالص";
+    public const string FilterByAccount = "فیلتر بر اساس حساب";
+    public const string FilterByType = "فیلتر بر اساس نوع";
+    public const string FilterByDate = "فیلتر بر اساس تاریخ";
+    public const string StartDate = "از تاریخ";
+    public const string EndDate = "تا تاریخ";
+    public const string AllAccounts = "همه حساب‌ها";
+    public const string AllTypes = "همه انواع";
+    public const string ApplyFilters = "اعمال فیلترها";
+    public const string ClearFilters = "پاک کردن فیلترها";
+    public const string ShowReport = "نمایش گزارش";
+    public const string PleaseSelectFinancialAccount = "لطفا حساب مالی را انتخاب کنید";
+    public const string PleaseSelectTransactionType = "لطفا نوع تراکنش را انتخاب کنید";
+    public const string ErrorSavingTransaction = "خطا در ثبت تراکنش";
+    public const string ErrorUpdatingTransaction = "خطا در ویرایش تراکنش";
+    
+    // MultiSelectDropdown
+    public const string SelectItem = "انتخاب کنید...";
+    public const string SearchPlaceholder = "جستجو...";
+    public const string NoResultsFound = "نتیجه‌ای یافت نشد";
 }
 

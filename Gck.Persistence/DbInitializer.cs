@@ -26,40 +26,32 @@ public static class DbInitializer
 
     public static async Task InitializeAsync(GckDbContext context, ILogger logger)
     {
-        try
+        // Apply pending migrations
+        if ((await context.Database.GetPendingMigrationsAsync()).Any())
         {
-            // Apply pending migrations
-            if ((await context.Database.GetPendingMigrationsAsync()).Any())
-            {
-                await context.Database.MigrateAsync();
-                logger.LogInformation("Database migrations applied successfully");
-            }
-
-            if (!await context.Users.AnyAsync())
-            {
-                var adminUser = new User
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Username = "admin",
-                    Name = "مدیر سیستم",
-                    Email = "admin@gckgames.ir",
-                    PasswordHash = HashPassword("Admin@123"),
-                    IsActive = true,
-                    CreateDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now,
-                    CreatorIdentityID = "system",
-                    PhoneNumber = null,
-                    Details = "حساب کاربری پیش‌فرض مدیر سیستم"
-                };
-
-                context.Users.Add(adminUser);
-                await context.SaveChangesAsync();
-            }
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Database migrations applied successfully");
         }
-        catch (Exception ex)
+
+        if (!await context.Users.AnyAsync())
         {
-            logger.LogError(ex, "An error occurred while initializing the database");
-            throw;
+            var adminUser = new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                Username = "admin",
+                Name = "مدیر سیستم",
+                Email = "admin@gckgames.ir",
+                PasswordHash = HashPassword("Admin@123"),
+                IsActive = true,
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                CreatorIdentityID = "system",
+                PhoneNumber = null,
+                Details = "حساب کاربری پیش‌فرض مدیر سیستم"
+            };
+
+            context.Users.Add(adminUser);
+            await context.SaveChangesAsync();
         }
     }
 }

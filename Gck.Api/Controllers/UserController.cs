@@ -31,16 +31,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(List<GetAllUsersVm>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<GetAllUsersVm>>> GetAllUsers()
     {
-        try
-        {
-            var users = await _mediator.Send(new GetAllUsersQuery());
-            return Ok(users);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting all users");
-            return StatusCode(500, "An error occurred while retrieving users");
-        }
+        var users = await _mediator.Send(new GetAllUsersQuery());
+        return Ok(users);
     }
 
     /// <summary>
@@ -51,20 +43,12 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GetUserByIdVm>> GetUserById(string id)
     {
-        try
-        {
-            var user = await _mediator.Send(new GetUserByIdQuery { Id = id });
-            if (user == null)
+        var user = await _mediator.Send(new GetUserByIdQuery { Id = id });
+        if (user == null)
             {
                 return NotFound($"User with ID '{id}' not found");
             }
-            return Ok(user);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting user by ID: {Id}", id);
-            return StatusCode(500, "An error occurred while retrieving the user");
-        }
+        return Ok(user);
     }
 
     /// <summary>
@@ -75,20 +59,12 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GetUserByIdVm>> GetUserByUsername(string username)
     {
-        try
-        {
-            var user = await _mediator.Send(new GetUserByUsernameQuery { Username = username });
-            if (user == null)
+        var user = await _mediator.Send(new GetUserByUsernameQuery { Username = username });
+        if (user == null)
             {
                 return NotFound($"User with username '{username}' not found");
             }
-            return Ok(user);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting user by username: {Username}", username);
-            return StatusCode(500, "An error occurred while retrieving the user");
-        }
+        return Ok(user);
     }
 
     /// <summary>
@@ -99,20 +75,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> AddUser([FromBody] AddUserCommand command)
     {
-        try
-        {
-            var userId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetUserById), new { id = userId }, userId);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error adding user");
-            return StatusCode(500, "An error occurred while creating the user");
-        }
+        var userId = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetUserById), new { id = userId }, userId);
     }
 
     /// <summary>
@@ -126,27 +90,11 @@ public class UserController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating user: {Id}", id);
-            return StatusCode(500, "An error occurred while updating the user");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 
     /// <summary>
@@ -157,20 +105,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        try
-        {
-            await _mediator.Send(new DeleteUserCommand { Id = id });
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting user: {Id}", id);
-            return StatusCode(500, "An error occurred while deleting the user");
-        }
+        await _mediator.Send(new DeleteUserCommand { Id = id });
+        return NoContent();
     }
 
     /// <summary>
@@ -185,26 +121,10 @@ public class UserController : ControllerBase
     {
         if (id != command.UserId)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating user password: {Id}", id);
-            return StatusCode(500, "An error occurred while updating the password");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 }

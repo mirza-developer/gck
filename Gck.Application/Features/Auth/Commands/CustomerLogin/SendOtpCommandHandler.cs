@@ -46,38 +46,27 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
         
         string? actualOtpSent = null;
 
-        // Try to send OTP via SMS API if configured
+        // Send OTP via SMS API if configured
         if (!string.IsNullOrEmpty(smsApiKey))
         {
-            try
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(smsBaseUrl);
+            
+            var result = await client.PostAsJsonAsync($"api/send/otp/{smsApiKey}",
+                new { to = request.PhoneNumber }, cancellationToken);
+            
+            result.EnsureSuccessStatusCode(); // Will throw if SMS API fails
+            
+            var response = await result.Content.ReadAsStringAsync(cancellationToken);
+            
+            // Parse response to get the actual OTP code sent by the provider
+            if (!string.IsNullOrEmpty(response))
             {
-                var client = _httpClientFactory.CreateClient();
-                client.BaseAddress = new Uri(smsBaseUrl);
-                
-                var result = await client.PostAsJsonAsync($"api/send/otp/{smsApiKey}",
-                    new { to = request.PhoneNumber }, cancellationToken);
-                var response = await result.Content.ReadAsStringAsync(cancellationToken);
-                
-                // Parse response to get the actual OTP code sent by the provider
-                if (!string.IsNullOrEmpty(response))
+                var jsonDoc = JsonDocument.Parse(response);
+                if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
                 {
-                    try
-                    {
-                        var jsonDoc = JsonDocument.Parse(response);
-                        if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
-                        {
-                            actualOtpSent = codeElement.GetString();
-                        }
-                    }
-                    catch (JsonException)
-                    {
-                        // If parsing fails, use our generated code
-                    }
+                    actualOtpSent = codeElement.GetString();
                 }
-            }
-            catch (HttpRequestException)
-            {
-                // Network error - will use our generated code
             }
         }
 

@@ -63,8 +63,8 @@
                                 <i class="fas fa-user"></i>
                                 نام کاربری
                             </label>
-                            <InputText @bind-Value="loginCommand.Username" 
-                                       class="form-input" 
+                            <InputText @bind-Value="loginCommand.Username"
+                                       class="form-input"
                                        placeholder="نام کاربری خود را وارد کنید"
                                        autofocus />
                         </div>
@@ -74,9 +74,9 @@
                                 <i class="fas fa-lock"></i>
                                 رمز عبور
                             </label>
-                            <InputText type="password" 
-                                       @bind-Value="loginCommand.Password" 
-                                       class="form-input" 
+                            <InputText type="password"
+                                       @bind-Value="loginCommand.Password"
+                                       class="form-input"
                                        placeholder="رمز عبور خود را وارد کنید" />
                         </div>
 
@@ -109,8 +109,8 @@
                                     <i class="fas fa-phone"></i>
                                     @PersianResources.PhoneNumber
                                 </label>
-                                <InputText @bind-Value="sendOtpCommand.PhoneNumber" 
-                                           class="form-input" 
+                                <InputText @bind-Value="sendOtpCommand.PhoneNumber"
+                                           class="form-input"
                                            placeholder="@PersianResources.EnterPhoneNumber"
                                            autofocus />
                             </div>
@@ -141,9 +141,9 @@
                                     <i class="fas fa-phone"></i>
                                     @PersianResources.PhoneNumber
                                 </label>
-                                <input type="text" 
-                                       class="form-input" 
-                                       value="@verifyOtpCommand.PhoneNumber" 
+                                <input type="text"
+                                       class="form-input"
+                                       value="@verifyOtpCommand.PhoneNumber"
                                        disabled />
                             </div>
 
@@ -152,8 +152,8 @@
                                     <i class="fas fa-key"></i>
                                     @PersianResources.OtpCode
                                 </label>
-                                <InputText @bind-Value="verifyOtpCommand.OtpCode" 
-                                           class="form-input" 
+                                <InputText @bind-Value="verifyOtpCommand.OtpCode"
+                                           class="form-input"
                                            placeholder="@PersianResources.EnterOtpCode"
                                            maxlength="6"
                                            autofocus />
@@ -243,12 +243,12 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
         otpSent = false;
-        
+
         // Reset forms
         loginCommand = new();
         sendOtpCommand = new();
         verifyOtpCommand = new();
-        
+
         // Stop timer if running
         StopResendTimer();
     }
@@ -259,10 +259,10 @@
         successMessage = string.Empty;
         sendOtpCommand = new() { PhoneNumber = verifyOtpCommand.PhoneNumber };
         verifyOtpCommand = new();
-        
+
         // Reset to send OTP form
         otpSent = false;
-        
+
         // Stop timer (will restart when new OTP is sent)
         StopResendTimer();
     }
@@ -271,7 +271,7 @@
     {
         resendCountdown = 60;
         canResendOtp = false;
-        
+
         resendTimer?.Dispose();
         resendTimer = new System.Threading.Timer(async _ =>
         {
@@ -304,45 +304,34 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        try
+        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/login"), loginCommand);
+
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/login"), loginCommand);
+            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
 
-            if (response.IsSuccessStatusCode)
+            if (result != null && result.Success)
             {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                // Store user info in local storage
+                await LocalStorage.SetItemAsync("currentUser", result.Username);
+                await LocalStorage.SetItemAsync("currentUserId", result.UserId);
+                await LocalStorage.SetItemAsync("currentUserName", result.Name);
+                await LocalStorage.SetItemAsync("userRole", "admin");
 
-                if (result != null && result.Success)
-                {
-                    // Store user info in local storage
-                    await LocalStorage.SetItemAsync("currentUser", result.Username);
-                    await LocalStorage.SetItemAsync("currentUserId", result.UserId);
-                    await LocalStorage.SetItemAsync("currentUserName", result.Name);
-                    await LocalStorage.SetItemAsync("userRole", "admin");
+                successMessage = result.Message;
+                await Task.Delay(1000);
 
-                    successMessage = result.Message;
-                    await Task.Delay(1000);
-
-                    // Redirect to home page
-                    Navigation.NavigateTo("/", true);
-                }
-                else
-                {
-                    errorMessage = result?.Message ?? "خطا در ورود به سیستم";
-                }
+                // Redirect to home page
+                Navigation.NavigateTo("/", true);
             }
             else
             {
-                errorMessage = "خطا در اتصال به سرور";
+                errorMessage = result?.Message ?? "خطا در ورود به سیستم";
             }
         }
-        catch (Exception ex)
+        else
         {
-            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
-        }
-        finally
-        {
-            isLoggingIn = false;
+            errorMessage = "خطا در اتصال به سرور";
         }
     }
 
@@ -365,7 +354,7 @@
                     successMessage = result.Message;
                     otpSent = true;
                     verifyOtpCommand.PhoneNumber = sendOtpCommand.PhoneNumber;
-                    
+
                     // Start the resend countdown timer
                     StartResendTimer();
                 }
@@ -412,10 +401,10 @@
                     await LocalStorage.SetItemAsync("userRole", "customer");
 
                     successMessage = result.Message;
-                    
+
                     // Stop timer on successful login
                     StopResendTimer();
-                    
+
                     await Task.Delay(1000);
 
                     // Redirect to home page
@@ -460,10 +449,10 @@
                 if (result != null && result.Success)
                 {
                     successMessage = result.Message;
-                    
+
                     // Clear the OTP field for the new code
                     verifyOtpCommand.OtpCode = string.Empty;
-                    
+
                     // Restart the countdown timer
                     StartResendTimer();
                 }

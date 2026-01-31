@@ -124,30 +124,21 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        try
+        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/user"), command);
+        
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/user"), command);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = "کاربر با موفقیت ایجاد شد";
-                await Task.Delay(1500);
-                Navigation.NavigateTo("/users");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"خطا در ایجاد کاربر: {error}";
-            }
+            successMessage = "کاربر با موفقیت ایجاد شد";
+            await Task.Delay(1500);
+            Navigation.NavigateTo("/users");
         }
-        catch (Exception ex)
+        else
         {
-            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
+            var error = await response.Content.ReadAsStringAsync();
+            errorMessage = $"خطا در ایجاد کاربر: {error}";
         }
-        finally
-        {
-            isSubmitting = false;
-        }
+
+        isSubmitting = false;
     }
 
     private void NavigateBack()

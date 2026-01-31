@@ -26,16 +26,8 @@ public class TablesController : ControllerBase
     [ProducesResponseType(typeof(List<TableDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<TableDto>>> GetAll()
     {
-        try
-        {
-            var tables = await _mediator.Send(new GetAllTablesQuery());
-            return Ok(tables);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting all tables");
-            return StatusCode(500, "An error occurred while retrieving tables");
-        }
+        var tables = await _mediator.Send(new GetAllTablesQuery());
+        return Ok(tables);
     }
 
     [HttpGet("{id}")]
@@ -43,20 +35,12 @@ public class TablesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TableDto>> GetById(int id)
     {
-        try
-        {
-            var table = await _mediator.Send(new GetTableByIdQuery { Id = id });
-            if (table == null)
+        var table = await _mediator.Send(new GetTableByIdQuery { Id = id });
+        if (table == null)
             {
                 return NotFound($"Table with ID '{id}' not found");
             }
-            return Ok(table);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting table by ID: {Id}", id);
-            return StatusCode(500, "An error occurred while retrieving the table");
-        }
+        return Ok(table);
     }
 
     [HttpPost]
@@ -64,20 +48,8 @@ public class TablesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create([FromBody] CreateTableCommand command)
     {
-        try
-        {
-            var tableId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = tableId }, tableId);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating table");
-            return StatusCode(500, "An error occurred while creating the table");
-        }
+        var tableId = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = tableId }, tableId);
     }
 
     [HttpPut("{id}")]
@@ -88,23 +60,11 @@ public class TablesController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest("ID in URL does not match ID in request body");
+        return BadRequest("ID in URL does not match ID in request body");
         }
 
-        try
-        {
-            await _mediator.Send(command);
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating table: {Id}", id);
-            return StatusCode(500, "An error occurred while updating the table");
-        }
+        await _mediator.Send(command);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -112,19 +72,7 @@ public class TablesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            await _mediator.Send(new DeleteTableCommand { Id = id });
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting table: {Id}", id);
-            return StatusCode(500, "An error occurred while deleting the table");
-        }
+        await _mediator.Send(new DeleteTableCommand { Id = id });
+        return NoContent();
     }
 }

@@ -164,21 +164,14 @@
         
         if (confirmed)
         {
-            try
+            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
+            if (response.IsSuccessStatusCode)
             {
-                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
-                if (response.IsSuccessStatusCode)
-                {
-                    await LoadAccounts();
-                }
-                else
-                {
-                    errorMessage = PersianResources.DeleteFinancialAccountError;
-                }
+                await LoadAccounts();
             }
-            catch (Exception ex)
+            else
             {
-                errorMessage = $"{PersianResources.Error}: {ex.Message}";
+                errorMessage = PersianResources.DeleteFinancialAccountError;
             }
         }
     }
