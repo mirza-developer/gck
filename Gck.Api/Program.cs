@@ -1,5 +1,6 @@
 using Gck.Persistence;
 using Gck.Application.Services;
+using Gck.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Gck.Api.Middlewares;
 
@@ -18,6 +19,7 @@ builder.Services.AddMediatR(cfg =>
 
 // Add Application Services
 builder.Services.AddScoped<ILoyaltyService, LoyaltyService>();
+builder.Services.AddScoped<ISmsService, SmsService>();
 
 // Add HttpClient for SMS provider
 builder.Services.AddHttpClient();

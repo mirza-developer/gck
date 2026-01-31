@@ -3,6 +3,7 @@ using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MD.PersianDateTime;
 
 namespace Gck.Application.Features.Sessions.Commands.FinishSession;
 
@@ -10,11 +11,13 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
 {
     private readonly GckDbContext _context;
     private readonly ILoyaltyService _loyaltyService;
+    private readonly ISmsService _smsService;
 
-    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService)
+    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService, ISmsService smsService)
     {
         _context = context;
         _loyaltyService = loyaltyService;
+        _smsService = smsService;
     }
 
     public async Task<Unit> Handle(FinishSessionCommand request, CancellationToken cancellationToken)
@@ -102,6 +105,63 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         _context.AccountantReceipts.Add(receipt);
         await _context.SaveChangesAsync(cancellationToken);
 
+        // Send SMS to customers after session completion
+        await SendSessionCompletionMessagesAsync(session, cancellationToken);
+
         return Unit.Value;
+    }
+
+    private async Task SendSessionCompletionMessagesAsync(Session session, CancellationToken cancellationToken)
+    {
+        // Get Persian date and time
+        var persianDateTime = new PersianDateTime(DateTime.Now);
+        var persianDateTimeStr = $"{persianDateTime.ToShortDateString()} {persianDateTime.ToString("HH:mm")}";
+
+        foreach (var sessionCustomer in session.SessionCustomers)
+        {
+            var customer = sessionCustomer.Customer;
+
+            // Ignore customers without phone numbers or with empty phone numbers
+            if (string.IsNullOrWhiteSpace(customer.PhoneNumber))
+            {
+                continue;
+            }
+
+            // Build loyalty program status message
+            string loyaltyStatus = string.Empty;
+            if (customer.IsLoyal && customer.SessionsRequiredForFree > 0)
+            {
+                int remainingSessions = customer.SessionsRequiredForFree - customer.PaidSessionsCount;
+                if (remainingSessions > 0)
+                {
+                    loyaltyStatus = $"تا جلسه رایگان {remainingSessions} جلسه مانده است";
+                }
+                else
+                {
+                    loyaltyStatus = "شما واجد شرایط دریافت جلسه رایگان هستید";
+                }
+            }
+
+            // Build the message
+            string message = $"{customer.Name} عزیز\n" +
+                           "از اینکه ما را برای گذران وقت تفریح خود انتخاب کردید، متشکریم\n";
+            
+            if (!string.IsNullOrEmpty(loyaltyStatus))
+            {
+                message += $"{loyaltyStatus}\n";
+            }
+            
+            message += persianDateTimeStr;
+
+            try
+            {
+                await _smsService.SendMessageAsync(customer.PhoneNumber, message, cancellationToken);
+            }
+            catch (Exception)
+            {
+                // Log error but don't fail the entire operation
+                // The session has already been completed successfully
+            }
+        }
     }
 }
