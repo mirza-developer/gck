@@ -3,6 +3,7 @@ using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MD.PersianDateTime;
 
 namespace Gck.Application.Features.Sessions.Commands.FinishSession;
@@ -12,12 +13,14 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
     private readonly GckDbContext _context;
     private readonly ILoyaltyService _loyaltyService;
     private readonly ISmsService _smsService;
+    private readonly ILogger<FinishSessionCommandHandler> _logger;
 
-    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService, ISmsService smsService)
+    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService, ISmsService smsService, ILogger<FinishSessionCommandHandler> logger)
     {
         _context = context;
         _loyaltyService = loyaltyService;
         _smsService = smsService;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(FinishSessionCommand request, CancellationToken cancellationToken)
@@ -134,11 +137,17 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
                 int remainingSessions = customer.SessionsRequiredForFree - customer.PaidSessionsCount;
                 if (remainingSessions > 0)
                 {
-                    loyaltyStatus = $"تا جلسه رایگان {remainingSessions} جلسه مانده است";
+                    loyaltyStatus = $"تا جلسه‌ی رایگان {remainingSessions} جلسه مانده است";
+                }
+                else if (remainingSessions == 0)
+                {
+                    loyaltyStatus = "شما واجد شرایط دریافت جلسه رایگان هستید";
                 }
                 else
                 {
-                    loyaltyStatus = "شما واجد شرایط دریافت جلسه رایگان هستید";
+                    // Data integrity issue - log it but continue
+                    _logger.LogWarning("Customer {CustomerId} has PaidSessionsCount ({PaidCount}) exceeding SessionsRequiredForFree ({RequiredCount})", 
+                        customer.Id, customer.PaidSessionsCount, customer.SessionsRequiredForFree);
                 }
             }
 
@@ -157,10 +166,12 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
             {
                 await _smsService.SendMessageAsync(customer.PhoneNumber, message, cancellationToken);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Log error but don't fail the entire operation
                 // The session has already been completed successfully
+                _logger.LogError(ex, "Failed to send session completion message to customer {CustomerId} at phone {PhoneNumber}", 
+                    customer.Id, customer.PhoneNumber);
             }
         }
     }

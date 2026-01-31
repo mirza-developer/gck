@@ -6,6 +6,8 @@ namespace Gck.Api.Services;
 
 public class SmsService : ISmsService
 {
+    private const string DEFAULT_SENDER_NUMBER = "50004001381951";
+    
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
     private readonly ILogger<SmsService> _logger;
@@ -67,7 +69,13 @@ public class SmsService : ISmsService
     {
         var smsBaseUrl = _configuration["SmsProvider:BaseUrl"] ?? "https://console.melipayamak.com";
         var smsApiKey = _configuration["SmsProvider:SimpleMessageApiKey"];
-        var fromNumber = _configuration["SmsProvider:FromNumber"] ?? "50004001381951";
+        var fromNumber = _configuration["SmsProvider:FromNumber"];
+        
+        if (string.IsNullOrEmpty(fromNumber))
+        {
+            fromNumber = DEFAULT_SENDER_NUMBER;
+            _logger.LogWarning("SmsProvider:FromNumber not configured, using default sender number: {DefaultNumber}", DEFAULT_SENDER_NUMBER);
+        }
 
         if (string.IsNullOrEmpty(smsApiKey))
         {
