@@ -36,8 +36,10 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./publish/client/
+        local-dir: ./publish/client/wwwroot/
         server-dir: ./Client/
+        timeout: 600000
+        log-level: minimal
 
     - name: Deploy API to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -47,3 +49,5 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./publish/api/
         server-dir: ./gckgames-api/
+        timeout: 600000
+        log-level: minimal
