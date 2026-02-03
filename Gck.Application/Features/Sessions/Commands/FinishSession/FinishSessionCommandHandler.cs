@@ -3,6 +3,8 @@ using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using MD.PersianDateTime;
 
 namespace Gck.Application.Features.Sessions.Commands.FinishSession;
 
@@ -10,11 +12,15 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
 {
     private readonly GckDbContext _context;
     private readonly ILoyaltyService _loyaltyService;
+    private readonly ISmsService _smsService;
+    private readonly ILogger<FinishSessionCommandHandler> _logger;
 
-    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService)
+    public FinishSessionCommandHandler(GckDbContext context, ILoyaltyService loyaltyService, ISmsService smsService, ILogger<FinishSessionCommandHandler> logger)
     {
         _context = context;
         _loyaltyService = loyaltyService;
+        _smsService = smsService;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(FinishSessionCommand request, CancellationToken cancellationToken)
@@ -102,6 +108,71 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         _context.AccountantReceipts.Add(receipt);
         await _context.SaveChangesAsync(cancellationToken);
 
+        // Send SMS to customers after session completion
+        await SendSessionCompletionMessagesAsync(session, cancellationToken);
+
         return Unit.Value;
+    }
+
+    private async Task SendSessionCompletionMessagesAsync(Session session, CancellationToken cancellationToken)
+    {
+        // Get Persian date and time
+        var persianDateTime = new PersianDateTime(DateTime.Now);
+        var persianDateTimeStr = $"{persianDateTime.ToShortDateString()} {persianDateTime.ToString("HH:mm")}";
+
+        foreach (var sessionCustomer in session.SessionCustomers)
+        {
+            var customer = sessionCustomer.Customer;
+
+            // Ignore customers without phone numbers or with empty phone numbers
+            if (string.IsNullOrWhiteSpace(customer.PhoneNumber))
+            {
+                continue;
+            }
+
+            // Build loyalty program status message
+            string loyaltyStatus = string.Empty;
+            if (customer.IsLoyal && customer.SessionsRequiredForFree > 0)
+            {
+                int remainingSessions = customer.SessionsRequiredForFree - customer.PaidSessionsCount;
+                if (remainingSessions > 0)
+                {
+                    loyaltyStatus = $"تا جلسه‌ی رایگان {remainingSessions} جلسه مانده است";
+                }
+                else if (remainingSessions == 0)
+                {
+                    loyaltyStatus = "شما واجد شرایط دریافت جلسه رایگان هستید";
+                }
+                else
+                {
+                    // Data integrity issue - log it but continue
+                    _logger.LogWarning("Customer {CustomerId} has PaidSessionsCount ({PaidCount}) exceeding SessionsRequiredForFree ({RequiredCount})", 
+                        customer.Id, customer.PaidSessionsCount, customer.SessionsRequiredForFree);
+                }
+            }
+
+            // Build the message
+            string message = $"{customer.Name} عزیز\n" +
+                           "از اینکه ما را برای گذران وقت تفریح خود انتخاب کردید، متشکریم\n";
+            
+            if (!string.IsNullOrEmpty(loyaltyStatus))
+            {
+                message += $"{loyaltyStatus}\n";
+            }
+            
+            message += persianDateTimeStr;
+
+            try
+            {
+                await _smsService.SendMessageAsync(customer.PhoneNumber, message, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't fail the entire operation
+                // The session has already been completed successfully
+                _logger.LogError(ex, "Failed to send session completion message to customer {CustomerId} at phone {PhoneNumber}", 
+                    customer.Id, customer.PhoneNumber);
+            }
+        }
     }
 }

@@ -37,7 +37,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./publish/client/
-        server-dir: ./wwwroot/
+        server-dir: ./Client/
 
     - name: Deploy API to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -46,4 +46,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./publish/api/
-        server-dir: ./api/
+        server-dir: ./gckgames-api/

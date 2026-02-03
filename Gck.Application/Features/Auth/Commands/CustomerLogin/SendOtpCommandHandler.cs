@@ -1,25 +1,21 @@
+using Gck.Application.Services;
 using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Net.Http.Json;
 using System.Security.Cryptography;
-using System.Text.Json;
 
 namespace Gck.Application.Features.Auth.Commands.CustomerLogin;
 
 public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResponse>
 {
     private readonly GckDbContext _context;
-    private readonly IConfiguration _configuration;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ISmsService _smsService;
 
-    public SendOtpCommandHandler(GckDbContext context, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+    public SendOtpCommandHandler(GckDbContext context, ISmsService smsService)
     {
         _context = context;
-        _configuration = configuration;
-        _httpClientFactory = httpClientFactory;
+        _smsService = smsService;
     }
 
     public async Task<SendOtpResponse> Handle(SendOtpCommand request, CancellationToken cancellationToken)
@@ -40,35 +36,8 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
         // Generate cryptographically secure 6-digit OTP
         var otpCode = GenerateSecureOtp();
 
-        // Get SMS provider configuration
-        var smsBaseUrl = _configuration["SmsProvider:BaseUrl"] ?? "https://console.melipayamak.com";
-        var smsApiKey = _configuration["SmsProvider:ApiKey"];
-        
-        string? actualOtpSent = null;
-
-        // Send OTP via SMS API if configured
-        if (!string.IsNullOrEmpty(smsApiKey))
-        {
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(smsBaseUrl);
-            
-            var result = await client.PostAsJsonAsync($"api/send/otp/{smsApiKey}",
-                new { to = request.PhoneNumber }, cancellationToken);
-            
-            result.EnsureSuccessStatusCode(); // Will throw if SMS API fails
-            
-            var response = await result.Content.ReadAsStringAsync(cancellationToken);
-            
-            // Parse response to get the actual OTP code sent by the provider
-            if (!string.IsNullOrEmpty(response))
-            {
-                var jsonDoc = JsonDocument.Parse(response);
-                if (jsonDoc.RootElement.TryGetProperty("code", out var codeElement))
-                {
-                    actualOtpSent = codeElement.GetString();
-                }
-            }
-        }
+        // Send OTP via SMS service
+        string? actualOtpSent = await _smsService.SendOtpAsync(request.PhoneNumber, cancellationToken);
 
         // Use the OTP from SMS provider if available, otherwise use generated one
         var otpToStore = actualOtpSent ?? otpCode;
