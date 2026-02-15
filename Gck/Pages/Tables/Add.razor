@@ -1,9 +1,12 @@
 @page "/tables/add"
 @using Gck.Application.Features.Tables.Commands.CreateTable
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -19,22 +22,6 @@
         </div>
 
         <div class="gaming-card fade-in-up">
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    @errorMessage
-                </div>
-            }
-
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    @successMessage
-                </div>
-            }
-
             <EditForm Model="@command" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
                 
@@ -83,17 +70,17 @@
         successMessage = string.Empty;
 
         var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/tables"), command);
-        
+
         if (response.IsSuccessStatusCode)
         {
-            successMessage = PersianResources.TableAddSuccess;
+            NotificationService.ShowSuccess(PersianResources.TableAddSuccess);
             await Task.Delay(1500);
             Navigation.NavigateTo("/tables");
         }
         else
         {
             var error = await response.Content.ReadAsStringAsync();
-            errorMessage = $"{PersianResources.Error}: {error}";
+            NotificationService.ShowError($"{PersianResources.Error}: {error}");
         }
 
         isSubmitting = false;

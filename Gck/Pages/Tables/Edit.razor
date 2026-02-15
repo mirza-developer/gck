@@ -3,9 +3,12 @@
 @using Gck.Application.Features.Tables.Commands.UpdateTable
 @using Gck.Application.Features.Tables.Queries.GetTableById
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -41,22 +44,6 @@
         else
         {
             <div class="gaming-card fade-in-up">
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        @errorMessage
-                    </div>
-                }
-
-                @if (!string.IsNullOrEmpty(successMessage))
-                {
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i>
-                        @successMessage
-                    </div>
-                }
-
                 <EditForm Model="@command" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
                     
@@ -134,7 +121,7 @@
         try
         {
             var response = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/tables/{Id}"));
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var table = await response.Content.ReadFromJsonAsync<TableDto>();
@@ -151,12 +138,12 @@
             }
             else
             {
-                errorMessage = PersianResources.TableNotFound;
+                NotificationService.ShowError(PersianResources.TableNotFound);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {
@@ -175,22 +162,22 @@
         try
         {
             var response = await Http.PutAsJsonAsync(ApiConfig.GetApiUrl($"/api/tables/{command.Id}"), command);
-            
+
             if (response.IsSuccessStatusCode)
             {
-                successMessage = PersianResources.SaveSuccess;
+                NotificationService.ShowSuccess(PersianResources.SaveSuccess);
                 await Task.Delay(1500);
                 Navigation.NavigateTo("/tables");
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.Error}: {error}";
+                NotificationService.ShowError($"{PersianResources.Error}: {error}");
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {

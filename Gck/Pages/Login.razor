@@ -2,10 +2,13 @@
 @using Gck.Application.Features.Auth.Commands.Login
 @using Gck.Application.Features.Auth.Commands.CustomerLogin
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject INotificationService NotificationService
 @implements IDisposable
 
 <section class="section login-section">
@@ -35,22 +38,6 @@
                         @PersianResources.CustomerLogin
                     </button>
                 </div>
-
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        @errorMessage
-                    </div>
-                }
-
-                @if (!string.IsNullOrEmpty(successMessage))
-                {
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i>
-                        @successMessage
-                    </div>
-                }
 
                 @if (isAdminTab)
                 {
@@ -318,7 +305,7 @@
                 await LocalStorage.SetItemAsync("currentUserName", result.Name);
                 await LocalStorage.SetItemAsync("userRole", "admin");
 
-                successMessage = result.Message;
+                NotificationService.ShowSuccess(result.Message);
                 await Task.Delay(1000);
 
                 // Redirect to home page
@@ -326,13 +313,15 @@
             }
             else
             {
-                errorMessage = result?.Message ?? "خطا در ورود به سیستم";
+                NotificationService.ShowError(result?.Message ?? "خطا در ورود به سیستم");
             }
         }
         else
         {
-            errorMessage = "خطا در اتصال به سرور";
+            NotificationService.ShowError("خطا در اتصال به سرور");
         }
+
+        isLoggingIn = false;
     }
 
     private async Task HandleSendOtp()
@@ -351,7 +340,7 @@
 
                 if (result != null && result.Success)
                 {
-                    successMessage = result.Message;
+                    NotificationService.ShowSuccess(result.Message);
                     otpSent = true;
                     verifyOtpCommand.PhoneNumber = sendOtpCommand.PhoneNumber;
 
@@ -360,17 +349,17 @@
                 }
                 else
                 {
-                    errorMessage = result?.Message ?? PersianResources.OtpSendError;
+                    NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
                 }
             }
             else
             {
-                errorMessage = PersianResources.ApiConnectionError;
+                NotificationService.ShowError(PersianResources.ApiConnectionError);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {
@@ -400,7 +389,7 @@
                     await LocalStorage.SetItemAsync("currentUserName", result.CustomerName);
                     await LocalStorage.SetItemAsync("userRole", "customer");
 
-                    successMessage = result.Message;
+                    NotificationService.ShowSuccess(result.Message);
 
                     // Stop timer on successful login
                     StopResendTimer();
@@ -412,17 +401,17 @@
                 }
                 else
                 {
-                    errorMessage = result?.Message ?? PersianResources.InvalidOtp;
+                    NotificationService.ShowError(result?.Message ?? PersianResources.InvalidOtp);
                 }
             }
             else
             {
-                errorMessage = PersianResources.ApiConnectionError;
+                NotificationService.ShowError(PersianResources.ApiConnectionError);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {
@@ -448,7 +437,7 @@
 
                 if (result != null && result.Success)
                 {
-                    successMessage = result.Message;
+                    NotificationService.ShowSuccess(result.Message);
 
                     // Clear the OTP field for the new code
                     verifyOtpCommand.OtpCode = string.Empty;
@@ -458,17 +447,17 @@
                 }
                 else
                 {
-                    errorMessage = result?.Message ?? PersianResources.OtpSendError;
+                    NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
                 }
             }
             else
             {
-                errorMessage = PersianResources.ApiConnectionError;
+                NotificationService.ShowError(PersianResources.ApiConnectionError);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {

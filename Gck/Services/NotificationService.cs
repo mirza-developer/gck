@@ -8,11 +8,11 @@ public interface INotificationService
     event Action? OnChange;
     IReadOnlyList<NotificationMessage> Notifications { get; }
     
-    void Show(string message, NotificationLevel level = NotificationLevel.Information, NotificationPosition position = NotificationPosition.TopRight);
-    void ShowInformation(string message, NotificationPosition position = NotificationPosition.TopRight);
-    void ShowSuccess(string message, NotificationPosition position = NotificationPosition.TopRight);
-    void ShowWarning(string message, NotificationPosition position = NotificationPosition.TopRight);
-    void ShowError(string message, NotificationPosition position = NotificationPosition.TopRight);
+    void Show(string message, NotificationLevel level = NotificationLevel.Information, NotificationPosition position = NotificationPosition.BottomRight);
+    void ShowInformation(string message, NotificationPosition position = NotificationPosition.BottomRight);
+    void ShowSuccess(string message, NotificationPosition position = NotificationPosition.BottomRight);
+    void ShowWarning(string message, NotificationPosition position = NotificationPosition.BottomRight);
+    void ShowError(string message, NotificationPosition position = NotificationPosition.BottomRight);
     void Remove(Guid id);
 }
 
@@ -24,7 +24,7 @@ public class NotificationService : INotificationService
     
     public IReadOnlyList<NotificationMessage> Notifications => _notifications.AsReadOnly();
 
-    public void Show(string message, NotificationLevel level = NotificationLevel.Information, NotificationPosition position = NotificationPosition.TopRight)
+    public void Show(string message, NotificationLevel level = NotificationLevel.Information, NotificationPosition position = NotificationPosition.BottomRight)
     {
         var notification = new NotificationMessage
         {
@@ -37,22 +37,22 @@ public class NotificationService : INotificationService
         OnChange?.Invoke();
     }
 
-    public void ShowInformation(string message, NotificationPosition position = NotificationPosition.TopRight)
+    public void ShowInformation(string message, NotificationPosition position = NotificationPosition.BottomRight)
     {
         Show(message, NotificationLevel.Information, position);
     }
 
-    public void ShowSuccess(string message, NotificationPosition position = NotificationPosition.TopRight)
+    public void ShowSuccess(string message, NotificationPosition position = NotificationPosition.BottomRight)
     {
         Show(message, NotificationLevel.Success, position);
     }
 
-    public void ShowWarning(string message, NotificationPosition position = NotificationPosition.TopRight)
+    public void ShowWarning(string message, NotificationPosition position = NotificationPosition.BottomRight)
     {
         Show(message, NotificationLevel.Warning, position);
     }
 
-    public void ShowError(string message, NotificationPosition position = NotificationPosition.TopRight)
+    public void ShowError(string message, NotificationPosition position = NotificationPosition.BottomRight)
     {
         Show(message, NotificationLevel.Error, position);
     }

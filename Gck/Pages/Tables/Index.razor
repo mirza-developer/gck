@@ -2,10 +2,13 @@
 @using Gck.Application.DTOs
 @using Gck.Resources
 @using Gck.Shared.Modals
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -128,7 +131,7 @@
     {
         isLoading = true;
         errorMessage = string.Empty;
-        
+
         try
         {
             var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/tables"));
@@ -138,12 +141,12 @@
             }
             else
             {
-                errorMessage = PersianResources.LoadTablesError;
+                NotificationService.ShowError(PersianResources.LoadTablesError);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
         }
         finally
         {
@@ -174,16 +177,17 @@
             var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/tables/{tableToDeleteId}"));
             if (response.IsSuccessStatusCode)
             {
+                NotificationService.ShowSuccess("میز با موفقیت حذف شد");
                 await LoadTables();
             }
             else
             {
-                errorMessage = PersianResources.DeleteTableError;
+                NotificationService.ShowError(PersianResources.DeleteTableError);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"{PersianResources.Error}: {ex.Message}";
+            NotificationService.ShowError($"{PersianResources.Error}: {ex.Message}");
         }
     }
 }

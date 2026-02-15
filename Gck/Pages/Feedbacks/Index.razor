@@ -1,9 +1,12 @@
 @page "/feedbacks"
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -19,13 +22,6 @@
             <div class="loading-container">
                 <div class="spinner"></div>
                 <p>@PersianResources.Loading</p>
-            </div>
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
             </div>
         }
         else if (feedbacks != null && feedbacks.Any())
@@ -121,7 +117,7 @@
         }
         else
         {
-            errorMessage = PersianResources.LoadingError;
+            NotificationService.ShowError(PersianResources.LoadingError);
         }
 
         isLoading = false;
@@ -136,7 +132,12 @@
             if (feedback != null)
             {
                 feedback.IsRead = true;
+                NotificationService.ShowSuccess("بازخورد به عنوان خوانده شده علامت‌گذاری شد");
             }
+        }
+        else
+        {
+            NotificationService.ShowError("خطا در علامت‌گذاری بازخورد");
         }
     }
 
