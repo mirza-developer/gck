@@ -1,0 +1,171 @@
+.notification-container {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    pointer-events: none;
+}
+
+.notification-container > * {
+    pointer-events: auto;
+}
+
+/* Position Classes */
+.position-top-left {
+    top: 0;
+    left: 0;
+    align-items: flex-start;
+}
+
+.position-top-center {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.position-top-right {
+    top: 0;
+    right: 0;
+    align-items: flex-end;
+}
+
+.position-bottom-left {
+    bottom: 0;
+    left: 0;
+    align-items: flex-start;
+}
+
+.position-bottom-center {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.position-bottom-right {
+    bottom: 0;
+    right: 0;
+    align-items: flex-end;
+}
+
+.position-center-left {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    align-items: flex-start;
+}
+
+.position-center-right {
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    align-items: flex-end;
+}
+
+/* Notification Styles */
+.notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    max-width: max-content;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.notification-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.notification-message {
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 0 0 12px;
+    margin: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+/* Level Colors */
+.notification-info {
+    background-color: #3498db;
+    color: white;
+}
+
+.notification-success {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.notification-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.notification-error {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Animations */
+.notification-show {
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 1;
+}
+
+.notification-hide {
+    animation: slideOut 0.3s ease-in forwards;
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
