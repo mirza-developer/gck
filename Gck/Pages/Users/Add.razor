@@ -1,11 +1,4 @@
 @page "/users/add"
-@using Gck.Application.Features.Users.Commands.AddUser
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -98,26 +91,3 @@
         </div>
     </div>
 </section>
-
-@code {
-    private AddUserCommand command = new();
-    private bool isSubmitting = false;
-
-    private async Task HandleSubmit()
-    {
-        isSubmitting = true;
-
-        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/user"), command);
-
-        NotificationService.ShowSuccess("کاربر با موفقیت ایجاد شد");
-        await Task.Delay(1500);
-        Navigation.NavigateTo("/users");
-
-        isSubmitting = false;
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/users");
-    }
-}
