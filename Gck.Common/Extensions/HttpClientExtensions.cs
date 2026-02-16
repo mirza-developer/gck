@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 
-namespace Gck.Extensions;
+namespace Gck.Common.Extensions;
+
 public static class HttpClientExtensions
 {
     /// <summary>

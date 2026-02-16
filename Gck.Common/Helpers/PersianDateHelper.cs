@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Gck.Services;
+namespace Gck.Common.Helpers;
 
 public static class PersianDateHelper
 {
@@ -37,13 +37,13 @@ public static class PersianDateHelper
     {
         return dateTime.DayOfWeek switch
         {
-            DayOfWeek.Saturday => "????",
-            DayOfWeek.Sunday => "???????",
-            DayOfWeek.Monday => "??????",
-            DayOfWeek.Tuesday => "???????",
-            DayOfWeek.Wednesday => "????????",
-            DayOfWeek.Thursday => "????????",
-            DayOfWeek.Friday => "????",
+            DayOfWeek.Saturday => "شنبه",
+            DayOfWeek.Sunday => "یکشنبه",
+            DayOfWeek.Monday => "دوشنبه",
+            DayOfWeek.Tuesday => "سه‌شنبه",
+            DayOfWeek.Wednesday => "چهارشنبه",
+            DayOfWeek.Thursday => "پنجشنبه",
+            DayOfWeek.Friday => "جمعه",
             _ => ""
         };
     }
@@ -56,18 +56,18 @@ public static class PersianDateHelper
         var month = PersianCalendar.GetMonth(dateTime);
         return month switch
         {
-            1 => "???????",
-            2 => "????????",
-            3 => "?????",
-            4 => "???",
-            5 => "?????",
-            6 => "??????",
-            7 => "???",
-            8 => "????",
-            9 => "???",
-            10 => "??",
-            11 => "????",
-            12 => "?????",
+            1 => "فروردین",
+            2 => "اردیبهشت",
+            3 => "خرداد",
+            4 => "تیر",
+            5 => "مرداد",
+            6 => "شهریور",
+            7 => "مهر",
+            8 => "آبان",
+            9 => "آذر",
+            10 => "دی",
+            11 => "بهمن",
+            12 => "اسفند",
             _ => ""
         };
     }
@@ -92,7 +92,7 @@ public static class PersianDateHelper
         var dayOfWeek = dateTime.GetPersianDayOfWeek();
         var dateWithMonth = dateTime.ToPersianDateWithMonthName();
         
-        return $"{dayOfWeek}? {dateWithMonth}";
+        return $"{dayOfWeek}، {dateWithMonth}";
     }
 
     /// <summary>
@@ -120,24 +120,53 @@ public static class PersianDateHelper
     }
 
     /// <summary>
-    /// Convert Persian date to DateTime (yyyy/MM/dd)
+    /// Convert Persian date string to DateTime (yyyy/MM/dd format)
+    /// Returns null if the date is invalid
     /// </summary>
-    public static DateTime? FromPersianDate(string persianDate)
+    public static DateTime? FromPersianDate(string? persianDate)
     {
-        var parts = persianDate.Split('/');
-        if (parts.Length != 3)
+        if (string.IsNullOrWhiteSpace(persianDate))
             return null;
 
-        if (!int.TryParse(parts[0], out var year) ||
-            !int.TryParse(parts[1], out var month) ||
-            !int.TryParse(parts[2], out var day))
-            return null;
+        try
+        {
+            var parts = persianDate.Split('/');
+            if (parts.Length != 3)
+                return null;
 
-        // Validate Persian date ranges
-        if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31)
-            return null;
+            if (!int.TryParse(parts[0], out var year) ||
+                !int.TryParse(parts[1], out var month) ||
+                !int.TryParse(parts[2], out var day))
+                return null;
 
-        return PersianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+            // Validate Persian date ranges
+            if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31)
+                return null;
+
+            return PersianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Convert Persian date string to DateTime with default fallback
+    /// Returns the provided default value if the date is invalid
+    /// </summary>
+    public static DateTime FromPersianDateOrDefault(string? persianDate, DateTime defaultValue = default)
+    {
+        return FromPersianDate(persianDate) ?? defaultValue;
+    }
+
+    /// <summary>
+    /// Convert Persian date string to DateTime or current date
+    /// Returns DateTime.Now if the date is invalid
+    /// </summary>
+    public static DateTime FromPersianDateOrNow(string? persianDate)
+    {
+        return FromPersianDate(persianDate) ?? DateTime.Now;
     }
 
     /// <summary>

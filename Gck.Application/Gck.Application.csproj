@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Gck.Common\Gck.Common.csproj" />
     <ProjectReference Include="..\Gck.Domain\Gck.Domain.csproj" />
     <ProjectReference Include="..\Gck.Persistence\Gck.Persistence.csproj" />
   </ItemGroup>

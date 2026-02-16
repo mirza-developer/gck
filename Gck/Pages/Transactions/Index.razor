@@ -4,7 +4,8 @@
 @using Gck.Components
 @using Gck.Services
 @using Gck.Enums
-@using Gck.Extensions
+@using Gck.Common.Extensions
+@using Gck.Common.Helpers
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -243,14 +244,14 @@ private class TransactionTypeOption
 
         if (!string.IsNullOrEmpty(filterStartDate))
         {
-            var startDate = ConvertPersianToGregorian(filterStartDate);
+            var startDate = PersianDateHelper.FromPersianDate(filterStartDate);
             if (startDate.HasValue)
                 queryParams.Add($"startDate={startDate.Value:yyyy-MM-dd}");
         }
 
         if (!string.IsNullOrEmpty(filterEndDate))
         {
-            var endDate = ConvertPersianToGregorian(filterEndDate);
+            var endDate = PersianDateHelper.FromPersianDate(filterEndDate);
             if (endDate.HasValue)
                 queryParams.Add($"endDate={endDate.Value:yyyy-MM-dd}");
         }
@@ -288,28 +289,6 @@ private class TransactionTypeOption
     private async Task OnEndDateChanged(string value)
     {
         filterEndDate = value;
-    }
-
-    private DateTime? ConvertPersianToGregorian(string persianDate)
-    {
-        if (string.IsNullOrEmpty(persianDate)) return null;
-
-        try
-        {
-            var parts = persianDate.Split('/');
-            if (parts.Length != 3) return null;
-
-            var year = int.Parse(parts[0]);
-            var month = int.Parse(parts[1]);
-            var day = int.Parse(parts[2]);
-
-            var calendar = new System.Globalization.PersianCalendar();
-            return calendar.ToDateTime(year, month, day, 0, 0, 0, 0);
-        }
-        catch
-        {
-            return null;
-        }
     }
 
     private void NavigateToAdd()

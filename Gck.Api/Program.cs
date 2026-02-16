@@ -43,10 +43,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Use centralized exception handling middleware (must be first)
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
-// Initialize database and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
