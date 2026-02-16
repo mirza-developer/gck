@@ -7,11 +7,11 @@
         <div class="page-header fade-in-up">
             <h2 class="section-title">
                 <i class="fas fa-users"></i>
-                مدیریت کاربران
+                @PersianResources.UsersManagement
             </h2>
             <button class="btn-gaming" @onclick="NavigateToAdd">
                 <i class="fas fa-plus"></i>
-                افزودن کاربر جدید
+                @PersianResources.AddNewUser
             </button>
         </div>
 
@@ -25,7 +25,7 @@
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" 
-                           placeholder="جستجوی کاربر (نام، نام کاربری)..." 
+                           placeholder="@PersianResources.SearchUsers" 
                            @bind="searchText" 
                            @bind:event="oninput"
                            class="search-input" />
@@ -46,17 +46,17 @@
                                         <p class="user-username">@@@user.Username</p>
                                     </div>
                                     <div class="user-status @(user.IsActive ? "active" : "inactive")">
-                                        @(user.IsActive ? "فعال" : "غیرفعال")
+                                        @(user.IsActive ? PersianResources.Active : PersianResources.Inactive)
                                     </div>
                                 </div>
                                 <div class="user-actions">
                                     <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(user.Username)">
                                         <i class="fas fa-edit"></i>
-                                        ویرایش
+                                        @PersianResources.Edit
                                     </button>
                                     <button class="btn-action btn-delete" @onclick="() => DeleteUser(user.Id)">
                                         <i class="fas fa-trash"></i>
-                                        حذف
+                                        @PersianResources.Delete
                                     </button>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                 {
                     <div class="no-data">
                         <i class="fas fa-inbox"></i>
-                        <p>کاربری یافت نشد</p>
+                        <p>@PersianResources.NoUsersFound</p>
                     </div>
                 }
             </div>

@@ -1,15 +1,16 @@
 @page "/users/add"
+@using Gck.Resources
 
 <section class="section">
     <div class="container">
         <div class="page-header fade-in-up">
             <h2 class="section-title">
                 <i class="fas fa-user-plus"></i>
-                افزودن کاربر جدید
+                @PersianResources.AddNewUser
             </h2>
             <button class="btn-gaming btn-secondary" @onclick="NavigateBack">
                 <i class="fas fa-arrow-right"></i>
-                بازگشت
+                @PersianResources.Back
             </button>
         </div>
 
@@ -20,34 +21,34 @@
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-user"></i>
-                        نام کاربری <span class="required">*</span>
+                        @PersianResources.Username <span class="required">@PersianResources.Required</span>
                     </label>
-                    <InputText @bind-Value="command.Username" class="form-input" placeholder="نام کاربری را وارد کنید" />
+                    <InputText @bind-Value="command.Username" class="form-input" placeholder="@PersianResources.EnterUsername" />
                     <ValidationMessage For="@(() => command.Username)" class="validation-error" />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-id-card"></i>
-                        نام کامل <span class="required">*</span>
+                        @PersianResources.UserFullName <span class="required">@PersianResources.Required</span>
                     </label>
-                    <InputText @bind-Value="command.Name" class="form-input" placeholder="نام کامل را وارد کنید" />
+                    <InputText @bind-Value="command.Name" class="form-input" placeholder="@PersianResources.UserFullName" />
                     <ValidationMessage For="@(() => command.Name)" class="validation-error" />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-lock"></i>
-                        رمز عبور <span class="required">*</span>
+                        @PersianResources.Password <span class="required">@PersianResources.Required</span>
                     </label>
-                    <InputText type="password" @bind-Value="command.Password" class="form-input" placeholder="رمز عبور را وارد کنید" />
+                    <InputText type="password" @bind-Value="command.Password" class="form-input" placeholder="@PersianResources.EnterPassword" />
                     <ValidationMessage For="@(() => command.Password)" class="validation-error" />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-envelope"></i>
-                        ایمیل
+                        @PersianResources.Email
                     </label>
                     <InputText @bind-Value="command.Email" class="form-input" placeholder="example@email.com" />
                     <ValidationMessage For="@(() => command.Email)" class="validation-error" />
@@ -56,17 +57,17 @@
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-phone"></i>
-                        شماره تلفن
+                        @PersianResources.PhoneNumber
                     </label>
-                    <InputText @bind-Value="command.PhoneNumber" class="form-input" placeholder="09123456789" />
+                    <InputText @bind-Value="command.PhoneNumber" class="form-input" placeholder="@PersianResources.PhonePlaceholder" />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-sticky-note"></i>
-                        جزئیات اضافی
+                        @PersianResources.AdditionalDetails
                     </label>
-                    <InputTextArea @bind-Value="command.Details" class="form-textarea" placeholder="توضیحات و جزئیات اضافی..." rows="4" />
+                    <InputTextArea @bind-Value="command.Details" class="form-textarea" placeholder="@PersianResources.AdditionalDetails" rows="4" />
                 </div>
 
                 <div class="form-actions">
@@ -74,17 +75,17 @@
                         @if (isSubmitting)
                         {
                             <i class="fas fa-spinner fa-spin"></i>
-                            <span>در حال ثبت...</span>
+                            <span>@PersianResources.Submitting</span>
                         }
                         else
                         {
                             <i class="fas fa-save"></i>
-                            <span>ثبت کاربر</span>
+                            <span>@PersianResources.SubmitUser</span>
                         }
                     </button>
                     <button type="button" class="btn-gaming btn-secondary" @onclick="NavigateBack" disabled="@isSubmitting">
                         <i class="fas fa-times"></i>
-                        انصراف
+                        @PersianResources.Cancel
                     </button>
                 </div>
             </EditForm>

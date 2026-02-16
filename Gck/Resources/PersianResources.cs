@@ -385,5 +385,23 @@ public static class PersianResources
     public const string LoginInProgress = "در حال ورود...";
     public const string Login = "ورود";
     public const string LoginError = "خطا در ورود به سیستم";
+    
+    // Users Management
+    public const string UsersManagement = "مدیریت کاربران";
+    public const string AddNewUser = "افزودن کاربر جدید";
+    public const string EditUser = "ویرایش کاربر";
+    public const string UserNotFound = "کاربر یافت نشد";
+    public const string SubmitUser = "ثبت کاربر";
+    public const string UserFullName = "نام کامل";
+    public const string Email = "ایمیل";
+    public const string AdditionalDetails = "جزئیات اضافی";
+    public const string SearchUsers = "جستجوی کاربر (نام، نام کاربری)...";
+    public const string NoUsersFound = "کاربری یافت نشد";
+    public const string DeleteUserConfirm = "آیا از حذف این کاربر اطمینان دارید؟";
+    public const string UserAddSuccess = "کاربر با موفقیت ایجاد شد";
+    public const string IsActive = "فعال";
+    public const string Active = "فعال";
+    public const string Inactive = "غیرفعال";
+    public const string Name = "نام";
 }
 
