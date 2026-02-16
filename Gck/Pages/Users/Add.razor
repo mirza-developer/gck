@@ -1,8 +1,11 @@
 @page "/users/add"
 @using Gck.Application.Features.Users.Commands.AddUser
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -18,22 +21,6 @@
         </div>
 
         <div class="gaming-card fade-in-up">
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    @errorMessage
-                </div>
-            }
-
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    @successMessage
-                </div>
-            }
-
             <EditForm Model="@command" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
                 
@@ -115,28 +102,16 @@
 @code {
     private AddUserCommand command = new();
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/user"), command);
-        
-        if (response.IsSuccessStatusCode)
-        {
-            successMessage = "کاربر با موفقیت ایجاد شد";
-            await Task.Delay(1500);
-            Navigation.NavigateTo("/users");
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            errorMessage = $"خطا در ایجاد کاربر: {error}";
-        }
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/user"), command);
+
+        NotificationService.ShowSuccess("کاربر با موفقیت ایجاد شد");
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/users");
 
         isSubmitting = false;
     }

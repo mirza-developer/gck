@@ -3,9 +3,13 @@
 @using Gck.Application.Features.Tables.Commands.UpdateTable
 @using Gck.Application.Features.Tables.Queries.GetTableById
 @using Gck.Resources
+@using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -22,14 +26,7 @@
 
         @if (isLoading)
         {
-            <div class="loading-container">
-                <div class="gaming-loader">
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <p class="loader-text">@PersianResources.Loading</p>
-                </div>
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else if (command == null)
         {
@@ -41,22 +38,6 @@
         else
         {
             <div class="gaming-card fade-in-up">
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        @errorMessage
-                    </div>
-                }
-
-                @if (!string.IsNullOrEmpty(successMessage))
-                {
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i>
-                        @successMessage
-                    </div>
-                }
-
                 <EditForm Model="@command" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
                     
@@ -118,8 +99,6 @@
     private UpdateTableCommand? command;
     private bool isLoading = true;
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,39 +108,20 @@
     private async Task LoadTable()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
-        try
+        var table = await Http.GetFromJsonWithExceptionAsync<TableDto>(ApiConfig.GetApiUrl($"/api/tables/{Id}"));
+        if (table != null)
         {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl($"/api/tables/{Id}"));
-            
-            if (response.IsSuccessStatusCode)
+            command = new UpdateTableCommand
             {
-                var table = await response.Content.ReadFromJsonAsync<TableDto>();
-                if (table != null)
-                {
-                    command = new UpdateTableCommand
-                    {
-                        Id = table.Id,
-                        Name = table.Name,
-                        NumberOfControllers = table.NumberOfControllers,
-                        HourlyFeePerController = table.HourlyFeePerController
-                    };
-                }
-            }
-            else
-            {
-                errorMessage = PersianResources.TableNotFound;
-            }
+                Id = table.Id,
+                Name = table.Name,
+                NumberOfControllers = table.NumberOfControllers,
+                HourlyFeePerController = table.HourlyFeePerController
+            };
         }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
+
+        isLoading = false;
     }
 
     private async Task HandleSubmit()
@@ -169,33 +129,14 @@
         if (command == null) return;
 
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.PutAsJsonAsync(ApiConfig.GetApiUrl($"/api/tables/{command.Id}"), command);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = PersianResources.SaveSuccess;
-                await Task.Delay(1500);
-                Navigation.NavigateTo("/tables");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.Error}: {error}";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
+        await Http.PutAsJsonWithExceptionAsync(ApiConfig.GetApiUrl($"/api/tables/{command.Id}"), command);
+
+        NotificationService.ShowSuccess(PersianResources.SaveSuccess);
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/tables");
+
+        isSubmitting = false;
     }
 
     private void NavigateBack()

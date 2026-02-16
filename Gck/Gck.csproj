@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gck.Application\Gck.Application.csproj" />
+    <ProjectReference Include="..\Gck.Common\Gck.Common.csproj" />
   </ItemGroup>
 
 </Project>

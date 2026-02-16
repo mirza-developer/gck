@@ -1,10 +1,13 @@
 @page "/customer/feedback"
 @using Gck.Resources
 @using System.ComponentModel.DataAnnotations
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -14,22 +17,6 @@
                 @PersianResources.SendFeedback
             </h1>
         </div>
-
-        @if (!string.IsNullOrEmpty(successMessage))
-        {
-            <div class="success-message">
-                <i class="fas fa-check-circle"></i>
-                @successMessage
-            </div>
-        }
-
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
-        }
 
         <div class="gaming-card">
             <EditForm Model="@feedbackModel" OnValidSubmit="HandleSubmit">
@@ -88,8 +75,6 @@
 @code {
     private FeedbackModel feedbackModel = new();
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,45 +89,27 @@
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        try
+        var customerIdStr = await LocalStorage.GetItemAsync<string>("currentUserId");
+        if (string.IsNullOrEmpty(customerIdStr))
         {
-            var customerIdStr = await LocalStorage.GetItemAsync<string>("currentUserId");
-            if (string.IsNullOrEmpty(customerIdStr))
-            {
-                Navigation.NavigateTo("/login");
-                return;
-            }
-
-            var feedbackDto = new
-            {
-                CustomerId = int.Parse(customerIdStr),
-                Subject = feedbackModel.Subject,
-                Message = feedbackModel.Message
-            };
-
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/feedback"), feedbackDto);
-
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = PersianResources.FeedbackSubmitted;
-                feedbackModel = new(); // Reset form
-            }
-            else
-            {
-                errorMessage = PersianResources.ApiConnectionError;
-            }
+            Navigation.NavigateTo("/login");
+            return;
         }
-        catch (Exception ex)
+
+        var feedbackDto = new
         {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
+            CustomerId = int.Parse(customerIdStr),
+            Subject = feedbackModel.Subject,
+            Message = feedbackModel.Message
+        };
+
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/feedback"), feedbackDto);
+
+        NotificationService.ShowSuccess(PersianResources.FeedbackSubmitted);
+        feedbackModel = new(); // Reset form
+
+        isSubmitting = false;
     }
 
     private void Cancel()

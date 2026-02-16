@@ -1,9 +1,13 @@
 @page "/feedbacks"
 @using Gck.Resources
+@using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -16,17 +20,7 @@
 
         @if (isLoading)
         {
-            <div class="loading-container">
-                <div class="spinner"></div>
-                <p>@PersianResources.Loading</p>
-            </div>
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else if (feedbacks != null && feedbacks.Any())
         {
@@ -94,7 +88,6 @@
 @code {
     private List<FeedbackDto> feedbacks = new();
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,31 +105,20 @@
     private async Task LoadFeedbacks()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
-        var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/feedback"));
-        if (response.IsSuccessStatusCode)
-        {
-            feedbacks = await response.Content.ReadFromJsonAsync<List<FeedbackDto>>() ?? new();
-        }
-        else
-        {
-            errorMessage = PersianResources.LoadingError;
-        }
+        feedbacks = await Http.GetFromJsonWithExceptionAsync<List<FeedbackDto>>(ApiConfig.GetApiUrl("/api/feedback")) ?? new();
 
         isLoading = false;
     }
 
     private async Task MarkAsRead(int feedbackId)
     {
-        var response = await Http.PutAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), null);
-        if (response.IsSuccessStatusCode)
+        await Http.PutAsJsonWithExceptionAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), (object?)null);
+        var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+        if (feedback != null)
         {
-            var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
-            if (feedback != null)
-            {
-                feedback.IsRead = true;
-            }
+            feedback.IsRead = true;
+            NotificationService.ShowSuccess("بازخورد به عنوان خوانده شده علامت‌گذاری شد");
         }
     }
 

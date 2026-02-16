@@ -1,0 +1,105 @@
+/* Loading Spinner Component Styles */
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: var(--darker-bg, #0a0a1a);
+    /* Fullscreen overlay positioning */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    width: 100vw;
+}
+
+.gaming-loader {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.loader-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: absolute;
+    border: 3px solid transparent;
+    animation: loadingSpin 2s linear infinite;
+}
+
+.loader-ring:nth-child(1) {
+    border-top-color: var(--primary-purple, #6c5ce7);
+    animation-delay: 0s;
+}
+
+.loader-ring:nth-child(2) {
+    border-right-color: var(--secondary-pink, #fd79a8);
+    animation-delay: 0.5s;
+    width: 60px;
+    height: 60px;
+}
+
+.loader-ring:nth-child(3) {
+    border-bottom-color: var(--accent-cyan, #00cec9);
+    animation-delay: 1s;
+    width: 40px;
+    height: 40px;
+}
+
+@keyframes loadingSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    margin-top: 100px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+    background: var(--gradient-1, linear-gradient(135deg, #6c5ce7, #fd79a8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Inline/Embedded Mode */
+.loading-container.inline {
+    height: auto;
+    min-height: 200px;
+    background: transparent;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.loading-container.small .gaming-loader {
+    gap: 1rem;
+    transform: scale(0.7);
+}
+
+.loading-container.small .loading-text {
+    margin-top: 70px;
+    font-size: 1rem;
+}

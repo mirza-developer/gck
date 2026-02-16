@@ -1,5 +1,6 @@
 ﻿@using Gck.Components
 @using Gck.Resources
+@using Gck.Enums
 @inherits LayoutComponentBase
 @inject IJSRuntime JS
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
@@ -134,6 +135,17 @@
     <main class="main-content">
         @Body
     </main>
+    
+    <!-- Notification Containers for all positions -->
+    <NotificationContainer Position="NotificationPosition.TopLeft" />
+    <NotificationContainer Position="NotificationPosition.TopCenter" />
+    <NotificationContainer Position="NotificationPosition.TopRight" />
+    <NotificationContainer Position="NotificationPosition.BottomLeft" />
+    <NotificationContainer Position="NotificationPosition.BottomCenter" />
+    <NotificationContainer Position="NotificationPosition.BottomRight" />
+    <NotificationContainer Position="NotificationPosition.CenterLeft" />
+    <NotificationContainer Position="NotificationPosition.CenterRight" />
+    
     @if (!isLoggedIn)
     {
         <footer class="footer">

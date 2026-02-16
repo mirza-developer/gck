@@ -19,10 +19,9 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddMediaQueryService();
 builder.Services.AddResizeListener();
 
-// Add custom services for the gaming platform
-builder.Services.AddScoped<GameStatsService>();
 builder.Services.AddScoped<UserProfileService>();
 builder.Services.AddScoped<TournamentService>();
 builder.Services.AddSingleton<ApiConfigurationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 await builder.Build().RunAsync();

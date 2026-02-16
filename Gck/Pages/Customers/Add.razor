@@ -1,9 +1,12 @@
 @page "/customers/add"
 @using Gck.Application.Features.Customers.Commands.CreateCustomer
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -19,22 +22,6 @@
         </div>
 
         <div class="gaming-card fade-in-up">
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    @errorMessage
-                </div>
-            }
-
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    @successMessage
-                </div>
-            }
-
             <EditForm Model="@command" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
                 
@@ -125,8 +112,6 @@
 @code {
     private CreateCustomerCommand command = new() { Gender = "Male" };
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     private void OnLoyaltyToggle(ChangeEventArgs e)
     {
@@ -139,33 +124,14 @@
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/customers"), command);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = PersianResources.CustomerAddSuccess;
-                await Task.Delay(1500);
-                Navigation.NavigateTo("/customers");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.Error}: {error}";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/customers"), command);
+
+        NotificationService.ShowSuccess(PersianResources.CustomerAddSuccess);
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/customers");
+
+        isSubmitting = false;
     }
 
     private void NavigateBack()

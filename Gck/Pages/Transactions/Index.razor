@@ -1,10 +1,15 @@
 @page "/transactions"
 @using Gck.Application.DTOs
 @using Gck.Resources
+@using Gck.Components
+@using Gck.Services
+@using Gck.Enums
+@using Gck.Common.Extensions
+@using Gck.Common.Helpers
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -21,21 +26,7 @@
 
         @if (isLoading)
         {
-            <div class="loading-container">
-                <div class="gaming-loader">
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <p class="loader-text">@PersianResources.Loading</p>
-                </div>
-            </div>
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else
         {
@@ -198,7 +189,6 @@ private string filterAccountId = string.Empty;
 private string filterStartDate = string.Empty;
 private string filterEndDate = string.Empty;
 private bool isLoading = true;
-private string errorMessage = string.Empty;
 
 private class TransactionTypeOption
 {
@@ -221,12 +211,11 @@ private class TransactionTypeOption
     private async Task LoadData()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
         // Load financial accounts
-        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        accounts = await Http.GetFromJsonWithExceptionAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
         allAccounts = new List<FinancialAccountDto>(accounts);
-        
+
         // Initialize transaction types
         transactionTypes = new List<TransactionTypeOption>
         {
@@ -234,7 +223,7 @@ private class TransactionTypeOption
             new TransactionTypeOption { Value = "Income", Display = PersianResources.Income },
             new TransactionTypeOption { Value = "Outcome", Display = PersianResources.Outcome }
         };
-        
+
         // Load report with initial filters
         await ApplyFilters();
 
@@ -244,32 +233,31 @@ private class TransactionTypeOption
     private async Task ApplyFilters()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
         var queryParams = new List<string>();
 
         if (!string.IsNullOrEmpty(filterAccountId))
             queryParams.Add($"financialAccountId={filterAccountId}");
-        
+
         if (!string.IsNullOrEmpty(filterType))
             queryParams.Add($"type={filterType}");
-        
+
         if (!string.IsNullOrEmpty(filterStartDate))
         {
-            var startDate = ConvertPersianToGregorian(filterStartDate);
+            var startDate = PersianDateHelper.FromPersianDate(filterStartDate);
             if (startDate.HasValue)
                 queryParams.Add($"startDate={startDate.Value:yyyy-MM-dd}");
         }
-        
+
         if (!string.IsNullOrEmpty(filterEndDate))
         {
-            var endDate = ConvertPersianToGregorian(filterEndDate);
+            var endDate = PersianDateHelper.FromPersianDate(filterEndDate);
             if (endDate.HasValue)
                 queryParams.Add($"endDate={endDate.Value:yyyy-MM-dd}");
         }
 
         var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
-        report = await Http.GetFromJsonAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
+        report = await Http.GetFromJsonWithExceptionAsync<TransactionReportDto>(ApiConfig.GetApiUrl($"/api/transactions/report{queryString}"));
 
         isLoading = false;
     }
@@ -303,28 +291,6 @@ private class TransactionTypeOption
         filterEndDate = value;
     }
 
-    private DateTime? ConvertPersianToGregorian(string persianDate)
-    {
-        if (string.IsNullOrEmpty(persianDate)) return null;
-
-        try
-        {
-            var parts = persianDate.Split('/');
-            if (parts.Length != 3) return null;
-
-            var year = int.Parse(parts[0]);
-            var month = int.Parse(parts[1]);
-            var day = int.Parse(parts[2]);
-
-            var calendar = new System.Globalization.PersianCalendar();
-            return calendar.ToDateTime(year, month, day, 0, 0, 0, 0);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
     private void NavigateToAdd()
     {
         Navigation.NavigateTo("/transactions/add");
@@ -337,19 +303,9 @@ private class TransactionTypeOption
 
     private async Task DeleteTransaction(int id)
     {
-        if (!await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteTransactionConfirm))
-            return;
+        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
 
-        var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
-        
-        if (response.IsSuccessStatusCode)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", PersianResources.DeleteSuccess);
-            await ApplyFilters(); // Reload data
-        }
-        else
-        {
-            errorMessage = PersianResources.DeleteTransactionError;
-        }
+        NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
+        await ApplyFilters(); // Reload data
     }
 }

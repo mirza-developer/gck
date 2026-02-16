@@ -282,7 +282,7 @@ document.addEventListener('click', (e) => {
     if (elementMatches(e.target, 'button, .btn-gaming, .game-card')) {
         playGameSound('click');
     }
-}
+});
 
 // Performance monitoring
 function logPerformance() {
@@ -290,7 +290,6 @@ function logPerformance() {
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const perfData = performance.getEntriesByType('navigation')[0];
-                console.log('???? ??', Math.round(perfData.loadEventEnd - perfData.fetchStart), '?????????? ??????? ??');
             }, 0);
         });
     }
@@ -320,7 +319,6 @@ function installApp() {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
-                console.log('????? ?? ?? ??? ???');
             }
             deferredPrompt = null;
         });
