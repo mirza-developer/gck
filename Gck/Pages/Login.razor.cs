@@ -140,7 +140,7 @@ namespace Gck.Pages
             }
             else
             {
-                NotificationService.ShowError(result?.Message ?? "خطا در ورود به سیستم");
+                NotificationService.ShowError(result?.Message ?? PersianResources.LoginError);
             }
 
             isLoggingIn = false;
