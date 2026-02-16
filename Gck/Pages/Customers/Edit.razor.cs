@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Customers;
 
-public partial class Edit : ComponentBase
+public partial class Edit
 {
     [Inject]
     private HttpClient Http { get; set; } = default!;

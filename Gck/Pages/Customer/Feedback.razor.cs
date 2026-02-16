@@ -5,7 +5,7 @@ using Gck.Common.Extensions;
 
 namespace Gck.Pages.Customer;
 
-public partial class Feedback : ComponentBase
+public partial class Feedback
 {
     [Inject]
     private HttpClient Http { get; set; } = default!;

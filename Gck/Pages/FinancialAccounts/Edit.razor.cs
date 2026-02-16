@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.FinancialAccounts;
 
-public partial class Edit : ComponentBase
+public partial class Edit
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;

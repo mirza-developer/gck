@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Tables;
 
-public partial class Edit : ComponentBase
+public partial class Edit
 {
     [Parameter]
     public int Id { get; set; }

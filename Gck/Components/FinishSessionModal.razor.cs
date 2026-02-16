@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class FinishSessionModal : ComponentBase
+public partial class FinishSessionModal
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private ApiConfigurationService ApiConfig { get; set; } = default!;

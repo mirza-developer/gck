@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class StartSessionModal : ComponentBase
+public partial class StartSessionModal
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private ApiConfigurationService ApiConfig { get; set; } = default!;

@@ -7,7 +7,7 @@ using Gck.Services;
 
 namespace Gck.Pages.Users;
 
-public partial class Edit : ComponentBase
+public partial class Edit
 {
     [Parameter]
     public string Username { get; set; } = string.Empty;

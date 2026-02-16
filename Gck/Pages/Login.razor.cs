@@ -7,7 +7,7 @@ using Gck.Common.Extensions;
 
 namespace Gck.Pages
 {
-    public partial class Login : ComponentBase, IDisposable
+    public partial class Login : IDisposable
     {
         [Inject]
         private HttpClient Http { get; set; } = default!;

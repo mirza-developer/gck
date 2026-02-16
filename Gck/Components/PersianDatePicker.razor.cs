@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace Gck.Components;
 
-public partial class PersianDatePicker : ComponentBase
+public partial class PersianDatePicker
 {
     [Inject] private IJSRuntime JS { get; set; } = default!;
     

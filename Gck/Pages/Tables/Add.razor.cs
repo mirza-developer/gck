@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Tables;
 
-public partial class Add : ComponentBase
+public partial class Add
 {
     [Inject]
     private HttpClient Http { get; set; } = default!;

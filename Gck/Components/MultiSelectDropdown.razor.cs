@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class MultiSelectDropdown<TItem, TValue> : ComponentBase
+public partial class MultiSelectDropdown<TItem, TValue>
 {
     [Parameter] public List<TItem> Items { get; set; } = new();
     [Parameter] public bool IsMultiSelect { get; set; } = true;

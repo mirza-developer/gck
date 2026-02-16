@@ -5,7 +5,7 @@ using Gck.Services;
 
 namespace Gck.Pages.Users;
 
-public partial class Add : ComponentBase
+public partial class Add
 {
     [Inject]
     private HttpClient Http { get; set; } = default!;

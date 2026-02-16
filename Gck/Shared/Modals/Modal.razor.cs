@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Shared.Modals;
 
-public partial class Modal : ComponentBase
+public partial class Modal
 {
     [Parameter] public string Title { get; set; } = string.Empty;
     

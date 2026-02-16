@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class LoadingSpinner : ComponentBase
+public partial class LoadingSpinner
 {
     [Parameter]
     public string LoadingText { get; set; } = "در حال بارگیری...";

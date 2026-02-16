@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Tables;
 
-public partial class Index : ComponentBase
+public partial class Index
 {
     [Inject]
     private HttpClient Http { get; set; } = default!;

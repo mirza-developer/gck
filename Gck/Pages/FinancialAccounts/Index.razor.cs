@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.FinancialAccounts;
 
-public partial class Index : ComponentBase
+public partial class Index
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;

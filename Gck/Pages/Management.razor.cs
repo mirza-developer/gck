@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 
 namespace Gck.Pages
 {
-    public partial class Management : ComponentBase, IDisposable
+    public partial class Management : IDisposable
     {
         [Inject]
         private HttpClient Http { get; set; } = default!;

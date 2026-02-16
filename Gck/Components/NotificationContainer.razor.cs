@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class NotificationContainer : ComponentBase, IDisposable
+public partial class NotificationContainer : IDisposable
 {
     [Inject] private INotificationService NotificationService { get; set; } = default!;
     
