@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Transactions;
 
-public partial class Edit
+public partial class Edit : ComponentBase
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;

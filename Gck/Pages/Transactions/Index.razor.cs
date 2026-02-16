@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Pages.Transactions;
 
-public partial class Index
+public partial class Index : ComponentBase
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -104,22 +104,22 @@ public partial class Index
         await ApplyFilters();
     }
 
-    private async Task OnAccountSelected(string? value)
+    private void OnAccountSelected(string? value)
     {
         filterAccountId = value ?? string.Empty;
     }
 
-    private async Task OnTypeSelected(string? value)
+    private void OnTypeSelected(string? value)
     {
         filterType = value ?? string.Empty;
     }
 
-    private async Task OnStartDateChanged(string value)
+    private void OnStartDateChanged(string value)
     {
         filterStartDate = value;
     }
 
-    private async Task OnEndDateChanged(string value)
+    private void OnEndDateChanged(string value)
     {
         filterEndDate = value;
     }
