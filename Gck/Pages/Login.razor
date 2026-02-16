@@ -4,6 +4,7 @@
 @using Gck.Resources
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -291,34 +292,25 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/login"), loginCommand);
+        var result = await Http.PostAsJsonWithExceptionAsync<LoginCommand, LoginResponse>(ApiConfig.GetApiUrl("/api/auth/login"), loginCommand);
 
-        if (response.IsSuccessStatusCode)
+        if (result != null && result.Success)
         {
-            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            // Store user info in local storage
+            await LocalStorage.SetItemAsync("currentUser", result.Username);
+            await LocalStorage.SetItemAsync("currentUserId", result.UserId);
+            await LocalStorage.SetItemAsync("currentUserName", result.Name);
+            await LocalStorage.SetItemAsync("userRole", "admin");
 
-            if (result != null && result.Success)
-            {
-                // Store user info in local storage
-                await LocalStorage.SetItemAsync("currentUser", result.Username);
-                await LocalStorage.SetItemAsync("currentUserId", result.UserId);
-                await LocalStorage.SetItemAsync("currentUserName", result.Name);
-                await LocalStorage.SetItemAsync("userRole", "admin");
+            NotificationService.ShowSuccess(result.Message);
+            await Task.Delay(1000);
 
-                NotificationService.ShowSuccess(result.Message);
-                await Task.Delay(1000);
-
-                // Redirect to home page
-                Navigation.NavigateTo("/", true);
-            }
-            else
-            {
-                NotificationService.ShowError(result?.Message ?? "خطا در ورود به سیستم");
-            }
+            // Redirect to home page
+            Navigation.NavigateTo("/", true);
         }
         else
         {
-            NotificationService.ShowError("خطا در اتصال به سرور");
+            NotificationService.ShowError(result?.Message ?? "خطا در ورود به سیستم");
         }
 
         isLoggingIn = false;
@@ -330,41 +322,23 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), sendOtpCommand);
+        var result = await Http.PostAsJsonWithExceptionAsync<SendOtpCommand, SendOtpResponse>(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), sendOtpCommand);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<SendOtpResponse>();
-
-                if (result != null && result.Success)
-                {
-                    NotificationService.ShowSuccess(result.Message);
-                    otpSent = true;
-                    verifyOtpCommand.PhoneNumber = sendOtpCommand.PhoneNumber;
-
-                    // Start the resend countdown timer
-                    StartResendTimer();
-                }
-                else
-                {
-                    NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
-                }
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.ApiConnectionError);
-            }
-        }
-        catch (Exception ex)
+        if (result != null && result.Success)
         {
-            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
+            NotificationService.ShowSuccess(result.Message);
+            otpSent = true;
+            verifyOtpCommand.PhoneNumber = sendOtpCommand.PhoneNumber;
+
+            // Start the resend countdown timer
+            StartResendTimer();
         }
-        finally
+        else
         {
-            isSendingOtp = false;
+            NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
         }
+
+        isSendingOtp = false;
     }
 
     private async Task HandleVerifyOtp()
@@ -373,50 +347,32 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        try
+        var result = await Http.PostAsJsonWithExceptionAsync<VerifyOtpCommand, VerifyOtpResponse>(ApiConfig.GetApiUrl("/api/auth/customer/verify-otp"), verifyOtpCommand);
+
+        if (result != null && result.Success)
         {
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/verify-otp"), verifyOtpCommand);
+            // Store customer info in local storage
+            await LocalStorage.SetItemAsync("currentUser", result.PhoneNumber);
+            await LocalStorage.SetItemAsync("currentUserId", result.CustomerId.ToString());
+            await LocalStorage.SetItemAsync("currentUserName", result.CustomerName);
+            await LocalStorage.SetItemAsync("userRole", "customer");
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<VerifyOtpResponse>();
+            NotificationService.ShowSuccess(result.Message);
 
-                if (result != null && result.Success)
-                {
-                    // Store customer info in local storage
-                    await LocalStorage.SetItemAsync("currentUser", result.PhoneNumber);
-                    await LocalStorage.SetItemAsync("currentUserId", result.CustomerId.ToString());
-                    await LocalStorage.SetItemAsync("currentUserName", result.CustomerName);
-                    await LocalStorage.SetItemAsync("userRole", "customer");
+            // Stop timer on successful login
+            StopResendTimer();
 
-                    NotificationService.ShowSuccess(result.Message);
+            await Task.Delay(1000);
 
-                    // Stop timer on successful login
-                    StopResendTimer();
-
-                    await Task.Delay(1000);
-
-                    // Redirect to home page
-                    Navigation.NavigateTo("/", true);
-                }
-                else
-                {
-                    NotificationService.ShowError(result?.Message ?? PersianResources.InvalidOtp);
-                }
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.ApiConnectionError);
-            }
+            // Redirect to home page
+            Navigation.NavigateTo("/", true);
         }
-        catch (Exception ex)
+        else
         {
-            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
+            NotificationService.ShowError(result?.Message ?? PersianResources.InvalidOtp);
         }
-        finally
-        {
-            isVerifyingOtp = false;
-        }
+
+        isVerifyingOtp = false;
     }
 
     private async Task HandleResendOtp()
@@ -425,44 +381,26 @@
         errorMessage = string.Empty;
         successMessage = string.Empty;
 
-        try
+        // Use the phone number from the verify command
+        var resendCommand = new SendOtpCommand { PhoneNumber = verifyOtpCommand.PhoneNumber };
+        var result = await Http.PostAsJsonWithExceptionAsync<SendOtpCommand, SendOtpResponse>(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), resendCommand);
+
+        if (result != null && result.Success)
         {
-            // Use the phone number from the verify command
-            var resendCommand = new SendOtpCommand { PhoneNumber = verifyOtpCommand.PhoneNumber };
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/auth/customer/send-otp"), resendCommand);
+            NotificationService.ShowSuccess(result.Message);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<SendOtpResponse>();
+            // Clear the OTP field for the new code
+            verifyOtpCommand.OtpCode = string.Empty;
 
-                if (result != null && result.Success)
-                {
-                    NotificationService.ShowSuccess(result.Message);
-
-                    // Clear the OTP field for the new code
-                    verifyOtpCommand.OtpCode = string.Empty;
-
-                    // Restart the countdown timer
-                    StartResendTimer();
-                }
-                else
-                {
-                    NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
-                }
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.ApiConnectionError);
-            }
+            // Restart the countdown timer
+            StartResendTimer();
         }
-        catch (Exception ex)
+        else
         {
-            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
+            NotificationService.ShowError(result?.Message ?? PersianResources.OtpSendError);
         }
-        finally
-        {
-            isSendingOtp = false;
-        }
+
+        isSendingOtp = false;
     }
 
     public void Dispose()

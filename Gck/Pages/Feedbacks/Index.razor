@@ -1,7 +1,9 @@
 @page "/feedbacks"
 @using Gck.Resources
+@using Gck.Components
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -87,7 +89,6 @@
 @code {
     private List<FeedbackDto> feedbacks = new();
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,36 +106,20 @@
     private async Task LoadFeedbacks()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
-        var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/feedback"));
-        if (response.IsSuccessStatusCode)
-        {
-            feedbacks = await response.Content.ReadFromJsonAsync<List<FeedbackDto>>() ?? new();
-        }
-        else
-        {
-            NotificationService.ShowError(PersianResources.LoadingError);
-        }
+        feedbacks = await Http.GetFromJsonWithExceptionAsync<List<FeedbackDto>>(ApiConfig.GetApiUrl("/api/feedback")) ?? new();
 
         isLoading = false;
     }
 
     private async Task MarkAsRead(int feedbackId)
     {
-        var response = await Http.PutAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), null);
-        if (response.IsSuccessStatusCode)
+        await Http.PutAsJsonWithExceptionAsync(ApiConfig.GetApiUrl($"/api/feedback/{feedbackId}/mark-read"), (object?)null);
+        var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+        if (feedback != null)
         {
-            var feedback = feedbacks.FirstOrDefault(f => f.Id == feedbackId);
-            if (feedback != null)
-            {
-                feedback.IsRead = true;
-                NotificationService.ShowSuccess("بازخورد به عنوان خوانده شده علامت‌گذاری شد");
-            }
-        }
-        else
-        {
-            NotificationService.ShowError("خطا در علامت‌گذاری بازخورد");
+            feedback.IsRead = true;
+            NotificationService.ShowSuccess("بازخورد به عنوان خوانده شده علامت‌گذاری شد");
         }
     }
 

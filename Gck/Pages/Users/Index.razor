@@ -4,6 +4,7 @@
 @using Gck.Resources
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -25,13 +26,6 @@
         @if (isLoading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
         }
         else
         {
@@ -93,7 +87,6 @@
     private List<GetAllUsersVm> users = new();
     private string searchText = string.Empty;
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
 
     private List<GetAllUsersVm> FilteredUsers =>
         users.Where(u =>
@@ -110,28 +103,10 @@
     private async Task LoadUsers()
     {
         isLoading = true;
-        errorMessage = string.Empty;
-        
-        try
-        {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/user"));
-            if (response.IsSuccessStatusCode)
-            {
-                users = await response.Content.ReadFromJsonAsync<List<GetAllUsersVm>>() ?? new();
-            }
-            else
-            {
-                errorMessage = "خطا در دریافت لیست کاربران. لطفاً اطمینان حاصل کنید که API در حال اجرا است.";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"خطا در اتصال به سرور: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
+
+        users = await Http.GetFromJsonWithExceptionAsync<List<GetAllUsersVm>>(ApiConfig.GetApiUrl("/api/user")) ?? new();
+
+        isLoading = false;
     }
 
     private void NavigateToAdd()
@@ -146,22 +121,8 @@
 
     private async Task DeleteUser(string userId)
     {
-        try
-        {
-            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
-            if (response.IsSuccessStatusCode)
-            {
-                NotificationService.ShowSuccess("کاربر با موفقیت حذف شد");
-                await LoadUsers();
-            }
-            else
-            {
-                NotificationService.ShowError("خطا در حذف کاربر");
-            }
-        }
-        catch (Exception ex)
-        {
-            NotificationService.ShowError($"خطا: {ex.Message}");
-        }
+        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
+        NotificationService.ShowSuccess("کاربر با موفقیت حذف شد");
+        await LoadUsers();
     }
 }

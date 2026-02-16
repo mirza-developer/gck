@@ -5,6 +5,7 @@
 @using Gck.Components
 @using Gck.Resources
 @using Gck.Services
+@using Gck.Extensions
 @implements IDisposable
 
 <PageTitle>@PersianResources.ManagementDashboard</PageTitle>
@@ -21,18 +22,6 @@
         @if (loading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (error != null)
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p><strong>@PersianResources.Error:</strong> @error</p>
-                <hr />
-                <p><small>@PersianResources.DashboardApiError</small></p>
-                <code style="display: block; background: #f5f5f5; padding: 10px; border-radius: 5px; direction: ltr; margin-top: 1rem;">
-                    cd Gck.Api && dotnet run
-                </code>
-            </div>
         }
         else
         {
@@ -156,7 +145,6 @@
 @code {
     private List<DashboardTableDto> dashboardTables = new();
     private bool loading = true;
-    private string? error = null;
     private DateTime currentTime = DateTime.Now;
     private System.Threading.Timer? timer;
 
@@ -182,25 +170,12 @@
 
     private async Task LoadData()
     {
-        try
-        {
-            loading = true;
-            error = null;
+        loading = true;
 
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/dashboard/tables"));
-            if (response.IsSuccessStatusCode)
-            {
-                dashboardTables = await response.Content.ReadFromJsonAsync<List<DashboardTableDto>>() ?? new();
-            }
+        dashboardTables = await Http.GetFromJsonWithExceptionAsync<List<DashboardTableDto>>(ApiConfig.GetApiUrl("/api/dashboard/tables")) ?? new();
 
-            loading = false;
-            currentTime = DateTime.Now;
-        }
-        catch (Exception ex)
-        {
-            error = ex.Message;
-            loading = false;
-        }
+        loading = false;
+        currentTime = DateTime.Now;
     }
 
     private async Task ShowStartModal(int tableId, string tableName)

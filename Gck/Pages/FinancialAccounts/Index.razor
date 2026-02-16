@@ -4,6 +4,7 @@
 @using Gck.Components
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -25,13 +26,6 @@
         @if (isLoading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
         }
         else
         {
@@ -94,7 +88,6 @@
     private List<FinancialAccountDto> accounts = new();
     private string searchText = string.Empty;
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
 
     private List<FinancialAccountDto> FilteredAccounts =>
         accounts.Where(a =>
@@ -112,28 +105,10 @@
     private async Task LoadAccounts()
     {
         isLoading = true;
-        errorMessage = string.Empty;
-        
-        try
-        {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/financialaccounts"));
-            if (response.IsSuccessStatusCode)
-            {
-                accounts = await response.Content.ReadFromJsonAsync<List<FinancialAccountDto>>() ?? new();
-            }
-            else
-            {
-                errorMessage = PersianResources.LoadFinancialAccountsError;
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
+
+        accounts = await Http.GetFromJsonWithExceptionAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+
+        isLoading = false;
     }
 
     private void NavigateToAdd()
@@ -156,15 +131,8 @@
             return;
         }
 
-        var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
-        if (response.IsSuccessStatusCode)
-        {
-            NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
-            await LoadAccounts();
-        }
-        else
-        {
-            NotificationService.ShowError(PersianResources.DeleteFinancialAccountError);
-        }
+        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
+        NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
+        await LoadAccounts();
     }
 }

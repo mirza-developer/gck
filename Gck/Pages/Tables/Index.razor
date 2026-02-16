@@ -5,6 +5,7 @@
 @using Gck.Services
 @using Gck.Enums
 @using Gck.Components
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -27,13 +28,6 @@
         @if (isLoading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
         }
         else
         {
@@ -106,7 +100,6 @@
     private List<TableDto> tables = new();
     private string searchText = string.Empty;
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
     private bool showDeleteModal = false;
     private int tableToDeleteId = 0;
 
@@ -124,28 +117,10 @@
     private async Task LoadTables()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
-        try
-        {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/tables"));
-            if (response.IsSuccessStatusCode)
-            {
-                tables = await response.Content.ReadFromJsonAsync<List<TableDto>>() ?? new();
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.LoadTablesError);
-            }
-        }
-        catch (Exception ex)
-        {
-            NotificationService.ShowError($"{PersianResources.ApiConnectionError}: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        tables = await Http.GetFromJsonWithExceptionAsync<List<TableDto>>(ApiConfig.GetApiUrl("/api/tables")) ?? new();
+
+        isLoading = false;
     }
 
     private void NavigateToAdd()
@@ -166,22 +141,8 @@
 
     private async Task ConfirmDelete()
     {
-        try
-        {
-            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/tables/{tableToDeleteId}"));
-            if (response.IsSuccessStatusCode)
-            {
-                NotificationService.ShowSuccess("میز با موفقیت حذف شد");
-                await LoadTables();
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.DeleteTableError);
-            }
-        }
-        catch (Exception ex)
-        {
-            NotificationService.ShowError($"{PersianResources.Error}: {ex.Message}");
-        }
+        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/tables/{tableToDeleteId}"));
+        NotificationService.ShowSuccess("میز با موفقیت حذف شد");
+        await LoadTables();
     }
 }

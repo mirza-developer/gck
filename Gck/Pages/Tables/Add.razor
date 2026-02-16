@@ -3,6 +3,7 @@
 @using Gck.Resources
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -60,28 +61,16 @@
 @code {
     private CreateTableCommand command = new();
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/tables"), command);
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/tables"), command);
 
-        if (response.IsSuccessStatusCode)
-        {
-            NotificationService.ShowSuccess(PersianResources.TableAddSuccess);
-            await Task.Delay(1500);
-            Navigation.NavigateTo("/tables");
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            NotificationService.ShowError($"{PersianResources.Error}: {error}");
-        }
+        NotificationService.ShowSuccess(PersianResources.TableAddSuccess);
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/tables");
 
         isSubmitting = false;
     }

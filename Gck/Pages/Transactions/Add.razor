@@ -5,6 +5,7 @@
 @using Gck.Components
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -26,13 +27,6 @@
         @if (isLoading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
         }
         else
         {
@@ -130,7 +124,6 @@ private CreateTransactionDto transaction = new();
 private List<FinancialAccountDto> accounts = new();
 private bool isLoading = true;
 private bool isSaving = false;
-private string errorMessage = string.Empty;
 private readonly System.Globalization.PersianCalendar _persianCalendar = new();
 
 private string GetCurrentPersianDate()
@@ -151,9 +144,8 @@ protected override async Task OnInitializedAsync()
     private async Task LoadFinancialAccounts()
     {
         isLoading = true;
-        errorMessage = string.Empty;
 
-        accounts = await Http.GetFromJsonAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
+        accounts = await Http.GetFromJsonWithExceptionAsync<List<FinancialAccountDto>>(ApiConfig.GetApiUrl("/api/financialaccounts")) ?? new();
 
         isLoading = false;
     }
@@ -173,21 +165,12 @@ protected override async Task OnInitializedAsync()
         }
 
         isSaving = true;
-        errorMessage = string.Empty;
 
-        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/transactions"), transaction);
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/transactions"), transaction);
 
-        if (response.IsSuccessStatusCode)
-        {
-            NotificationService.ShowSuccess(PersianResources.TransactionAddSuccess);
-            await Task.Delay(1500);
-            Navigation.NavigateTo("/transactions");
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            errorMessage = $"{PersianResources.ErrorSavingTransaction}: {error}";
-        }
+        NotificationService.ShowSuccess(PersianResources.TransactionAddSuccess);
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/transactions");
 
         isSaving = false;
     }

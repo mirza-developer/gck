@@ -2,6 +2,7 @@
 @using Gck.Application.Features.Users.Commands.AddUser
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -102,28 +103,16 @@
 @code {
     private AddUserCommand command = new();
     private bool isSubmitting = false;
-    private string errorMessage = string.Empty;
-    private string successMessage = string.Empty;
 
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-        errorMessage = string.Empty;
-        successMessage = string.Empty;
 
-        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/user"), command);
+        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/user"), command);
 
-        if (response.IsSuccessStatusCode)
-        {
-            NotificationService.ShowSuccess("کاربر با موفقیت ایجاد شد");
-            await Task.Delay(1500);
-            Navigation.NavigateTo("/users");
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            NotificationService.ShowError($"خطا در ایجاد کاربر: {error}");
-        }
+        NotificationService.ShowSuccess("کاربر با موفقیت ایجاد شد");
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/users");
 
         isSubmitting = false;
     }

@@ -4,6 +4,7 @@
 @using Gck.Components
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Extensions
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -25,13 +26,6 @@
         @if (isLoading)
         {
             <LoadingSpinner LoadingText="@PersianResources.Loading" />
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="gaming-card fade-in-up error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
         }
         else
         {
@@ -261,7 +255,6 @@
     private List<CustomerDto> customers = new();
     private string searchText = string.Empty;
     private bool isLoading = true;
-    private string errorMessage = string.Empty;
     private int? expandedRowId = null;
 
     private List<CustomerDto> FilteredCustomers =>
@@ -279,28 +272,10 @@
     private async Task LoadCustomers()
     {
         isLoading = true;
-        errorMessage = string.Empty;
-        
-        try
-        {
-            var response = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
-            if (response.IsSuccessStatusCode)
-            {
-                customers = await response.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
-            }
-            else
-            {
-                errorMessage = PersianResources.LoadCustomersError;
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"{PersianResources.ApiConnectionError}: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
+
+        customers = await Http.GetFromJsonWithExceptionAsync<List<CustomerDto>>(ApiConfig.GetApiUrl("/api/customers")) ?? new();
+
+        isLoading = false;
     }
 
     private void ToggleRow(int customerId)
@@ -326,22 +301,8 @@
 
     private async Task DeleteCustomer(int id)
     {
-        try
-        {
-            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
-            if (response.IsSuccessStatusCode)
-            {
-                NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
-                await LoadCustomers();
-            }
-            else
-            {
-                NotificationService.ShowError(PersianResources.DeleteCustomerError);
-            }
-        }
-        catch (Exception ex)
-        {
-            NotificationService.ShowError($"{PersianResources.Error}: {ex.Message}");
-        }
+        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
+        NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
+        await LoadCustomers();
     }
 }
