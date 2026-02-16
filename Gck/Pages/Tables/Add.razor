@@ -1,12 +1,5 @@
 @page "/tables/add"
-@using Gck.Application.Features.Tables.Commands.CreateTable
 @using Gck.Resources
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -56,26 +49,3 @@
         </div>
     </div>
 </section>
-
-@code {
-    private CreateTableCommand command = new();
-    private bool isSubmitting = false;
-
-    private async Task HandleSubmit()
-    {
-        isSubmitting = true;
-
-        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/tables"), command);
-
-        NotificationService.ShowSuccess(PersianResources.TableAddSuccess);
-        await Task.Delay(1500);
-        Navigation.NavigateTo("/tables");
-
-        isSubmitting = false;
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/tables");
-    }
-}

@@ -1,15 +1,7 @@
 @page "/tables"
-@using Gck.Application.DTOs
 @using Gck.Resources
 @using Gck.Shared.Modals
-@using Gck.Services
-@using Gck.Enums
 @using Gck.Components
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -94,54 +86,3 @@
         ??? ???? ????? ?????? ?? ??? ??? ????? ????
     </p>
 </Modal>
-
-@code {
-    private List<TableDto> tables = new();
-    private string searchText = string.Empty;
-    private bool isLoading = true;
-    private bool showDeleteModal = false;
-    private int tableToDeleteId = 0;
-
-    private List<TableDto> FilteredTables =>
-        tables.Where(t =>
-            string.IsNullOrEmpty(searchText) ||
-            t.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-        .ToList();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadTables();
-    }
-
-    private async Task LoadTables()
-    {
-        isLoading = true;
-
-        tables = await Http.GetFromJsonWithExceptionAsync<List<TableDto>>(ApiConfig.GetApiUrl("/api/tables")) ?? new();
-
-        isLoading = false;
-    }
-
-    private void NavigateToAdd()
-    {
-        Navigation.NavigateTo("/tables/add");
-    }
-
-    private void NavigateToEdit(int id)
-    {
-        Navigation.NavigateTo($"/tables/edit/{id}");
-    }
-
-    private void ShowDeleteConfirmation(int id)
-    {
-        tableToDeleteId = id;
-        showDeleteModal = true;
-    }
-
-    private async Task ConfirmDelete()
-    {
-        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/tables/{tableToDeleteId}"));
-        NotificationService.ShowSuccess("میز با موفقیت حذف شد");
-        await LoadTables();
-    }
-}
