@@ -20,14 +20,7 @@
 
         @if (loading)
         {
-            <div class="loading-container">
-                <div class="gaming-loader">
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <p class="loader-text">@PersianResources.Loading</p>
-                </div>
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else if (error != null)
         {

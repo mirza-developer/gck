@@ -1,0 +1,64 @@
+@* Loading Spinner Component - Gaming Theme *@
+
+<div class="loading-container @GetContainerClasses()" style="@ContainerStyle">
+    <div class="gaming-loader">
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        @if (!string.IsNullOrWhiteSpace(LoadingText))
+        {
+            <div class="loading-text">@LoadingText</div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// متن نمایشی در حین بارگیری
+    /// </summary>
+    [Parameter]
+    public string LoadingText { get; set; } = "در حال بارگیری...";
+
+    /// <summary>
+    /// کلاس CSS اضافی برای کانتینر
+    /// </summary>
+    [Parameter]
+    public string ContainerClass { get; set; } = string.Empty;
+
+    /// <summary>
+    /// استایل inline برای کانتینر
+    /// </summary>
+    [Parameter]
+    public string ContainerStyle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// اگر true باشد، لودینگ تمام صفحه را می‌پوشاند
+    /// </summary>
+    [Parameter]
+    public bool Fullscreen { get; set; } = true;
+
+    protected override void OnParametersSet()
+    {
+        if (!Fullscreen && string.IsNullOrWhiteSpace(ContainerStyle))
+        {
+            ContainerStyle = "height: auto; min-height: 200px;";
+        }
+    }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string>();
+
+        if (!Fullscreen)
+        {
+            classes.Add("inline");
+        }
+
+        if (!string.IsNullOrWhiteSpace(ContainerClass))
+        {
+            classes.Add(ContainerClass);
+        }
+
+        return string.Join(" ", classes);
+    }
+}

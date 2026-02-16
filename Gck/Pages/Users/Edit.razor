@@ -2,8 +2,10 @@
 @using Gck.Application.DTOs
 @using Gck.Application.Features.Users.Commands.UpdateUser
 @using Gck.Application.Features.Users.Queries.GetUserByUsername
+@using Gck.Resources
 @using Gck.Services
 @using Gck.Enums
+@using Gck.Components
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ApiConfigurationService ApiConfig
@@ -24,14 +26,7 @@
 
         @if (isLoading)
         {
-            <div class="loading-container">
-                <div class="gaming-loader">
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <p class="loader-text">در حال بارگذاری...</p>
-                </div>
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else if (command == null)
         {

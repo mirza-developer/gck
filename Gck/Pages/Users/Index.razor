@@ -1,5 +1,7 @@
 @page "/users"
 @using Gck.Application.DTOs
+@using Gck.Components
+@using Gck.Resources
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -20,14 +22,7 @@
 
         @if (isLoading)
         {
-            <div class="loading-container">
-                <div class="gaming-loader">
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <div class="loader-ring"></div>
-                    <p class="loader-text">در حال بارگذاری...</p>
-                </div>
-            </div>
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
         }
         else if (!string.IsNullOrEmpty(errorMessage))
         {
