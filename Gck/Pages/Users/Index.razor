@@ -2,10 +2,12 @@
 @using Gck.Application.DTOs
 @using Gck.Components
 @using Gck.Resources
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -144,26 +146,22 @@
 
     private async Task DeleteUser(string userId)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "آیا از حذف این کاربر اطمینان دارید؟");
-        
-        if (confirmed)
+        try
         {
-            try
+            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
+            if (response.IsSuccessStatusCode)
             {
-                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
-                if (response.IsSuccessStatusCode)
-                {
-                    await LoadUsers();
-                }
-                else
-                {
-                    errorMessage = "خطا در حذف کاربر";
-                }
+                NotificationService.ShowSuccess("کاربر با موفقیت حذف شد");
+                await LoadUsers();
             }
-            catch (Exception ex)
+            else
             {
-                errorMessage = $"خطا: {ex.Message}";
+                NotificationService.ShowError("خطا در حذف کاربر");
             }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.ShowError($"خطا: {ex.Message}");
         }
     }
 }

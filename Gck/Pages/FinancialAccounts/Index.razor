@@ -2,10 +2,12 @@
 @using Gck.Application.DTOs
 @using Gck.Resources
 @using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -150,23 +152,19 @@
         var account = accounts.FirstOrDefault(a => a.Id == id);
         if (account != null && account.Balance > 0)
         {
-            errorMessage = PersianResources.CannotDeleteAccountWithBalance;
+            NotificationService.ShowError(PersianResources.CannotDeleteAccountWithBalance);
             return;
         }
 
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteFinancialAccountConfirm);
-        
-        if (confirmed)
+        var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/financialaccounts/{id}"));
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadAccounts();
-            }
-            else
-            {
-                errorMessage = PersianResources.DeleteFinancialAccountError;
-            }
+            NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
+            await LoadAccounts();
+        }
+        else
+        {
+            NotificationService.ShowError(PersianResources.DeleteFinancialAccountError);
         }
     }
 }

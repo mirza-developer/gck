@@ -2,10 +2,12 @@
 @using Gck.Application.DTOs
 @using Gck.Resources
 @using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -331,19 +333,16 @@ private class TransactionTypeOption
 
     private async Task DeleteTransaction(int id)
     {
-        if (!await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteTransactionConfirm))
-            return;
-
         var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/transactions/{id}"));
-        
+
         if (response.IsSuccessStatusCode)
         {
-            await JSRuntime.InvokeVoidAsync("alert", PersianResources.DeleteSuccess);
+            NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
             await ApplyFilters(); // Reload data
         }
         else
         {
-            errorMessage = PersianResources.DeleteTransactionError;
+            NotificationService.ShowError(PersianResources.DeleteTransactionError);
         }
     }
 }

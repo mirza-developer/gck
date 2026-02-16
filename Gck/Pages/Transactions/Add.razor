@@ -3,10 +3,12 @@
 @using Gck.Resources
 @using System.Net.Http.Json
 @using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -160,13 +162,13 @@ protected override async Task OnInitializedAsync()
     {
         if (transaction.FinancialAccountId == 0)
         {
-            await JSRuntime.InvokeVoidAsync("alert", PersianResources.PleaseSelectFinancialAccount);
+            NotificationService.ShowWarning(PersianResources.PleaseSelectFinancialAccount);
             return;
         }
 
         if (string.IsNullOrEmpty(transaction.Type))
         {
-            await JSRuntime.InvokeVoidAsync("alert", PersianResources.PleaseSelectTransactionType);
+            NotificationService.ShowWarning(PersianResources.PleaseSelectTransactionType);
             return;
         }
 
@@ -177,7 +179,8 @@ protected override async Task OnInitializedAsync()
 
         if (response.IsSuccessStatusCode)
         {
-            await JSRuntime.InvokeVoidAsync("alert", PersianResources.TransactionAddSuccess);
+            NotificationService.ShowSuccess(PersianResources.TransactionAddSuccess);
+            await Task.Delay(1500);
             Navigation.NavigateTo("/transactions");
         }
         else

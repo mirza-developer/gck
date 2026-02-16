@@ -2,10 +2,12 @@
 @using Gck.Application.DTOs
 @using Gck.Resources
 @using Gck.Components
+@using Gck.Services
+@using Gck.Enums
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
 @inject ApiConfigurationService ApiConfig
+@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -324,26 +326,22 @@
 
     private async Task DeleteCustomer(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", PersianResources.DeleteCustomerConfirm);
-        
-        if (confirmed)
+        try
         {
-            try
+            var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
+            if (response.IsSuccessStatusCode)
             {
-                var response = await Http.DeleteAsync(ApiConfig.GetApiUrl($"/api/customers/{id}"));
-                if (response.IsSuccessStatusCode)
-                {
-                    await LoadCustomers();
-                }
-                else
-                {
-                    errorMessage = PersianResources.DeleteCustomerError;
-                }
+                NotificationService.ShowSuccess(PersianResources.DeleteSuccess);
+                await LoadCustomers();
             }
-            catch (Exception ex)
+            else
             {
-                errorMessage = $"{PersianResources.Error}: {ex.Message}";
+                NotificationService.ShowError(PersianResources.DeleteCustomerError);
             }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.ShowError($"{PersianResources.Error}: {ex.Message}");
         }
     }
 }
