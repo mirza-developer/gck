@@ -269,5 +269,139 @@ public static class PersianResources
     public const string SelectItem = "انتخاب کنید...";
     public const string SearchPlaceholder = "جستجو...";
     public const string NoResultsFound = "نتیجه‌ای یافت نشد";
+    
+    // Home Page - SEO
+    public const string HomePageTitle = "گیم سنتر کوثر - PS5";
+    public const string HomePageDescription = "بهترین گیم سنتر PS5 در غرب تهران و کوثر. بازی‌های محبوب FC25، eFootball، Mortal Kombat، Forza و Red Dead Redemption در دسترس";
+    public const string HomePageKeywords = "گیم سنتر، PS5، FC25, eFootball، مورتال کمبت، فورزا، رد دد، گیم نت";
+    
+    // Home Page - Hero Section
+    public const string WelcomeToGameCenter = "به گیم سنتر کوثر خوش آمدید";
+    public const string HeroSubtitle = "تجربه بی‌نظیری از بازی‌های PS5 را همین الان آغاز کنید";
+    public const string HeroDescription = "بازی‌های محبوب شما اکنون با کیفیت 4K آماده بازی!";
+    public const string PopularGames = "بازی‌های محبوب";
+    public const string LocationAndContact = "اطلاعات و آدرس";
+    
+    // Home Page - Features Section
+    public const string PS5Consoles = "کنسول‌های PS5";
+    public const string PS5ConsolesDesc = "دسته‌ها، بازی با ظرفیت بالا";
+    public const string PopularAndNewGames = "بازی‌های محبوب و جدید";
+    public const string PopularGamesDesc = "جذاب‌ترین و جدیدترین بازی‌های روز دنیا";
+    public const string CleanAndSafeEnvironment = "محیط تمیز و امن";
+    public const string CleanEnvironmentDesc = "تعهد ما به ارائه محیطی امن و تمیز برای شما و خانواده";
+    public const string TournamentsAndPrizes = "مسابقات و جوایز ویژه";
+    public const string TournamentsDesc = "شرکت در تورنومنت‌ها و مسابقات پیوسته در طول سال";
+    
+    // Home Page - Games Section
+    public const string PopularPS5Games = "از بازی‌های محبوب PS5";
+    public const string FC25Title = "FC25";
+    public const string FC25Description = "جدیدترین بازی فوتبال EA Sports با گرافیک واقع‌گرا و گیم‌پلی عالی";
+    public const string TagFootball = "فوتبال";
+    public const string TagMultiplayer = "چندنفره";
+    public const string TagOnline = "آنلاین";
+    
+    public const string EFootballTitle = "eFootball";
+    public const string EFootballDescription = "فوتبال رایگان با عشق واقعی و گیم‌پلی روان";
+    
+    public const string MortalKombatTitle = "Mortal Kombat";
+    public const string MortalKombatDescription = "جدیدترین نسخه مبارزه‌ای آیکون با گرافیک فوق‌العاده و مهارت‌های جدید";
+    public const string TagFighting = "مبارزه‌ای";
+    public const string TagAction = "اکشن";
+    public const string TagSinglePlayer = "تک‌نفره";
+    
+    public const string ForzaTitle = "Forza Horizon 5";
+    public const string ForzaDescription = "بهترین بازی مسابقه‌ای اتومبیل با محیط‌های فوق‌العاده و گرافیک کامل";
+    public const string TagRacing = "مسابقه‌ای";
+    
+    public const string RedDeadTitle = "Red Dead Redemption 2";
+    public const string RedDeadDescription = "بهترین ماجراجویی وحش غرب با داستان استثنائی";
+    public const string TagAdventure = "ماجراجویی";
+    public const string TagStory = "داستانی";
+    
+    public const string VariousGamesTitle = "بازی‌های متنوع";
+    public const string VariousGamesDescription = "بهترین بازی‌ها از همه سبک‌های PS5 در اختیار شما";
+    public const string TagDiverse = "متنوع";
+    public const string Tag4KGameplay = "گیم‌پلی 4K";
+    
+    // Home Page - Center Features
+    public const string OurFacilities = "از امکانات ما";
+    public const string CleanAndSafe = "محیط تمیز و امن";
+    public const string CleanAndSafeDesc = "تعهد ما به ارائه محیطی امن و تمیز برای شما";
+    public const string CleanAndTidy = "تمیز و نظافت شده";
+    public const string ProperVentilation = "تهویه مطبوع مناسب";
+    public const string ComfortableSeats = "صندلی‌های راحت";
+    public const string Parking = "پارکینگ";
+    
+    public const string ModernEquipment = "تجهیزات مدرن";
+    public const string ModernEquipmentDesc = "بازی‌های کنسول‌های PS5 با مانیتورهای 4K و صدای سینمایی";
+    public const string OriginalPS5Consoles = "کنسول‌های PS5 اورجینال";
+    public const string Monitors4KHDR = "مانیتورهای 4K HDR و HDR";
+    
+    public const string WelfareServices = "خدمات رفاهی";
+    public const string WelfareServicesDesc = "نوشیدنی‌ها و خوراکی‌های سالم برای تجربه بهتر";
+    public const string HotAndColdDrinks = "نوشیدنی‌های گرم و سرد";
+    public const string SnacksAndFood = "میان‌وعده و اسنک‌ها";
+    
+    // Home Page - Pricing Section
+    public const string PricingAndDiscounts = "از نرخ‌ها و تخفیف‌ها";
+    public const string OurHourlyRates = "نرخ‌های ساعتی ما بسته به نفرات متغیر است";
+    public const string PleaseCallBeforeVisit = "لطفا پیش از مراجعه تماس بگیرید";
+    public const string NumberOfPeople = "تعداد نفرات";
+    public const string PricePerHour = "نرخ بر ساعت";
+    public const string TwoPeople = "۲ نفره";
+    public const string ThreePeople = "۳ نفره";
+    public const string FourPeople = "۴ نفره";
+    public const string FivePeople = "۵ نفره";
+    public const string Price150000 = "۱۵۰,۰۰۰ تومان";
+    public const string Price200000 = "۲۰۰,۰۰۰ تومان";
+    public const string Price250000 = "۲۵۰,۰۰۰ تومان";
+    public const string Price300000 = "۳۰۰,۰۰۰ تومان";
+    public const string UnlimitedPS5Access = "دسترسی نامحدود به بازی PS5";
+    public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال و لایسنس";
+    public const string FreeInternet = "اینترنت آزاد و همیشه فعال";
+    
+    // Home Page - Contact Section
+    public const string LocationAndContactInfo = "از مکان و اطلاعات تماس";
+    public const string OurLocation = "مکان ما";
+    public const string AddressLine1 = "استان تهران، شهر تهران، غرب";
+    public const string AddressLine2 = "منطقه کوثر، خیابان پیروزی، نبش کوچه ۱۸۱";
+    public const string NavigateOnMap = "مسیریابی در نقشه";
+    public const string WorkingHours = "ساعات کاری";
+    public const string SaturdayToWednesday = "شنبه تا چهار شنبه:";
+    public const string Friday = "جمعه:";
+    public const string Hours0900to2200 = "09:00 - 22:00";
+    public const string Hours0900to1900 = "09:00 - 19:00";
+    public const string BookingAppointment = "رزرو نوبت";
+    public const string BookingDescription = "برای استفاده از خدمات لطفا برای رزرو نوبت پیامی به ما در تلگرام ارسال کنید";
+    public const string MessageOnTelegram = "پیام در تلگرام";
+    
+    // Login Page
+    public const string LoginToSystem = "ورود به سیستم";
+    public const string GameCenterKowsar = "گیم سنتر کوثر";
+    public const string Username = "نام کاربری";
+    public const string Password = "رمز عبور";
+    public const string EnterUsername = "نام کاربری خود را وارد کنید";
+    public const string EnterPassword = "رمز عبور خود را وارد کنید";
+    public const string LoginInProgress = "در حال ورود...";
+    public const string Login = "ورود";
+    public const string LoginError = "خطا در ورود به سیستم";
+    
+    // Users Management
+    public const string UsersManagement = "مدیریت کاربران";
+    public const string AddNewUser = "افزودن کاربر جدید";
+    public const string EditUser = "ویرایش کاربر";
+    public const string UserNotFound = "کاربر یافت نشد";
+    public const string SubmitUser = "ثبت کاربر";
+    public const string UserFullName = "نام کامل";
+    public const string Email = "ایمیل";
+    public const string AdditionalDetails = "جزئیات اضافی";
+    public const string SearchUsers = "جستجوی کاربر (نام، نام کاربری)...";
+    public const string NoUsersFound = "کاربری یافت نشد";
+    public const string DeleteUserConfirm = "آیا از حذف این کاربر اطمینان دارید؟";
+    public const string UserAddSuccess = "کاربر با موفقیت ایجاد شد";
+    public const string IsActive = "فعال";
+    public const string Active = "فعال";
+    public const string Inactive = "غیرفعال";
+    public const string Name = "نام";
 }
 

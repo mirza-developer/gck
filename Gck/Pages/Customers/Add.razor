@@ -1,12 +1,5 @@
 @page "/customers/add"
-@using Gck.Application.Features.Customers.Commands.CreateCustomer
 @using Gck.Resources
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -108,34 +101,3 @@
         </div>
     </div>
 </section>
-
-@code {
-    private CreateCustomerCommand command = new() { Gender = "Male" };
-    private bool isSubmitting = false;
-
-    private void OnLoyaltyToggle(ChangeEventArgs e)
-    {
-        if (!command.IsLoyal)
-        {
-            command.SessionsRequiredForFree = 0;
-        }
-    }
-
-    private async Task HandleSubmit()
-    {
-        isSubmitting = true;
-
-        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/customers"), command);
-
-        NotificationService.ShowSuccess(PersianResources.CustomerAddSuccess);
-        await Task.Delay(1500);
-        Navigation.NavigateTo("/customers");
-
-        isSubmitting = false;
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/customers");
-    }
-}

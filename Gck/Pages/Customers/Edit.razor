@@ -1,15 +1,6 @@
 @page "/customers/edit/{id:int}"
-@using Gck.Application.DTOs
-@using Gck.Application.Features.Customers.Commands.UpdateCustomer
-@using Gck.Application.Features.Customers.Queries.GetCustomerById
 @using Gck.Resources
 @using Gck.Components
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -125,67 +116,3 @@
         }
     </div>
 </section>
-
-@code {
-    [Parameter]
-    public int Id { get; set; }
-
-    private UpdateCustomerCommand? command;
-    private bool isLoading = true;
-    private bool isSubmitting = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadCustomer();
-    }
-
-    private async Task LoadCustomer()
-    {
-        isLoading = true;
-
-        var customer = await Http.GetFromJsonWithExceptionAsync<CustomerDto>(ApiConfig.GetApiUrl($"/api/customers/{Id}"));
-        if (customer != null)
-        {
-            command = new UpdateCustomerCommand
-            {
-                Id = customer.Id,
-                Name = customer.Name,
-                PhoneNumber = customer.PhoneNumber,
-                BirthYear = customer.BirthYear,
-                Gender = customer.Gender,
-                IsLoyal = customer.IsLoyal,
-                SessionsRequiredForFree = customer.SessionsRequiredForFree
-            };
-        }
-
-        isLoading = false;
-    }
-
-    private async Task HandleSubmit()
-    {
-        if (command == null) return;
-
-        isSubmitting = true;
-
-        await Http.PutAsJsonWithExceptionAsync(ApiConfig.GetApiUrl($"/api/customers/{command.Id}"), command);
-
-        NotificationService.ShowSuccess(PersianResources.SaveSuccess);
-        await Task.Delay(1500);
-        Navigation.NavigateTo("/customers");
-
-        isSubmitting = false;
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/customers");
-    }
-
-    private void OnLoyaltyToggle(ChangeEventArgs e)
-    {
-        if (command != null && !command.IsLoyal)
-        {
-            command.SessionsRequiredForFree = 0;
-        }
-    }
-}

@@ -1,24 +1,17 @@
 @page "/users"
-@using Gck.Application.DTOs
 @using Gck.Components
 @using Gck.Resources
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
         <div class="page-header fade-in-up">
             <h2 class="section-title">
                 <i class="fas fa-users"></i>
-                مدیریت کاربران
+                @PersianResources.UsersManagement
             </h2>
             <button class="btn-gaming" @onclick="NavigateToAdd">
                 <i class="fas fa-plus"></i>
-                افزودن کاربر جدید
+                @PersianResources.AddNewUser
             </button>
         </div>
 
@@ -32,7 +25,7 @@
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" 
-                           placeholder="جستجوی کاربر (نام، نام کاربری)..." 
+                           placeholder="@PersianResources.SearchUsers" 
                            @bind="searchText" 
                            @bind:event="oninput"
                            class="search-input" />
@@ -53,17 +46,17 @@
                                         <p class="user-username">@@@user.Username</p>
                                     </div>
                                     <div class="user-status @(user.IsActive ? "active" : "inactive")">
-                                        @(user.IsActive ? "فعال" : "غیرفعال")
+                                        @(user.IsActive ? PersianResources.Active : PersianResources.Inactive)
                                     </div>
                                 </div>
                                 <div class="user-actions">
                                     <button class="btn-action btn-edit" @onclick="() => NavigateToEdit(user.Username)">
                                         <i class="fas fa-edit"></i>
-                                        ویرایش
+                                        @PersianResources.Edit
                                     </button>
                                     <button class="btn-action btn-delete" @onclick="() => DeleteUser(user.Id)">
                                         <i class="fas fa-trash"></i>
-                                        حذف
+                                        @PersianResources.Delete
                                     </button>
                                 </div>
                             </div>
@@ -74,54 +67,10 @@
                 {
                     <div class="no-data">
                         <i class="fas fa-inbox"></i>
-                        <p>کاربری یافت نشد</p>
+                        <p>@PersianResources.NoUsersFound</p>
                     </div>
                 }
             </div>
         }
     </div>
 </section>
-
-@code {
-    private List<GetAllUsersVm> users = new();
-    private string searchText = string.Empty;
-    private bool isLoading = true;
-
-    private List<GetAllUsersVm> FilteredUsers =>
-        users.Where(u =>
-            string.IsNullOrEmpty(searchText) ||
-            u.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-            u.Username.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-        .ToList();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadUsers();
-    }
-
-    private async Task LoadUsers()
-    {
-        isLoading = true;
-
-        users = await Http.GetFromJsonWithExceptionAsync<List<GetAllUsersVm>>(ApiConfig.GetApiUrl("/api/user")) ?? new();
-
-        isLoading = false;
-    }
-
-    private void NavigateToAdd()
-    {
-        Navigation.NavigateTo("/users/add");
-    }
-
-    private void NavigateToEdit(string username)
-    {
-        Navigation.NavigateTo($"/users/edit/{username}");
-    }
-
-    private async Task DeleteUser(string userId)
-    {
-        await Http.DeleteWithExceptionAsync(ApiConfig.GetApiUrl($"/api/user/{userId}"));
-        NotificationService.ShowSuccess("کاربر با موفقیت حذف شد");
-        await LoadUsers();
-    }
-}

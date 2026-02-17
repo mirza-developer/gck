@@ -1,13 +1,5 @@
 @page "/customer/feedback"
 @using Gck.Resources
-@using System.ComponentModel.DataAnnotations
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -71,60 +63,3 @@
         </div>
     </div>
 </section>
-
-@code {
-    private FeedbackModel feedbackModel = new();
-    private bool isSubmitting = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Check if user is a customer
-        var userRole = await LocalStorage.GetItemAsync<string>("userRole");
-        if (userRole != "customer")
-        {
-            Navigation.NavigateTo("/login");
-        }
-    }
-
-    private async Task HandleSubmit()
-    {
-        isSubmitting = true;
-
-        var customerIdStr = await LocalStorage.GetItemAsync<string>("currentUserId");
-        if (string.IsNullOrEmpty(customerIdStr))
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-
-        var feedbackDto = new
-        {
-            CustomerId = int.Parse(customerIdStr),
-            Subject = feedbackModel.Subject,
-            Message = feedbackModel.Message
-        };
-
-        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/feedback"), feedbackDto);
-
-        NotificationService.ShowSuccess(PersianResources.FeedbackSubmitted);
-        feedbackModel = new(); // Reset form
-
-        isSubmitting = false;
-    }
-
-    private void Cancel()
-    {
-        Navigation.NavigateTo("/");
-    }
-
-    public class FeedbackModel
-    {
-        [Required(ErrorMessage = "موضوع الزامی است")]
-        [StringLength(100, ErrorMessage = "موضوع نباید بیشتر از 100 کاراکتر باشد")]
-        public string Subject { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "پیام الزامی است")]
-        [StringLength(1000, ErrorMessage = "پیام نباید بیشتر از 1000 کاراکتر باشد")]
-        public string Message { get; set; } = string.Empty;
-    }
-}

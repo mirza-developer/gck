@@ -1,29 +1,30 @@
 @page "/"
 @using Gck.Components
+@using Gck.Resources
 
-<SeoHead Title="??? ???? ???? - PS5"
-         Description="?????? ???? ???????? PS5 ?? ???? ???? ? ???. ???????? ????? FC25? eFootball? Mortal Kombat? Forza ? Red Dead Redemption ?? ?????"
-         Keywords="???? ,??????, PS5, FC25, eFootball, ?????? ????, ?????, ?? ??, ???? ????"
+<SeoHead Title="@PersianResources.HomePageTitle"
+         Description="@PersianResources.HomePageDescription"
+         Keywords="@PersianResources.HomePageKeywords"
          Url="https://gckgames.ir" />
 <section class="hero">
     <div class="container">
         <div class="hero-content fade-in-up">
             <h1 class="hero-title glow-pulse">
-                ?? ??? ???? ????
+                @PersianResources.WelcomeToGameCenter
             </h1>
             <p class="hero-subtitle">
-                ???????? ?????????? ?? ???????? PS5 ?? ????? ????? ??? ? ????
+                @PersianResources.HeroSubtitle
                 <br>
-                ???????? ???????? ??? ???? ?? ????? 4K ????? ?????!
+                @PersianResources.HeroDescription
             </p>
             <div class="hero-buttons">
                 <a href="#games" class="btn-gaming">
                     <i class="fas fa-gamepad"></i>
-                    ?????? ???????
+                    @PersianResources.PopularGames
                 </a>
                 <a href="#contact" class="btn-gaming btn-secondary">
                     <i class="fas fa-map-marker-alt"></i>
-                    ???? ? ????
+                    @PersianResources.LocationAndContact
                 </a>
             </div>
         </div>
@@ -34,44 +35,44 @@
         <div class="feature-grid">
             <div class="feature-card fade-in-up">
                 <i class="fas fa-gamepad feature-icon"></i>
-                <div class="feature-title">????????? PS5</div>
-                <div class="feature-desc">????? ???? ?? ???????? ??????</div>
+                <div class="feature-title">@PersianResources.PS5Consoles</div>
+                <div class="feature-desc">@PersianResources.PS5ConsolesDesc</div>
             </div>
             <div class="feature-card fade-in-up">
                 <i class="fas fa-star feature-icon"></i>
-                <div class="feature-title">???????? ????? ? ????</div>
-                <div class="feature-desc">?????? ?? ?????? ? ???????????? ???????? ??? ????</div>
+                <div class="feature-title">@PersianResources.PopularAndNewGames</div>
+                <div class="feature-desc">@PersianResources.PopularGamesDesc</div>
             </div>
             <div class="feature-card fade-in-up">
                 <i class="fas fa-shield-alt feature-icon"></i>
-                <div class="feature-title">???? ????? ? ???? </div>
-                <div class="feature-desc">????? ????? ???? ??? ????? ????? ??????? ???? ????? ? ????? </div>
+                <div class="feature-title">@PersianResources.CleanAndSafeEnvironment</div>
+                <div class="feature-desc">@PersianResources.CleanEnvironmentDesc</div>
             </div>
             <div class="feature-card fade-in-up">
                 <i class="fas fa-trophy feature-icon"></i>
-                <div class="feature-title">??????? ??????? ???????</div>
-                <div class="feature-desc">???? ?? ??????? ? ??????? ??????????? ?? ????? ????</div>
+                <div class="feature-title">@PersianResources.TournamentsAndPrizes</div>
+                <div class="feature-desc">@PersianResources.TournamentsDesc</div>
             </div>
         </div>
     </div>
 </section>
 <section class="section" id="games">
     <div class="container">
-        <h2 class="section-title">?? ???????? ????? PS5</h2>
+        <h2 class="section-title">@PersianResources.PopularPS5Games</h2>
         <div class="games-grid">
             <div class="game-card fade-in-up">
                 <div class="game-image">
                     <i class="fas fa-futbol"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">FC25</h3>
+                    <h3 class="game-title">@PersianResources.FC25Title</h3>
                     <p class="game-description">
-                        ???????? ???? ?????? EA Sports ?? ?????? ??????? ? ???????? ???? ????
+                        @PersianResources.FC25Description
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????</span>
-                        <span class="tag">???????</span>
-                        <span class="tag">?????</span>
+                        <span class="tag">@PersianResources.TagFootball</span>
+                        <span class="tag">@PersianResources.TagMultiplayer</span>
+                        <span class="tag">@PersianResources.TagOnline</span>
                     </div>
                 </div>
             </div>
@@ -80,14 +81,14 @@
                     <i class="fas fa-running"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">eFootball</h3>
+                    <h3 class="game-title">@PersianResources.EFootballTitle</h3>
                     <p class="game-description">
-                        ?????? ?????? ?? ????? ????? ? ??????? ????? ????
+                        @PersianResources.EFootballDescription
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????</span>
-                        <span class="tag">???????</span>
-                        <span class="tag">?????</span>
+                        <span class="tag">@PersianResources.TagFootball</span>
+                        <span class="tag">@PersianResources.TagMultiplayer</span>
+                        <span class="tag">@PersianResources.TagOnline</span>
                     </div>
                 </div>
             </div>
@@ -96,14 +97,14 @@
                     <i class="fas fa-fist-raised"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">Mortal Kombat</h3>
+                    <h3 class="game-title">@PersianResources.MortalKombatTitle</h3>
                     <p class="game-description">
-                        ???????? ???? ?????? ???? ?? ?????? ?????????? ? ??????? ?????
+                        @PersianResources.MortalKombatDescription
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????????</span>
-                        <span class="tag">????</span>
-                        <span class="tag">??????</span>
+                        <span class="tag">@PersianResources.TagFighting</span>
+                        <span class="tag">@PersianResources.TagAction</span>
+                        <span class="tag">@PersianResources.TagSinglePlayer</span>
                     </div>
                 </div>
             </div>
@@ -112,13 +113,13 @@
                     <i class="fas fa-car"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">Forza Horizon 5</h3>
+                    <h3 class="game-title">@PersianResources.ForzaTitle</h3>
                     <p class="game-description">
-                        ?????? ???? ????????? ???? ?? ????????? ?????????? ? ??????? ?????
+                        @PersianResources.ForzaDescription
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????????</span>
-                        <span class="tag">????</span>
+                        <span class="tag">@PersianResources.TagRacing</span>
+                        <span class="tag">@PersianResources.TagAction</span>
                     </div>
                 </div>
             </div>
@@ -127,14 +128,14 @@
                     <i class="fas fa-horse"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">Red Dead Redemption 2</h3>
+                    <h3 class="game-title">@PersianResources.RedDeadTitle</h3>
                     <p class="game-description">
-                        ?????? ??????? ???? ?? ????? ????? ?? ?????? ??????????
+                        @PersianResources.RedDeadDescription
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????????</span>
-                        <span class="tag">????</span>
-                        <span class="tag">???????</span>
+                        <span class="tag">@PersianResources.TagAdventure</span>
+                        <span class="tag">@PersianResources.TagAction</span>
+                        <span class="tag">@PersianResources.TagStory</span>
                     </div>
                 </div>
             </div>
@@ -143,14 +144,14 @@
                     <i class="fas fa-gamepad"></i>
                 </div>
                 <div class="game-content">
-                    <h3 class="game-title">???????? ?????</h3>
+                    <h3 class="game-title">@PersianResources.VariousGamesTitle</h3>
                     <p class="game-description">
-                        ?????? ????? ?? ?????? ???????? PS5 ?? ?????? ?????
+                        @PersianResources.VariousGamesDescription
                     </p>
                     <div class="game-tags">
-                        <span class="tag">?????</span>
-                        <span class="tag">????</span>
-                        <span class="tag">????? 4K</span>
+                        <span class="tag">@PersianResources.TagDiverse</span>
+                        <span class="tag">@PersianResources.TagAction</span>
+                        <span class="tag">@PersianResources.Tag4KGameplay</span>
                     </div>
                 </div>
             </div>
@@ -159,47 +160,47 @@
 </section>
 <section class="section">
     <div class="container">
-        <h2 class="section-title">?? ??????? ????</h2>
+        <h2 class="section-title">@PersianResources.OurFacilities</h2>
         <div class="center-features-grid">
             <div class="gaming-card fade-in-up">
                 <h3 class="accent-cyan mb-1rem">
                     <i class="fas fa-shield-alt"></i>
-                    ???? ??? ? ????
+                    @PersianResources.CleanAndSafe
                 </h3>
                 <p class="text-secondary mb-1-5rem">
-                    ????? ???? ???? ? ????? ???? ??? ???? 
+                    @PersianResources.CleanAndSafeDesc
                 </p>
                 <ul class="feature-list text-secondary">
-                    <li><i class="fas fa-broom accent-cyan ml-0-5rem"></i>????? ? ?????? ????</li>
-                    <li><i class="fas fa-fan accent-cyan ml-0-5rem"></i>????? ???? ?????</li>
-                    <li><i class="fas fa-couch accent-cyan ml-0-5rem"></i>????????? ???? </li>
-                    <li><i class="fas fa-square-parking accent-cyan ml-0-5rem"></i>???????</li>
+                    <li><i class="fas fa-broom accent-cyan ml-0-5rem"></i>@PersianResources.CleanAndTidy</li>
+                    <li><i class="fas fa-fan accent-cyan ml-0-5rem"></i>@PersianResources.ProperVentilation</li>
+                    <li><i class="fas fa-couch accent-cyan ml-0-5rem"></i>@PersianResources.ComfortableSeats</li>
+                    <li><i class="fas fa-square-parking accent-cyan ml-0-5rem"></i>@PersianResources.Parking</li>
                 </ul>
             </div>
             <div class="gaming-card fade-in-up">
                 <h3 class="secondary-pink mb-1rem">
                     <i class="fa-brands fa-playstation"></i>
-                    ??????? ???????
+                    @PersianResources.ModernEquipment
                 </h3>
                 <p class="text-secondary mb-1-5rem">
-                    ???????? ????????? PS5 ?? ???????????? 4K ? ???? ??????????
+                    @PersianResources.ModernEquipmentDesc
                 </p>
                 <ul class="feature-list text-secondary">
-                    <li><i class="fas fa-gamepad secondary-pink ml-0-5rem"></i>????????? PS5 ????????</li>
-                    <li><i class="fas fa-tv secondary-pink ml-0-5rem"></i>???????????? 4K HDR ? ????</li>
+                    <li><i class="fas fa-gamepad secondary-pink ml-0-5rem"></i>@PersianResources.OriginalPS5Consoles</li>
+                    <li><i class="fas fa-tv secondary-pink ml-0-5rem"></i>@PersianResources.Monitors4KHDR</li>
                 </ul>
             </div>
             <div class="gaming-card fade-in-up">
                 <h3 class="accent-yellow mb-1rem">
                     <i class="fas fa-coffee"></i>
-                    ????? ?????
+                    @PersianResources.WelfareServices
                 </h3>
                 <p class="text-secondary mb-1-5rem">
-                    ?????????? ? ?????? ????? ???? ???????? ????
+                    @PersianResources.WelfareServicesDesc
                 </p>
                 <ul class="feature-list text-secondary">
-                    <li><i class="fas fa-mug-hot accent-yellow ml-0-5rem"></i>??????????? ??? ? ???</li>
-                    <li><i class="fas fa-burger accent-yellow ml-0-5rem"></i>?????? ? ??????</li>
+                    <li><i class="fas fa-mug-hot accent-yellow ml-0-5rem"></i>@PersianResources.HotAndColdDrinks</li>
+                    <li><i class="fas fa-burger accent-yellow ml-0-5rem"></i>@PersianResources.SnacksAndFood</li>
                 </ul>
             </div>
         </div>
@@ -207,96 +208,96 @@
 </section>
 <section class="section">
     <div class="container">
-        <h2 class="section-title">?? ??????? ? ???????</h2>
+        <h2 class="section-title">@PersianResources.PricingAndDiscounts</h2>
         <div class="gaming-card fade-in-up pricing-card">
             <div class="pricing-header">
-                <h3 class="primary-purple mb-1rem">????? ????? ?? ???? ????? ????</h3>
-                <div class="text-secondary mb-1-5rem">???? ???? ??? ??????? ????? ???</div>
+                <h3 class="primary-purple mb-1rem">@PersianResources.OurHourlyRates</h3>
+                <div class="text-secondary mb-1-5rem">@PersianResources.PleaseCallBeforeVisit</div>
                 <table class="pricing-table">
                     <thead class="gradient-1-bg text-white">
                         <tr>
-                            <th class="p-0-7rem">????? ????</th>
-                            <th class="p-0-7rem">???? ?? ????</th>
+                            <th class="p-0-7rem">@PersianResources.NumberOfPeople</th>
+                            <th class="p-0-7rem">@PersianResources.PricePerHour</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="bg-purple-07">
-                            <td class="p-0-7rem font-600">? ????</td>
-                            <td class="p-0-7rem font-700 primary-purple">???,??? ?????</td>
+                            <td class="p-0-7rem font-600">@PersianResources.TwoPeople</td>
+                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price150000</td>
                         </tr>
                         <tr>
-                            <td class="p-0-7rem font-600">? ????</td>
-                            <td class="p-0-7rem font-700 primary-purple">???,??? ?????</td>
+                            <td class="p-0-7rem font-600">@PersianResources.ThreePeople</td>
+                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price200000</td>
                         </tr>
                         <tr class="bg-purple-07">
-                            <td class="p-0-7rem font-600">? ????</td>
-                            <td class="p-0-7rem font-700 primary-purple">???,??? ?????</td>
+                            <td class="p-0-7rem font-600">@PersianResources.FourPeople</td>
+                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price250000</td>
                         </tr>
                         <tr>
-                            <td class="p-0-7rem font-600">? ????</td>
-                            <td class="p-0-7rem font-700 primary-purple">???,??? ?????</td>
+                            <td class="p-0-7rem font-600">@PersianResources.FivePeople</td>
+                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price300000</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <ul class="feature-list text-secondary mb-2rem">
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>????? ?????? ?? ???? PS5</li>
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>????? ???? ??????? ? ?????</li>
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>??????? ???? ? ???? ???????</li>
+                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.UnlimitedPS5Access</li>
+                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.AllOriginalGameplay</li>
+                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.FreeInternet</li>
             </ul>
         </div>
     </div>
 </section>
 <section class="section contact-section">
     <div class="container">
-        <h2 class="section-title">?? ???? ? ??????? ????</h2>
+        <h2 class="section-title">@PersianResources.LocationAndContactInfo</h2>
         <div class="contact-grid">
             <div class="gaming-card fade-in-up">
                 <h3 class="primary-purple mb-1-5rem">
                     <i class="fas fa-map-marker-alt"></i>
-                    ???? ????
+                    @PersianResources.OurLocation
                 </h3>
                 <p class="text-secondary contact-address">
-                    ?????? ????? ??? ?????? ???? ?????
+                    @PersianResources.AddressLine1
                     <br>
-                    ?????? ?????? ?????? ?????? ?????? ????
+                    @PersianResources.AddressLine2
                 </p>
                 <a href="https://neshan.org/maps/routing/car/destination/35.6837518,51.3858216"
                    target="_blank"
                    class="btn-gaming btn-secondary">
                     <i class="fas fa-route"></i>
-                    ???????? ?? ????
+                    @PersianResources.NavigateOnMap
                 </a>
             </div>
             <div class="gaming-card fade-in-up">
                 <h3 class="secondary-pink mb-1-5rem">
                     <i class="fas fa-clock"></i>
-                    ????? ????
+                    @PersianResources.WorkingHours
                 </h3>
                 <div class="text-secondary contact-hours">
                     <div class="contact-hours-row">
-                        <span> ???? ?? ??? ????:</span>
-                        <span class="accent-cyan">09:00 - 22:00</span>
+                        <span>@PersianResources.SaturdayToWednesday</span>
+                        <span class="accent-cyan">@PersianResources.Hours0900to2200</span>
                     </div>
                     <div class="contact-hours-row">
-                        <span>?????:</span>
-                        <span class="accent-cyan">09:00 - 19:00</span>
+                        <span>@PersianResources.Friday</span>
+                        <span class="accent-cyan">@PersianResources.Hours0900to1900</span>
                     </div>
                 </div>
             </div>
             <div class="gaming-card fade-in-up">
                 <h3 class="accent-cyan mb-1-5rem">
                     <i class="fas fa-calendar-check"></i>
-                    ???? ???
+                    @PersianResources.BookingAppointment
                 </h3>
                 <p class="text-secondary mb-1-5rem">
-                    ???? ??????? ?? ?? ????? ???? ???? ??????? ??????? ?? ??? ???? ????
+                    @PersianResources.BookingDescription
                 </p>
                 <a href="https://t.me/gc_kowsar_admin" 
                    class="btn-gaming btn-secondary contact-btn"
                    target="_blank">
                     <i class="fab fa-telegram"></i>
-                    ???? ?? ??????
+                    @PersianResources.MessageOnTelegram
                 </a>
             </div>
         </div>

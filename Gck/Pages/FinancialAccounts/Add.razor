@@ -1,12 +1,5 @@
 @page "/financialaccounts/add"
-@using Gck.Application.Features.FinancialAccounts.Commands.CreateFinancialAccount
 @using Gck.Resources
-@using Gck.Services
-@using Gck.Enums
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject ApiConfigurationService ApiConfig
-@inject INotificationService NotificationService
 
 <section class="section">
     <div class="container">
@@ -74,26 +67,3 @@
         </div>
     </div>
 </section>
-
-@code {
-    private CreateFinancialAccountCommand command = new();
-    private bool isSubmitting = false;
-
-    private async Task HandleSubmit()
-    {
-        isSubmitting = true;
-
-        await Http.PostAsJsonWithExceptionAsync(ApiConfig.GetApiUrl("/api/financialaccounts"), command);
-
-        NotificationService.ShowSuccess(PersianResources.FinancialAccountAddSuccess);
-        await Task.Delay(1500);
-        Navigation.NavigateTo("/financialaccounts");
-
-        isSubmitting = false;
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/financialaccounts");
-    }
-}

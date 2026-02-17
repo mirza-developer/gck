@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Gck.Components;
 
-public partial class SeoHead : ComponentBase
+public partial class SeoHead
 {
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? Description { get; set; }
