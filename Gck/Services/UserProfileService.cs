@@ -75,8 +75,11 @@ public class UserProfileService
         {
             try
             {
-                // Simulate API call - in production, uncomment this
+                // In production, implement actual API call here:
                 // await _httpClient.PutAsJsonAsync($"/api/users/{profile.Id}", profile);
+                
+                // For now, simulating as this is a demo/offline-first app
+                await Task.CompletedTask;
             }
             catch
             {

@@ -109,79 +109,11 @@ self.addEventListener('sync', (event) => {
 });
 
 // Function to sync offline changes
+// Note: Actual sync is handled by C# SyncService using LocalStorage
+// This is a placeholder for future background sync enhancement
 async function syncOfflineChanges() {
-    try {
-        // Get offline changes from IndexedDB
-        const db = await openDatabase();
-        const changes = await getAllChanges(db);
-        
-        if (changes.length === 0) {
-            console.log('[ServiceWorker] No offline changes to sync');
-            return;
-        }
-
-        console.log('[ServiceWorker] Syncing', changes.length, 'changes');
-        
-        // Send each change to the server
-        for (const change of changes) {
-            try {
-                const response = await fetch(change.url, {
-                    method: change.method,
-                    headers: change.headers,
-                    body: change.body
-                });
-
-                if (response.ok) {
-                    // Remove synced change from IndexedDB
-                    await deleteChange(db, change.id);
-                    console.log('[ServiceWorker] Synced change', change.id);
-                }
-            } catch (error) {
-                console.error('[ServiceWorker] Failed to sync change', change.id, error);
-            }
-        }
-    } catch (error) {
-        console.error('[ServiceWorker] Sync failed', error);
-    }
-}
-
-// IndexedDB helper functions
-function openDatabase() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('GckOfflineDB', 1);
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('offlineChanges')) {
-                db.createObjectStore('offlineChanges', { keyPath: 'id', autoIncrement: true });
-            }
-        };
-    });
-}
-
-function getAllChanges(db) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['offlineChanges'], 'readonly');
-        const store = transaction.objectStore('offlineChanges');
-        const request = store.getAll();
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-    });
-}
-
-function deleteChange(db, id) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['offlineChanges'], 'readwrite');
-        const store = transaction.objectStore('offlineChanges');
-        const request = store.delete(id);
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve();
-    });
+    console.log('[ServiceWorker] Background sync triggered - handled by C# SyncService');
+    return Promise.resolve();
 }
 
 // Push notification handler

@@ -122,14 +122,17 @@ public class SyncService
             var endpoint = GetApiEndpoint(change.EntityType, change.EntityId, change.OperationType);
 
             HttpResponseMessage response;
+            
+            // Prepare the content - data is already JSON serialized
+            var content = new StringContent(change.Data, System.Text.Encoding.UTF8, "application/json");
 
             switch (change.OperationType.ToLower())
             {
                 case "create":
-                    response = await _httpClient.PostAsJsonAsync(endpoint, change.Data);
+                    response = await _httpClient.PostAsync(endpoint, content);
                     break;
                 case "update":
-                    response = await _httpClient.PutAsJsonAsync(endpoint, change.Data);
+                    response = await _httpClient.PutAsync(endpoint, content);
                     break;
                 case "delete":
                     response = await _httpClient.DeleteAsync(endpoint);

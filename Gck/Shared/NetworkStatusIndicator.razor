@@ -44,31 +44,31 @@
         SyncService.SyncStarted += OnSyncStarted;
         SyncService.SyncCompleted += OnSyncCompleted;
         
-        await UpdatePendingChanges();
+        await UpdatePendingChangesAsync();
     }
 
-    private async void OnNetworkStatusChanged(object? sender, bool isOnline)
+    private void OnNetworkStatusChanged(object? sender, bool isOnline)
     {
         _isOnline = isOnline;
-        await InvokeAsync(StateHasChanged);
+        InvokeAsync(StateHasChanged);
     }
 
-    private async void OnSyncStarted(object? sender, SyncEventArgs e)
+    private void OnSyncStarted(object? sender, SyncEventArgs e)
     {
         _isSyncing = true;
-        await InvokeAsync(StateHasChanged);
+        InvokeAsync(StateHasChanged);
     }
 
-    private async void OnSyncCompleted(object? sender, SyncEventArgs e)
+    private void OnSyncCompleted(object? sender, SyncEventArgs e)
     {
         _isSyncing = false;
-        await UpdatePendingChanges();
-        await InvokeAsync(StateHasChanged);
+        _ = UpdatePendingChangesAsync();
     }
 
-    private async Task UpdatePendingChanges()
+    private async Task UpdatePendingChangesAsync()
     {
         _pendingChanges = await SyncService.GetPendingChangesCountAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task SyncNow()

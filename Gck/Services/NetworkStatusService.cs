@@ -51,7 +51,9 @@ public class NetworkStatusService : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to initialize network status: {ex.Message}");
+            // Log the failure more prominently
+            Console.Error.WriteLine($"[NetworkStatusService] Failed to initialize network status monitoring: {ex.Message}");
+            Console.Error.WriteLine("[NetworkStatusService] Assuming online status - network detection will be degraded");
             // Assume online if initialization fails
             _isOnline = true;
         }
