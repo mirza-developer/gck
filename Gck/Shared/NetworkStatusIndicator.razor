@@ -1,0 +1,158 @@
+@using Gck.Services
+@inject NetworkStatusService NetworkStatus
+@inject SyncService SyncService
+@implements IDisposable
+
+<div class="network-status-indicator @(_isOnline ? "online" : "offline")" title="@(_isOnline ? "آنلاین" : "آفلاین")">
+    @if (_isOnline)
+    {
+        <i class="fas fa-wifi"></i>
+        @if (_pendingChanges > 0)
+        {
+            <span class="sync-badge">@_pendingChanges</span>
+            @if (_isSyncing)
+            {
+                <i class="fas fa-sync fa-spin sync-icon"></i>
+            }
+            else
+            {
+                <button @onclick="SyncNow" class="sync-button" title="همگام‌سازی تغییرات">
+                    <i class="fas fa-sync"></i>
+                </button>
+            }
+        }
+    }
+    else
+    {
+        <i class="fas fa-wifi-slash"></i>
+        @if (_pendingChanges > 0)
+        {
+            <span class="sync-badge">@_pendingChanges</span>
+        }
+    }
+</div>
+
+@code {
+    private bool _isOnline = true;
+    private int _pendingChanges = 0;
+    private bool _isSyncing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isOnline = NetworkStatus.IsOnline;
+        NetworkStatus.OnlineStatusChanged += OnNetworkStatusChanged;
+        SyncService.SyncStarted += OnSyncStarted;
+        SyncService.SyncCompleted += OnSyncCompleted;
+        
+        await UpdatePendingChanges();
+    }
+
+    private async void OnNetworkStatusChanged(object? sender, bool isOnline)
+    {
+        _isOnline = isOnline;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnSyncStarted(object? sender, SyncEventArgs e)
+    {
+        _isSyncing = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnSyncCompleted(object? sender, SyncEventArgs e)
+    {
+        _isSyncing = false;
+        await UpdatePendingChanges();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task UpdatePendingChanges()
+    {
+        _pendingChanges = await SyncService.GetPendingChangesCountAsync();
+    }
+
+    private async Task SyncNow()
+    {
+        if (!_isSyncing && _isOnline)
+        {
+            await SyncService.SyncOfflineChangesAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        NetworkStatus.OnlineStatusChanged -= OnNetworkStatusChanged;
+        SyncService.SyncStarted -= OnSyncStarted;
+        SyncService.SyncCompleted -= OnSyncCompleted;
+    }
+}
+
+<style>
+    .network-status-indicator {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 10px 15px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .network-status-indicator.online {
+        border: 2px solid #2ecc71;
+        color: #2ecc71;
+    }
+
+    .network-status-indicator.offline {
+        border: 2px solid #e74c3c;
+        color: #e74c3c;
+    }
+
+    .sync-badge {
+        background: #fd79a8;
+        color: white;
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+
+    .sync-icon {
+        color: #6c5ce7;
+        font-size: 0.9rem;
+    }
+
+    .sync-button {
+        background: transparent;
+        border: none;
+        color: #6c5ce7;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s;
+    }
+
+    .sync-button:hover {
+        transform: scale(1.1);
+    }
+
+    .sync-button:active {
+        transform: scale(0.95);
+    }
+
+    @@media (max-width: 768px) {
+        .network-status-indicator {
+            top: 10px;
+            left: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+    }
+</style>

@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using System.Text.Json;
 
 namespace Gck.Services;
 
@@ -6,11 +7,19 @@ public class UserProfileService
 {
     private readonly ILocalStorageService _localStorage;
     private readonly HttpClient _httpClient;
+    private readonly OfflineStorageService _offlineStorage;
+    private readonly NetworkStatusService _networkStatus;
     
-    public UserProfileService(ILocalStorageService localStorage, HttpClient httpClient)
+    public UserProfileService(
+        ILocalStorageService localStorage, 
+        HttpClient httpClient,
+        OfflineStorageService offlineStorage,
+        NetworkStatusService networkStatus)
     {
         _localStorage = localStorage;
         _httpClient = httpClient;
+        _offlineStorage = offlineStorage;
+        _networkStatus = networkStatus;
     }
 
     public async Task<UserProfile> GetUserProfileAsync()
@@ -26,8 +35,8 @@ public class UserProfileService
         var guestProfile = new UserProfile
         {
             Id = "guest",
-            Username = "????? ?????",
-            DisplayName = "????? ?????",
+            Username = "کاربر مهمان",
+            DisplayName = "کاربر مهمان",
             Email = "guest@gckgames.ir",
             JoinDate = DateTime.Now.AddDays(-30),
             Level = 7,
@@ -39,15 +48,15 @@ public class UserProfileService
             IsGuest = true,
             Achievements = new List<Achievement>
             {
-                new() { Id = "first-win", Title = "????? ??????", Description = "????? ???? ??? ?? ????? ????", Icon = "fas fa-trophy", UnlockedAt = DateTime.Now.AddDays(-25) },
-                new() { Id = "speed-demon", Title = "????? ????", Description = "?? ?? ?????? ???? ????? ????", Icon = "fas fa-tachometer-alt", UnlockedAt = DateTime.Now.AddDays(-15) },
-                new() { Id = "strategist", Title = "??????????", Description = "? ???? ????? ?????? ?????", Icon = "fas fa-chess-king", UnlockedAt = DateTime.Now.AddDays(-10) }
+                new() { Id = "first-win", Title = "اولین پیروزی", Description = "اولین بازی خود را برنده شدید", Icon = "fas fa-trophy", UnlockedAt = DateTime.Now.AddDays(-25) },
+                new() { Id = "speed-demon", Title = "شیطان سرعت", Description = "ده بار متوالی سریع بازی کنید", Icon = "fas fa-tachometer-alt", UnlockedAt = DateTime.Now.AddDays(-15) },
+                new() { Id = "strategist", Title = "استراتژیست", Description = "۵ بازی استراتژی ببرید", Icon = "fas fa-chess-king", UnlockedAt = DateTime.Now.AddDays(-10) }
             },
             RecentGames = new List<RecentGame>
             {
-                new() { GameTitle = "???? ?????", PlayedAt = DateTime.Now.AddHours(-2), Score = 1250, Won = true },
-                new() { GameTitle = "????? ?????????", PlayedAt = DateTime.Now.AddHours(-5), Score = 0, Won = false },
-                new() { GameTitle = "?????? ????", PlayedAt = DateTime.Now.AddDays(-1), Score = 3400, Won = true }
+                new() { GameTitle = "جنگ کارتی", PlayedAt = DateTime.Now.AddHours(-2), Score = 1250, Won = true },
+                new() { GameTitle = "شطرنج استراتژیک", PlayedAt = DateTime.Now.AddHours(-5), Score = 0, Won = false },
+                new() { GameTitle = "تیراندازی دقیق", PlayedAt = DateTime.Now.AddDays(-1), Score = 3400, Won = true }
             }
         };
 
@@ -58,8 +67,28 @@ public class UserProfileService
 
     public async Task UpdateUserProfileAsync(UserProfile profile)
     {
+        // Always update local storage
         await _localStorage.SetItemAsync("userProfile", profile);
-        // In a real app, you would also send to API
+        
+        // If online, sync to server
+        if (_networkStatus.IsOnline)
+        {
+            try
+            {
+                // Simulate API call - in production, uncomment this
+                // await _httpClient.PutAsJsonAsync($"/api/users/{profile.Id}", profile);
+            }
+            catch
+            {
+                // If API call fails, queue for later sync
+                await QueueOfflineChange("userprofile", profile.Id, "update", profile);
+            }
+        }
+        else
+        {
+            // Queue change for when we're back online
+            await QueueOfflineChange("userprofile", profile.Id, "update", profile);
+        }
     }
 
     public async Task AddExperienceAsync(int experience)
@@ -95,6 +124,18 @@ public class UserProfileService
             return true;
         }
         return false;
+    }
+    
+    private async Task QueueOfflineChange(string entityType, string entityId, string operation, object data)
+    {
+        var change = new OfflineChange
+        {
+            EntityType = entityType,
+            EntityId = entityId,
+            OperationType = operation,
+            Data = JsonSerializer.Serialize(data)
+        };
+        await _offlineStorage.QueueChangeAsync(change);
     }
 }
 
