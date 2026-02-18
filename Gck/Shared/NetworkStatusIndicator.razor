@@ -90,8 +90,8 @@
 <style>
     .network-status-indicator {
         position: fixed;
-        top: 20px;
-        left: 20px;
+        bottom: 20px;
+        right: 20px;
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         padding: 10px 15px;
@@ -147,12 +147,24 @@
         transform: scale(0.95);
     }
 
+    /* Responsive positioning */
     @@media (max-width: 768px) {
         .network-status-indicator {
-            top: 10px;
-            left: 10px;
+            bottom: 10px;
+            right: 10px;
             padding: 8px 12px;
             font-size: 0.85rem;
+        }
+    }
+
+    /* Extra small screens - move to top right to avoid bottom navigation */
+    @@media (max-width: 480px) {
+        .network-status-indicator {
+            top: 70px;
+            right: 10px;
+            bottom: auto;
+            padding: 6px 10px;
+            font-size: 0.8rem;
         }
     }
 </style>

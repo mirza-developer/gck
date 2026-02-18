@@ -3,11 +3,12 @@ using Microsoft.JSInterop;
 namespace Gck.Services;
 
 /// <summary>
-/// Service for monitoring network connectivity status
+/// Service for monitoring network connectivity status based on API accessibility
 /// </summary>
 public class NetworkStatusService : IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime;
+    private readonly ApiConfigurationService _apiConfig;
     private IJSObjectReference? _module;
     private DotNetObjectReference<NetworkStatusService>? _dotNetReference;
 
@@ -27,13 +28,14 @@ public class NetworkStatusService : IAsyncDisposable
         }
     }
 
-    public NetworkStatusService(IJSRuntime jsRuntime)
+    public NetworkStatusService(IJSRuntime jsRuntime, ApiConfigurationService apiConfig)
     {
         _jsRuntime = jsRuntime;
+        _apiConfig = apiConfig;
     }
 
     /// <summary>
-    /// Initialize network status monitoring
+    /// Initialize network status monitoring with API health checks
     /// </summary>
     public async Task InitializeAsync()
     {
@@ -44,7 +46,8 @@ public class NetworkStatusService : IAsyncDisposable
 
             _dotNetReference = DotNetObjectReference.Create(this);
 
-            await _module.InvokeVoidAsync("initialize", _dotNetReference);
+            // Pass the API base URL for health checks
+            await _module.InvokeVoidAsync("initialize", _dotNetReference, _apiConfig.BaseApiUrl);
 
             // Get initial online status
             _isOnline = await _module.InvokeAsync<bool>("isOnline");
@@ -69,7 +72,7 @@ public class NetworkStatusService : IAsyncDisposable
     }
 
     /// <summary>
-    /// Check current network status
+    /// Manually trigger an immediate network status check
     /// </summary>
     public async Task<bool> CheckNetworkStatusAsync()
     {
@@ -77,7 +80,9 @@ public class NetworkStatusService : IAsyncDisposable
         {
             if (_module != null)
             {
-                _isOnline = await _module.InvokeAsync<bool>("isOnline");
+                await _module.InvokeVoidAsync("checkNow");
+                // Wait a moment for the check to complete
+                await Task.Delay(500);
             }
             return _isOnline;
         }
@@ -91,6 +96,14 @@ public class NetworkStatusService : IAsyncDisposable
     {
         if (_module != null)
         {
+            try
+            {
+                await _module.InvokeVoidAsync("dispose");
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
             await _module.DisposeAsync();
         }
 
