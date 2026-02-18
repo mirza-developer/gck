@@ -19,9 +19,21 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddMediaQueryService();
 builder.Services.AddResizeListener();
 
+// Add offline and sync services
+builder.Services.AddScoped<OfflineStorageService>();
+builder.Services.AddScoped<NetworkStatusService>();
+builder.Services.AddScoped<SyncService>();
+
+// Add existing services
 builder.Services.AddScoped<UserProfileService>();
 builder.Services.AddScoped<TournamentService>();
 builder.Services.AddSingleton<ApiConfigurationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+// Initialize network status service
+var networkStatus = host.Services.GetRequiredService<NetworkStatusService>();
+await networkStatus.InitializeAsync();
+
+await host.RunAsync();

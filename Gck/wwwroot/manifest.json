@@ -1,24 +1,24 @@
 {
-  "name": "???? ???????? Gck - Gaming Hub",
+  "name": "گیم سنتر کوثر - Gaming Hub",
   "short_name": "Gck Games",
-  "description": "?????? ?????? ???????? ?????? ?? ????? ???? ? ????? ?????? ??????????",
+  "description": "بهترین مجموعه بازی‌های آنلاین با طراحی مدرن و تجربه کاربری فوق‌العاده",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0f23",
   "theme_color": "#6c5ce7",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
   "lang": "fa",
   "dir": "rtl",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -27,18 +27,18 @@
   "categories": ["games", "entertainment"],
   "shortcuts": [
     {
-      "name": "???????? ????",
-      "short_name": "????",
-      "description": "????? ???????? ????? ???",
+      "name": "بازی‌های جدید",
+      "short_name": "جدید",
+      "description": "مشاهده بازی‌های تازه وارد",
       "url": "/games/new",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-192x192.png", "sizes": "192x192" }]
     },
     {
-      "name": "???????? ?????",
-      "short_name": "?????",
-      "description": "???????????? ???????",
+      "name": "بازی‌های محبوب",
+      "short_name": "محبوب",
+      "description": "پرطرفدارترین بازی‌ها",
       "url": "/games/popular", 
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

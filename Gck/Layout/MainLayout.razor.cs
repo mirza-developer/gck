@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using BlazorPro.BlazorSize;
 
 namespace Gck.Layout
 {
@@ -13,6 +14,9 @@ namespace Gck.Layout
 
         [Inject]
         private NavigationManager Navigation { get; set; } = default!;
+
+        [Inject]
+        private IResizeListener ResizeListener { get; set; } = default!;
 
         private bool isLoggedIn = false;
         private string currentUserName = string.Empty;
@@ -30,6 +34,17 @@ namespace Gck.Layout
             if (firstRender)
             {
                 await JS.InvokeVoidAsync("initFooterMap");
+                ResizeListener.OnResized += HandleWindowResize;
+            }
+        }
+
+        private async void HandleWindowResize(object? sender, BrowserWindowSize window)
+        {
+            // Close mobile menu when resizing to desktop view
+            if (window.Width > 768 && isMobileMenuOpen)
+            {
+                isMobileMenuOpen = false;
+                await InvokeAsync(StateHasChanged);
             }
         }
 

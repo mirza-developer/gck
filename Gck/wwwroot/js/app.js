@@ -86,25 +86,6 @@ function initDropdownMenu() {
             });
         }
     });
-    
-    // Handle window resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            if (window.innerWidth > 768) {
-                navMenu.classList.remove('mobile-open');
-                const icon = mobileMenuToggle?.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-times');
-                }
-                dropdownItems.forEach(item => {
-                    item.classList.remove('open');
-                });
-            }
-        }, 250);
-    });
 }
 
 // Helper function to safely check if element matches selector
