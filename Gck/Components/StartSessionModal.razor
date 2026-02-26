@@ -1,271 +1,107 @@
+@using Gck.Application.DTOs
 @using Gck.Shared.Modals
 @using Gck.Resources
 
 <Modal @bind-IsVisible="isVisible"
        Title="@PersianResources.StartSession"
        ShowFooter="false"
-       CloseOnOverlayClick="@(!submitting)"
+       CloseOnOverlayClick="@(!loading)"
        Size="ModalSize.Medium">
     @if (loading)
     {
-        <div class="text-center">
-            <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
-            <p>@PersianResources.Loading</p>
-        </div>
+        <LoadingSpinner LoadingText="@PersianResources.Loading" Fullscreen="true" />
     }
-    else if (errorMessage != null)
-    {
-        <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            @errorMessage
+    <EditForm Model="@model" OnValidSubmit="HandleSubmit">
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-table"></i>
+                @PersianResources.Table
+            </label>
+            <input type="text" class="form-input" value="@TableName" disabled />
         </div>
-    }
-    else
-    {
-        <EditForm Model="@model" OnValidSubmit="HandleSubmit">
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-table"></i>
-                    @PersianResources.Table
-                </label>
-                <input type="text" class="form-input" value="@TableName" disabled />
-            </div>
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-users"></i>
-                    @PersianResources.CustomersOptional
-                </label>
-                @if (customers.Any())
-                {
-                    <MultiSelectDropdown TItem="CustomerDto"
-                                         TValue="int"
-                                         Items="@customers"
-                                         IsMultiSelect="true"
-                                         EnableSearch="true"
-                                         @bind-SelectedValues="@model.CustomerIds"
-                                         ValueSelector="@(customer => customer.Id)"
-                                         DisplayTextSelector="@(customer => $"{customer.Name} ({customer.PhoneNumber})")"
-                                         Placeholder="@PersianResources.CustomersOptional"
-                                         SearchPlaceholder="@PersianResources.Search"
-                                         NoResultsText="@PersianResources.NoCustomersFound"
-                                         @bind-SelectedValues:after="OnCustomersOrCountChanged" />
-                }
-                else
-                {
-                    <p class="text-secondary">@PersianResources.NoCustomersRegistered</p>
-                }
-            </div>
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-user-plus"></i>
-                    @PersianResources.AnonymousCustomersCount
-                </label>
-                <div class="count-control">
-                    <button type="button" class="count-btn" @onclick="DecrementAnonymousCount" disabled="@(model.AnonymousCustomersCount <= 0)">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <input type="number" 
-                           class="count-input" 
-                           @bind="model.AnonymousCustomersCount" 
-                           @bind:after="OnCustomersOrCountChanged"
-                           min="0" />
-                    <button type="button" class="count-btn" @onclick="IncrementAnonymousCount">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-gamepad"></i>
-                    @PersianResources.SeatsCount
-                </label>
-                <div class="fee-display">
-                    <div class="fee-info">
-                        <div class="fee-breakdown">
-                            @if (model.CustomerIds.Any())
-                            {
-                                <span class="fee-detail">
-                                    <i class="fas fa-users"></i>
-                                    @model.CustomerIds.Count @PersianResources.RegisteredCustomer
-                                </span>
-                            }
-                            @if (model.AnonymousCustomersCount > 0)
-                            {
-                                <span class="fee-detail">
-                                    <i class="fas fa-user-plus"></i>
-                                    @model.AnonymousCustomersCount @PersianResources.AnonymousCustomer
-                                </span>
-                            }
-                            <span class="fee-total">
-                                <i class="fas fa-equals"></i>
-                                @model.SeatsCount @PersianResources.PersonSuffix
-                            </span>
-                        </div>
-                        @if (selectedFee.HasValue)
-                        {
-                            <span class="fee-amount">@selectedFee.Value.ToString("N0") @PersianResources.TomanPerHour</span>
-                        }
-                    </div>
-                </div>
-            </div>
-            @if (successMessage != null)
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-users"></i>
+                @PersianResources.CustomersOptional
+            </label>
+            @if (customers.Any())
             {
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    @successMessage
-                </div>
+                <MultiSelectDropdown TItem="CustomerDto"
+                                     TValue="int"
+                                     Items="@customers"
+                                     IsMultiSelect="true"
+                                     EnableSearch="true"
+                                     @bind-SelectedValues="@model.CustomerIds"
+                                     ValueSelector="@(customer => customer.Id)"
+                                     DisplayTextSelector="@(customer => $"{customer.Name} ({customer.PhoneNumber})")"
+                                     Placeholder="@PersianResources.CustomersOptional"
+                                     SearchPlaceholder="@PersianResources.Search"
+                                     NoResultsText="@PersianResources.NoCustomersFound"
+                                     @bind-SelectedValues:after="OnCustomersOrCountChanged" />
             }
-
-            <div class="modal-actions">
-                <button type="submit" class="btn-gaming" disabled="@submitting">
-                    @if (submitting)
-                    {
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <span>@PersianResources.Submitting</span>
-                    }
-                    else
-                    {
-                        <i class="fas fa-play"></i>
-                        <span>@PersianResources.StartSession</span>
-                    }
+        </div>
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-user-plus"></i>
+                @PersianResources.AnonymousCustomersCount
+            </label>
+            <div class="count-control">
+                <button type="button" class="count-btn" @onclick="DecrementAnonymousCount" disabled="@(model.AnonymousCustomersCount <= 0)">
+                    <i class="fas fa-minus"></i>
                 </button>
-                <button type="button" class="btn-gaming btn-secondary" @onclick="Close" disabled="@submitting">
-                    <i class="fas fa-times"></i>
-                    <span>@PersianResources.Cancel</span>
+                <input type="number"
+                       class="count-input"
+                       @bind="model.AnonymousCustomersCount"
+                       @bind:after="OnCustomersOrCountChanged"
+                       min="0" />
+                <button type="button" class="count-btn" @onclick="IncrementAnonymousCount">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
-        </EditForm>
-    }
+        </div>
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-gamepad"></i>
+                @PersianResources.SeatsCount
+            </label>
+            <div class="fee-display">
+                <div class="fee-info">
+                    <div class="fee-breakdown">
+                        @if (model.CustomerIds.Any())
+                        {
+                            <span class="fee-detail">
+                                <i class="fas fa-users"></i>
+                                @model.CustomerIds.Count @PersianResources.RegisteredCustomer
+                            </span>
+                        }
+                        @if (model.AnonymousCustomersCount > 0)
+                        {
+                            <span class="fee-detail">
+                                <i class="fas fa-user-plus"></i>
+                                @model.AnonymousCustomersCount @PersianResources.AnonymousCustomer
+                            </span>
+                        }
+                        <span class="fee-total">
+                            <i class="fas fa-equals"></i>
+                            @model.SeatsCount @PersianResources.PersonSuffix
+                        </span>
+                    </div>
+                    @if (selectedFee.HasValue)
+                    {
+                        <span class="fee-amount">@selectedFee.Value.ToString("N0") @PersianResources.TomanPerHour</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button type="submit" class="btn-gaming" disabled="@loading">
+                <i class="fas fa-play"></i>
+                <span>@PersianResources.StartSession</span>
+            </button>
+            <button type="button" class="btn-gaming btn-secondary" @onclick="Close" disabled="@loading">
+                <i class="fas fa-times"></i>
+                <span>@PersianResources.Cancel</span>
+            </button>
+        </div>
+    </EditForm>
 </Modal>
-
-<style>
-    .modal-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-
-    .text-secondary {
-        color: var(--text-secondary);
-    }
-
-    .count-control {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        width: 100%;
-    }
-
-    .count-btn {
-        width: 3rem;
-        height: 3rem;
-        background: rgba(26, 26, 46, 0.6);
-        border: 1px solid rgba(108, 92, 231, 0.3);
-        border-radius: 12px;
-        color: var(--text-primary);
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .count-btn:hover:not(:disabled) {
-        border-color: var(--primary-purple);
-        background: rgba(108, 92, 231, 0.2);
-        transform: translateY(-2px);
-    }
-
-    .count-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-
-    .count-input {
-        flex: 1;
-        height: 3rem;
-        padding: 0.5rem 1.2rem;
-        background: rgba(26, 26, 46, 0.6);
-        border: 1px solid rgba(108, 92, 231, 0.3);
-        border-radius: 12px;
-        color: var(--text-primary);
-        font-family: 'Vazirmatn', sans-serif;
-        font-size: 1.2rem;
-        text-align: center;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .count-input:focus {
-        outline: none;
-        border-color: var(--primary-purple);
-        background: rgba(26, 26, 46, 0.9);
-        box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
-    }
-
-    .count-input::-webkit-inner-spin-button,
-    .count-input::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .fee-display {
-        width: 100%;
-        padding: 1rem 1.2rem;
-        background: rgba(26, 26, 46, 0.6);
-        border: 1px solid rgba(108, 92, 231, 0.3);
-        border-radius: 12px;
-        min-height: 3rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .fee-info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .fee-breakdown {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    .fee-detail {
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .fee-detail i {
-        color: var(--primary-purple);
-    }
-
-    .fee-total {
-        color: var(--text-primary);
-        font-weight: 600;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .fee-total i {
-        color: var(--secondary-pink);
-    }
-
-    .fee-amount {
-        color: var(--primary-purple);
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-right: auto;
-    }
-</style>

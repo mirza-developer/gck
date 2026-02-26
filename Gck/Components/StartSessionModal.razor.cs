@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using Gck.Application.DTOs;
+using Gck.Models;
 using Gck.Resources;
 using Gck.Services;
 using Microsoft.AspNetCore.Components;
@@ -7,38 +9,28 @@ namespace Gck.Components;
 
 public partial class StartSessionModal
 {
-    [Inject] private HttpClient Http { get; set; } = default!;
-    [Inject] private ApiConfigurationService ApiConfig { get; set; } = default!;
-    
-    [Parameter] public int TableId { get; set; }
-    [Parameter] public string TableName { get; set; } = string.Empty;
-    [Parameter] public EventCallback OnSessionStarted { get; set; }
-
     private bool isVisible;
     private bool loading = true;
-    private bool submitting;
-    private string? errorMessage;
-    private string? successMessage;
-
     private List<HourlyFeeDto> hourlyFees = new();
     private List<CustomerDto> customers = new();
     private decimal? selectedFee;
 
-    private StartSessionModel model = new();
+    [Inject] private HttpClient Http { get; set; } = default!;
+    [Inject] private ApiConfigurationService ApiConfig { get; set; } = default!;
+    [Inject] private INotificationService NotificationService { get; set; } = default!;
 
-    private class StartSessionModel
-    {
-        public int SeatsCount { get; set; } = 1;
-        public int AnonymousCustomersCount { get; set; } = 0;
-        public List<int> CustomerIds { get; set; } = new();
-    }
+    [Parameter] public int TableId { get; set; }
+    [Parameter] public string TableName { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnSessionStarted { get; set; }
+
+    private StartSessionModel model = new();
 
     public async Task Show()
     {
         model = new StartSessionModel { SeatsCount = 1, AnonymousCustomersCount = 0 };
-        errorMessage = null;
-        successMessage = null;
+        
         isVisible = true;
+      
         loading = true;
 
         await LoadData();
@@ -51,42 +43,36 @@ public partial class StartSessionModal
 
     private async Task LoadData()
     {
-        try
+        loading = true;
+
+        var feesResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/hourlyfees"));
+      
+        if (feesResponse.IsSuccessStatusCode)
         {
-            loading = true;
-            errorMessage = null;
+            hourlyFees = await feesResponse.Content.ReadFromJsonAsync<List<HourlyFeeDto>>() ?? new();
+            hourlyFees = hourlyFees.OrderBy(f => f.SeatsCount).ToList();
 
-            var feesResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/hourlyfees"));
-            if (feesResponse.IsSuccessStatusCode)
+            if (hourlyFees.Any())
             {
-                hourlyFees = await feesResponse.Content.ReadFromJsonAsync<List<HourlyFeeDto>>() ?? new();
-                hourlyFees = hourlyFees.OrderBy(f => f.SeatsCount).ToList();
-                
-                if (hourlyFees.Any())
-                {
-                    model.SeatsCount = hourlyFees.First().SeatsCount;
-                    selectedFee = hourlyFees.First().Fee;
-                }
+                model.SeatsCount = hourlyFees.First().SeatsCount;
+                selectedFee = hourlyFees.First().Fee;
             }
-
-            var customersResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
-            if (customersResponse.IsSuccessStatusCode)
-            {
-                customers = await customersResponse.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
-            }
-
-            loading = false;
         }
-        catch (Exception ex)
+
+        var customersResponse = await Http.GetAsync(ApiConfig.GetApiUrl("/api/customers"));
+      
+        if (customersResponse.IsSuccessStatusCode)
         {
-            errorMessage = $"{PersianResources.LoadingError}: {ex.Message}";
-            loading = false;
+            customers = await customersResponse.Content.ReadFromJsonAsync<List<CustomerDto>>() ?? new();
         }
+
+        loading = false;
     }
 
     private void IncrementAnonymousCount()
     {
         model.AnonymousCustomersCount++;
+      
         OnCustomersOrCountChanged();
     }
 
@@ -102,22 +88,26 @@ public partial class StartSessionModal
     private void OnCustomersOrCountChanged()
     {
         var registeredCustomersCount = model.CustomerIds.Count;
+    
         var totalCustomersCount = registeredCustomersCount + model.AnonymousCustomersCount;
-        
+
         if (totalCustomersCount == 0)
         {
             if (hourlyFees.Any())
             {
                 model.SeatsCount = hourlyFees.First().SeatsCount;
+              
                 selectedFee = hourlyFees.First().Fee;
             }
+         
             return;
         }
-        
+
         model.SeatsCount = totalCustomersCount;
-        
+
         var exactFee = hourlyFees.FirstOrDefault(f => f.SeatsCount == model.SeatsCount);
-        if (exactFee != null)
+    
+        if (exactFee is not null)
         {
             selectedFee = exactFee.Fee;
         }
@@ -127,18 +117,21 @@ public partial class StartSessionModal
                 .Where(f => f.SeatsCount > model.SeatsCount)
                 .OrderBy(f => f.SeatsCount)
                 .FirstOrDefault();
-            
-            if (nextHigherFee != null)
+
+            if (nextHigherFee is not null)
             {
                 model.SeatsCount = nextHigherFee.SeatsCount;
+             
                 selectedFee = nextHigherFee.Fee;
             }
             else
             {
                 var highestFee = hourlyFees.OrderByDescending(f => f.SeatsCount).FirstOrDefault();
-                if (highestFee != null)
+              
+                if (highestFee is not null)
                 {
                     model.SeatsCount = highestFee.SeatsCount;
+                   
                     selectedFee = highestFee.Fee;
                 }
             }
@@ -147,56 +140,29 @@ public partial class StartSessionModal
 
     private async Task HandleSubmit()
     {
-        try
+        var command = new
         {
-            submitting = true;
-            errorMessage = null;
-            successMessage = null;
+            tableId = TableId,
+            seatsCount = model.SeatsCount,
+            anonymousCustomersCount = model.AnonymousCustomersCount,
+            customerIds = model.CustomerIds.Any() ? model.CustomerIds : null
+        };
 
-            var command = new
-            {
-                tableId = TableId,
-                seatsCount = model.SeatsCount,
-                anonymousCustomersCount = model.AnonymousCustomersCount,
-                customerIds = model.CustomerIds.Any() ? model.CustomerIds : null
-            };
+        var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/sessions/start"), command);
 
-            var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl("/api/sessions/start"), command);
-
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = PersianResources.SessionStartedSuccess;
-                await Task.Delay(1000);
-                await OnSessionStarted.InvokeAsync();
-                Close();
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                errorMessage = $"{PersianResources.ErrorStartingSession}: {error}";
-            }
-        }
-        catch (Exception ex)
+        if (response.IsSuccessStatusCode)
         {
-            errorMessage = $"{PersianResources.ErrorStartingSession}: {ex.Message}";
-        }
-        finally
-        {
-            submitting = false;
-        }
-    }
+            NotificationService.ShowSuccess(PersianResources.SessionStartedSuccess);
 
-    private class HourlyFeeDto
-    {
-        public int Id { get; set; }
-        public int SeatsCount { get; set; }
-        public decimal Fee { get; set; }
-    }
+            await Task.Delay(1000);
 
-    private class CustomerDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
+            await OnSessionStarted.InvokeAsync();
+
+            Close();
+        }
+        else
+        { 
+            NotificationService.ShowError(PersianResources.FailureMessage); 
+        }
     }
 }

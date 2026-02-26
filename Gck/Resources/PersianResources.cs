@@ -403,5 +403,6 @@ public static class PersianResources
     public const string Active = "فعال";
     public const string Inactive = "غیرفعال";
     public const string Name = "نام";
+    public const string FailureMessage = "در انجام عملیات مشکلی بوجود آمده است";
 }
 
