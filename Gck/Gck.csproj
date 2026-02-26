@@ -2,14 +2,15 @@
 
   <!--
     ╔══════════════════════════════════════════════════════════════════╗
-    ║  Bootstrap: import Directory.Build.props BEFORE the SDK loads.  ║
-    ║  This makes BlazorMode available for the conditional SDK below.  ║
-    ║  We then disable the automatic re-import that would otherwise    ║
-    ║  happen when Microsoft.Common.props runs inside the SDK chain.   ║
+    ║  BlazorMode controls the hosting model for the Gck client.      ║
+    ║                                                                   ║
+    ║  Allowed values:                                                 ║
+    ║    WebAssembly  (default) – runs entirely in the browser        ║
+    ║    Server                 – UI rendered on the server via        ║
     ╚══════════════════════════════════════════════════════════════════╝
   -->
-  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props" />
   <PropertyGroup>
+    <BlazorMode>Server</BlazorMode>
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
   </PropertyGroup>
 
