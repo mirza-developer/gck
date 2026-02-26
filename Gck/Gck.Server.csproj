@@ -1,25 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    This project file builds the Gck client as Blazor Server.
+    All source files are shared with the WebAssembly project (Gck.csproj).
+    Build command: dotnet build Gck/Gck.Server.csproj
+  -->
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Keep the same root namespace as Gck.csproj so all code-behind files match -->
+    <RootNamespace>Gck</RootNamespace>
+    <!-- Expose BLAZOR_SERVER constant so shared source code can use #if guards -->
+    <DefineConstants>$(DefineConstants);BLAZOR_SERVER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.9" PrivateAssets="all" />
     <PackageReference Include="BlazorPro.BlazorSize" Version="8.0.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
   </ItemGroup>
 
-  <!-- Exclude the Server-mode startup file from WASM builds -->
+  <!-- Exclude the WASM-only startup file -->
   <ItemGroup>
-    <Compile Remove="Program.Server.cs" />
-    <!-- _Host.cshtml is a Razor Page used only by the Server project (Gck.Server.csproj) -->
-    <Content Remove="Pages/_Host.cshtml" />
-    <None Include="Pages/_Host.cshtml" />
+    <Compile Remove="Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
