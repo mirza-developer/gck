@@ -57,6 +57,20 @@ public static class PersianResources
     public const string ControllersPlaceholder = "مثال: 2";
     public const string HourlyFeePlaceholder = "مثال: 50000";
     public const string SubmitTable = "ثبت میز";
+    
+    // Hourly Fees
+    public const string HourlyFeesManagement = "مدیریت نرخ ساعتی";
+    public const string AddNewHourlyFee = "افزودن نرخ ساعتی جدید";
+    public const string EditHourlyFee = "ویرایش نرخ ساعتی";
+    public const string SearchHourlyFees = "جستجوی نرخ ساعتی...";
+    public const string NoHourlyFeesFound = "نرخ ساعتی یافت نشد";
+    public const string HourlyFeeNotFound = "نرخ ساعتی یافت نشد";
+    public const string NumberOfPeoplePlaceholder = "مثال: 2";
+    public const string PricePerHourPlaceholder = "مثال: 150000";
+    public const string People = "نفر";
+    public const string CreateSuccess = "با موفقیت ایجاد شد";
+    public const string UpdateSuccess = "با موفقیت به‌روزرسانی شد";
+    
     public const string CustomersManagement = "مدیریت مشتریان";
     public const string AddNewCustomer = "افزودن مشتری جدید";
     public const string EditCustomer = "ویرایش مشتری";
