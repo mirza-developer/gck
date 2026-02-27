@@ -377,8 +377,8 @@ public static class PersianResources
     // Home Page - Contact Section
     public const string LocationAndContactInfo = "از مکان و اطلاعات تماس";
     public const string OurLocation = "مکان ما";
-    public const string AddressLine1 = "استان تهران، شهر تهران، غرب";
-    public const string AddressLine2 = "منطقه کوثر، خیابان پیروزی، نبش کوچه ۱۸۱";
+    public const string AddressLine1 = " تهران، میدان حر";
+    public const string AddressLine2 = "خیابان کمالی، خیابان کاشان، مجموعه ورزشی کوثر";
     public const string NavigateOnMap = "مسیریابی در نقشه";
     public const string WorkingHours = "ساعات کاری";
     public const string SaturdayToWednesday = "شنبه تا چهار شنبه:";
