@@ -29,6 +29,27 @@ public class FinishSessionDto
     public int FinancialAccountId { get; set; }
 }
 
+public class SessionDetailsDto
+{
+    public int Id { get; set; }
+    public string TableName { get; set; } = string.Empty;
+    public DateTime StartDateTime { get; set; }
+    public decimal FeePerHour { get; set; }
+    public int AnonymousCustomersCount { get; set; } = 0;
+    public List<CustomerDto> Customers { get; set; } = new();
+}
+
+public class CustomerLoyaltyInfo
+{
+    public int CustomerId { get; set; }
+    public bool IsLoyal { get; set; }
+    public int SessionsRequiredForFree { get; set; }
+    public int PaidSessionsCount { get; set; }
+    public bool CanGetFreeSession { get; set; }
+    public int RemainingSessionsForFree { get; set; }
+    public double ProgressPercentage { get; set; }
+}
+
 public class DashboardTableDto
 {
     public int Id { get; set; }

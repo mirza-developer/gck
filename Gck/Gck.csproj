@@ -1,22 +1,71 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project>
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  BlazorMode controls the hosting model for the Gck client.      ║
+    ║                                                                   ║
+    ║  Allowed values:                                                 ║
+    ║    WebAssembly  (default) – runs entirely in the browser        ║
+    ║    Server                 – UI rendered on the server via        ║
+    ╚══════════════════════════════════════════════════════════════════╝
+  -->
+  <PropertyGroup>
+    <BlazorMode>Server</BlazorMode>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+  </PropertyGroup>
+
+  <!--
+    Conditional SDK selection – driven by the BlazorMode property set above.
+      WebAssembly → Microsoft.NET.Sdk.BlazorWebAssembly
+      Server      → Microsoft.NET.Sdk.Web
+  -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" Condition="'$(BlazorMode)' != 'Server'" />
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.Web"               Condition="'$(BlazorMode)' == 'Server'" />
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Explicit namespace so code-behind files match in both hosting modes -->
+    <RootNamespace>Gck</RootNamespace>
+    <!-- Expose the hosting mode to C# code so components can use #if BLAZOR_SERVER -->
+    <DefineConstants Condition="'$(BlazorMode)' == 'Server'">$(DefineConstants);BLAZOR_SERVER</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- WebAssembly-only packages -->
+  <ItemGroup Condition="'$(BlazorMode)' != 'Server'">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.9" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Packages shared by both hosting modes -->
+  <ItemGroup>
     <PackageReference Include="BlazorPro.BlazorSize" Version="8.0.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
+  </ItemGroup>
+
+  <!-- Server-mode files: excluded from WebAssembly builds -->
+  <ItemGroup Condition="'$(BlazorMode)' != 'Server'">
+    <Compile Remove="Program.Server.cs" />
+    <Content Remove="Pages/_Host.cshtml" />
+    <None Include="Pages/_Host.cshtml" />
+  </ItemGroup>
+
+  <!-- WebAssembly-only file: excluded from Server builds -->
+  <ItemGroup Condition="'$(BlazorMode)' == 'Server'">
+    <Compile Remove="Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gck.Application\Gck.Application.csproj" />
     <ProjectReference Include="..\Gck.Common\Gck.Common.csproj" />
   </ItemGroup>
+
+  <!--
+    SDK targets – must be imported last, matching the SDK chosen above.
+  -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" Condition="'$(BlazorMode)' != 'Server'" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.Web"               Condition="'$(BlazorMode)' == 'Server'" />
 
 </Project>

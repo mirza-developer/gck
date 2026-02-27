@@ -1,34 +1,19 @@
+@using Gck.Application.DTOs
 @using Gck.Shared.Modals
 @using Gck.Resources
 
 <Modal @bind-IsVisible="isVisible"
        Title="@(showConfirm ? PersianResources.ConfirmFinishSession : PersianResources.FinishSession)"
        ShowFooter="false"
-       CloseOnOverlayClick="@(!submitting)"
+       CloseOnOverlayClick="@(!loading)"
        Size="@(showConfirm ? ModalSize.Medium : ModalSize.Large)">
-    @if (!showConfirm)
+    @if (loading)
     {
-        @if (loading)
-        {
-            <div class="text-center">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
-                <p>@PersianResources.Loading</p>
-            </div>
-        }
-        else if (errorMessage != null)
-        {
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @errorMessage
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-gaming btn-secondary" @onclick="Close">
-                    <i class="fas fa-times"></i>
-                    <span>@PersianResources.Close</span>
-                </button>
-            </div>
-        }
-        else if (sessionDetails != null)
+        <LoadingSpinner LoadingText="@PersianResources.Loading" Fullscreen="true" />
+    }
+    else if (!showConfirm)
+    {
+        if (sessionDetails != null)
         {
             <div class="session-summary">
                 <div class="summary-row">
@@ -112,9 +97,9 @@
                                                 </span>
                                             }
                                         </div>
-                                        
+
                                         <div class="loyalty-progress-bar">
-                                            <div class="progress-fill @(loyaltyInfo.CanGetFreeSession ? "completed" : "")" 
+                                            <div class="progress-fill @(loyaltyInfo.CanGetFreeSession ? "completed" : "")"
                                                  style="width: @loyaltyInfo.ProgressPercentage%">
                                             </div>
                                             <div class="progress-circles">
@@ -175,9 +160,9 @@
                         <i class="fas fa-edit"></i>
                         @PersianResources.EditableFinalPrice
                     </label>
-                    <input type="number" 
-                           class="form-input" 
-                           @bind="finalPrice" 
+                    <input type="number"
+                           class="form-input"
+                           @bind="finalPrice"
                            @bind:event="oninput"
                            step="1000"
                            min="0" />
@@ -226,45 +211,25 @@
                 <i class="fas fa-wallet"></i>
                 @PersianResources.FinancialAccount
             </label>
-            <select class="form-input" @bind="selectedFinancialAccountId">
-                <option value="0">@PersianResources.SelectFinancialAccount</option>
-                @foreach (var account in financialAccounts)
-                {
-                    <option value="@account.Id">@account.AccountName - @account.BankName</option>
-                }
-            </select>
+            <MultiSelectDropdown TItem="FinancialAccountDto"
+                                 TValue="int"
+                                 Items="financialAccounts"
+                                 IsMultiSelect="false"
+                                 SelectedValue="selectedFinancialAccountId"
+                                 SelectedValueChanged="@((int value) => selectedFinancialAccountId = value)"
+                                 ValueSelector="@(account => account.Id)"
+                                 DisplayTextSelector="@(account => $"{account.AccountName} - {account.BankName}")"
+                                 Placeholder="@PersianResources.SelectFinancialAccount"
+                                 EnableSearch="true"
+                                 SearchPlaceholder="@PersianResources.Search"
+                                 NoResultsText="@PersianResources.NoResultsFound" />
         </div>
-
-        @if (confirmErrorMessage != null)
-        {
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                @confirmErrorMessage
-            </div>
-        }
-
-        @if (successMessage != null)
-        {
-            <div class="success-message">
-                <i class="fas fa-check-circle"></i>
-                @successMessage
-            </div>
-        }
-
         <div class="modal-actions">
-            <button type="button" class="btn-gaming" @onclick="FinishSession" disabled="@(submitting || selectedFinancialAccountId == 0)">
-                @if (submitting)
-                {
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>@PersianResources.Submitting</span>
-                }
-                else
-                {
-                    <i class="fas fa-check"></i>
-                    <span>@PersianResources.ConfirmAndFinish</span>
-                }
+            <button type="button" class="btn-gaming" @onclick="FinishSession" disabled="@(loading || selectedFinancialAccountId == 0)">
+                <i class="fas fa-check"></i>
+                <span>@PersianResources.ConfirmAndFinish</span>
             </button>
-            <button type="button" class="btn-gaming btn-secondary" @onclick="BackToPrice" disabled="@submitting">
+            <button type="button" class="btn-gaming btn-secondary" @onclick="BackToPrice" disabled="@loading">
                 <i class="fas fa-arrow-right"></i>
                 <span>@PersianResources.Back</span>
             </button>
