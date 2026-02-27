@@ -20,7 +20,7 @@ public class UpdateHourlyFeeCommandHandler : IRequestHandler<UpdateHourlyFeeComm
 
         if (hourlyFee == null)
         {
-            throw new Exception($"HourlyFee with ID {request.Id} not found");
+            throw new InvalidOperationException($"HourlyFee with ID {request.Id} not found");
         }
 
         hourlyFee.SeatsCount = request.SeatsCount;
