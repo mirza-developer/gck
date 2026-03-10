@@ -362,14 +362,6 @@ public static class PersianResources
     public const string PleaseCallBeforeVisit = "لطفا پیش از مراجعه تماس بگیرید";
     public const string NumberOfPeople = "تعداد نفرات";
     public const string PricePerHour = "نرخ بر ساعت";
-    public const string TwoPeople = "۲ نفره";
-    public const string ThreePeople = "۳ نفره";
-    public const string FourPeople = "۴ نفره";
-    public const string FivePeople = "۵ نفره";
-    public const string Price150000 = "۱۵۰,۰۰۰ تومان";
-    public const string Price200000 = "۲۰۰,۰۰۰ تومان";
-    public const string Price250000 = "۲۵۰,۰۰۰ تومان";
-    public const string Price300000 = "۳۰۰,۰۰۰ تومان";
     public const string UnlimitedPS5Access = "دسترسی نامحدود به بازی PS5";
     public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال و لایسنس";
     public const string FreeInternet = "اینترنت آزاد و همیشه فعال";
@@ -418,5 +410,8 @@ public static class PersianResources
     public const string Inactive = "غیرفعال";
     public const string Name = "نام";
     public const string FailureMessage = "در انجام عملیات مشکلی بوجود آمده است";
+
+    // Validation
+    public const string ValidationRequired = "ورود اطلاعات فیلد {0} الزامی است";
 }
 
