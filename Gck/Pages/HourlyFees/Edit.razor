@@ -1,0 +1,81 @@
+@page "/hourlyfees/edit/{id:int}"
+@using Gck.Resources
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-edit"></i>
+                @PersianResources.EditHourlyFee
+            </h2>
+            <button class="btn-gaming btn-secondary" @onclick="NavigateBack">
+                <i class="fas fa-arrow-right"></i>
+                @PersianResources.Back
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="text-center p-2rem">
+                    <i class="fas fa-spinner fa-spin fa-3x primary-purple"></i>
+                    <p class="mt-1rem text-secondary">@PersianResources.Loading</p>
+                </div>
+            </div>
+        }
+        else if (command == null)
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="text-center p-2rem">
+                    <i class="fas fa-exclamation-triangle fa-3x accent-yellow"></i>
+                    <p class="mt-1rem text-secondary">@PersianResources.HourlyFeeNotFound</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <EditForm Model="@command" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-users"></i>
+                            @PersianResources.NumberOfPeople <span class="required">@PersianResources.Required</span>
+                        </label>
+                        <InputNumber @bind-Value="command.SeatsCount" class="form-input" placeholder="@PersianResources.NumberOfPeoplePlaceholder" />
+                        <ValidationMessage For="@(() => command.SeatsCount)" class="validation-error" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-dollar-sign"></i>
+                            @PersianResources.PricePerHour <span class="required">@PersianResources.Required</span>
+                        </label>
+                        <InputNumber @bind-Value="command.Fee" class="form-input" placeholder="@PersianResources.PricePerHourPlaceholder" />
+                        <ValidationMessage For="@(() => command.Fee)" class="validation-error" />
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-gaming" disabled="@isSaving">
+                            @if (isSaving)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>@PersianResources.Saving</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-save"></i>
+                                <span>@PersianResources.Save</span>
+                            }
+                        </button>
+                        <button type="button" class="btn-gaming btn-secondary" @onclick="NavigateBack" disabled="@isSaving">
+                            <i class="fas fa-times"></i>
+                            @PersianResources.Cancel
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        }
+    </div>
+</section>

@@ -53,5 +53,21 @@ public static class DbInitializer
             context.Users.Add(adminUser);
             await context.SaveChangesAsync();
         }
+
+        // Seed default hourly fees if none exist
+        if (!await context.Fees.AnyAsync())
+        {
+            var hourlyFees = new List<HourlyFee>
+            {
+                new HourlyFee { SeatsCount = 2, Fee = 150000, CreateDate = DateTime.Now, LastModifiedDate = DateTime.Now },
+                new HourlyFee { SeatsCount = 3, Fee = 200000, CreateDate = DateTime.Now, LastModifiedDate = DateTime.Now },
+                new HourlyFee { SeatsCount = 4, Fee = 250000, CreateDate = DateTime.Now, LastModifiedDate = DateTime.Now },
+                new HourlyFee { SeatsCount = 5, Fee = 300000, CreateDate = DateTime.Now, LastModifiedDate = DateTime.Now }
+            };
+
+            context.Fees.AddRange(hourlyFees);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Hourly fees seeded successfully");
+        }
     }
 }

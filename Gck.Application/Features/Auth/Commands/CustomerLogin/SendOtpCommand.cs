@@ -1,9 +1,11 @@
 using MediatR;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gck.Application.Features.Auth.Commands.CustomerLogin;
 
 public class SendOtpCommand : IRequest<SendOtpResponse>
 {
+    [Required]
     public string PhoneNumber { get; set; } = string.Empty;
 }
 

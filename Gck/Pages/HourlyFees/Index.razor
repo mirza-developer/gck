@@ -1,0 +1,88 @@
+@page "/hourlyfees"
+@using Gck.Resources
+@using Gck.Components
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-dollar-sign"></i>
+                @PersianResources.HourlyFeesManagement
+            </h2>
+            <button class="btn-gaming" @onclick="NavigateToAdd">
+                <i class="fas fa-plus"></i>
+                @PersianResources.AddNewHourlyFee
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
+        }
+        else
+        {
+            <div class="gaming-card fade-in-up">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="@PersianResources.SearchHourlyFees" 
+                           @bind="searchText" 
+                           @bind:event="oninput"
+                           class="search-input" />
+                </div>
+
+                @if (FilteredHourlyFees.Any())
+                {
+                    <div class="data-grid">
+                        <table class="data-grid-table">
+                            <thead class="data-grid-header">
+                                <tr>
+                                    <th>@PersianResources.NumberOfPeople</th>
+                                    <th>@PersianResources.PricePerHour</th>
+                                    <th>@PersianResources.Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="data-grid-body">
+                                @foreach (var fee in FilteredHourlyFees)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="grid-cell-primary">
+                                                <i class="fas fa-users"></i>
+                                                @fee.SeatsCount @PersianResources.People
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="grid-cell-primary primary-purple">
+                                                @fee.Fee.ToString("N0") @PersianResources.Toman
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="grid-actions">
+                                                <button class="grid-action-btn edit" @onclick="() => NavigateToEdit(fee.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                    @PersianResources.Edit
+                                                </button>
+                                                <button class="grid-action-btn delete" @onclick="() => DeleteHourlyFee(fee.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                    @PersianResources.Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data-message">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoHourlyFeesFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

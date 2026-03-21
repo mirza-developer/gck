@@ -24,6 +24,7 @@ public partial class AppErrorBoundary : ErrorBoundaryBase
         }
 
         Console.Error.WriteLine($"Error caught by ErrorBoundary: {exception.Message}");
+       
         Console.Error.WriteLine($"Stack Trace: {exception.StackTrace}");
         
         return Task.CompletedTask;

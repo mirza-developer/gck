@@ -57,6 +57,20 @@ public static class PersianResources
     public const string ControllersPlaceholder = "مثال: 2";
     public const string HourlyFeePlaceholder = "مثال: 50000";
     public const string SubmitTable = "ثبت میز";
+    
+    // Hourly Fees
+    public const string HourlyFeesManagement = "مدیریت نرخ ساعتی";
+    public const string AddNewHourlyFee = "افزودن نرخ ساعتی جدید";
+    public const string EditHourlyFee = "ویرایش نرخ ساعتی";
+    public const string SearchHourlyFees = "جستجوی نرخ ساعتی...";
+    public const string NoHourlyFeesFound = "نرخ ساعتی یافت نشد";
+    public const string HourlyFeeNotFound = "نرخ ساعتی یافت نشد";
+    public const string NumberOfPeoplePlaceholder = "مثال: 2";
+    public const string PricePerHourPlaceholder = "مثال: 150000";
+    public const string People = "نفر";
+    public const string CreateSuccess = "با موفقیت ایجاد شد";
+    public const string UpdateSuccess = "با موفقیت به‌روزرسانی شد";
+    
     public const string CustomersManagement = "مدیریت مشتریان";
     public const string AddNewCustomer = "افزودن مشتری جدید";
     public const string EditCustomer = "ویرایش مشتری";
@@ -343,28 +357,19 @@ public static class PersianResources
     public const string SnacksAndFood = "میان‌وعده و اسنک‌ها";
     
     // Home Page - Pricing Section
-    public const string PricingAndDiscounts = "از نرخ‌ها و تخفیف‌ها";
+    public const string PricingAndDiscounts = "نرخ‌ها";
     public const string OurHourlyRates = "نرخ‌های ساعتی ما بسته به نفرات متغیر است";
     public const string PleaseCallBeforeVisit = "لطفا پیش از مراجعه تماس بگیرید";
     public const string NumberOfPeople = "تعداد نفرات";
     public const string PricePerHour = "نرخ بر ساعت";
-    public const string TwoPeople = "۲ نفره";
-    public const string ThreePeople = "۳ نفره";
-    public const string FourPeople = "۴ نفره";
-    public const string FivePeople = "۵ نفره";
-    public const string Price150000 = "۱۵۰,۰۰۰ تومان";
-    public const string Price200000 = "۲۰۰,۰۰۰ تومان";
-    public const string Price250000 = "۲۵۰,۰۰۰ تومان";
-    public const string Price300000 = "۳۰۰,۰۰۰ تومان";
     public const string UnlimitedPS5Access = "دسترسی نامحدود به بازی PS5";
-    public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال و لایسنس";
-    public const string FreeInternet = "اینترنت آزاد و همیشه فعال";
+    public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال";
     
     // Home Page - Contact Section
     public const string LocationAndContactInfo = "از مکان و اطلاعات تماس";
     public const string OurLocation = "مکان ما";
-    public const string AddressLine1 = "استان تهران، شهر تهران، غرب";
-    public const string AddressLine2 = "منطقه کوثر، خیابان پیروزی، نبش کوچه ۱۸۱";
+    public const string AddressLine1 = " تهران، میدان حر";
+    public const string AddressLine2 = "خیابان کمالی، خیابان کاشان، مجموعه ورزشی کوثر";
     public const string NavigateOnMap = "مسیریابی در نقشه";
     public const string WorkingHours = "ساعات کاری";
     public const string SaturdayToWednesday = "شنبه تا چهار شنبه:";
@@ -404,5 +409,8 @@ public static class PersianResources
     public const string Inactive = "غیرفعال";
     public const string Name = "نام";
     public const string FailureMessage = "در انجام عملیات مشکلی بوجود آمده است";
+
+    // Validation
+    public const string ValidationRequired = "ورود اطلاعات فیلد {0} الزامی است";
 }
 

@@ -212,39 +212,27 @@
         <div class="gaming-card fade-in-up pricing-card">
             <div class="pricing-header">
                 <h3 class="primary-purple mb-1rem">@PersianResources.OurHourlyRates</h3>
-                <div class="text-secondary mb-1-5rem">@PersianResources.PleaseCallBeforeVisit</div>
-                <table class="pricing-table">
-                    <thead class="gradient-1-bg text-white">
-                        <tr>
-                            <th class="p-0-7rem">@PersianResources.NumberOfPeople</th>
-                            <th class="p-0-7rem">@PersianResources.PricePerHour</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="bg-purple-07">
-                            <td class="p-0-7rem font-600">@PersianResources.TwoPeople</td>
-                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price150000</td>
-                        </tr>
-                        <tr>
-                            <td class="p-0-7rem font-600">@PersianResources.ThreePeople</td>
-                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price200000</td>
-                        </tr>
-                        <tr class="bg-purple-07">
-                            <td class="p-0-7rem font-600">@PersianResources.FourPeople</td>
-                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price250000</td>
-                        </tr>
-                        <tr>
-                            <td class="p-0-7rem font-600">@PersianResources.FivePeople</td>
-                            <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price300000</td>
-                        </tr>
-                    </tbody>
-                </table>
+                @if (hourlyFees.Any())
+                {
+                    <table class="pricing-table">
+                        <thead class="gradient-1-bg text-white">
+                            <tr>
+                                <th class="p-0-7rem">@PersianResources.NumberOfPeople</th>
+                                <th class="p-0-7rem">@PersianResources.PricePerHour</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (fee, index) in hourlyFees.Select((f, i) => (f, i)))
+                            {
+                                <tr class="@(index % 2 == 0 ? "bg-purple-07" : "")">
+                                    <td class="p-0-7rem font-600">@fee.SeatsCount @PersianResources.People</td>
+                                    <td class="p-0-7rem font-700 primary-purple">@fee.Fee.ToString("N0") @PersianResources.Toman</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
             </div>
-            <ul class="feature-list text-secondary mb-2rem">
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.UnlimitedPS5Access</li>
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.AllOriginalGameplay</li>
-                <li><i class="fas fa-check accent-cyan ml-0-5rem"></i>@PersianResources.FreeInternet</li>
-            </ul>
         </div>
     </div>
 </section>

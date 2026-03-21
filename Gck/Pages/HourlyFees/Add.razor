@@ -1,0 +1,60 @@
+@page "/hourlyfees/add"
+@using Gck.Resources
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                @PersianResources.AddNewHourlyFee
+            </h2>
+            <button class="btn-gaming btn-secondary" @onclick="NavigateBack">
+                <i class="fas fa-arrow-right"></i>
+                @PersianResources.Back
+            </button>
+        </div>
+
+        <div class="gaming-card fade-in-up">
+            <EditForm Model="@command" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-users"></i>
+                        @PersianResources.NumberOfPeople <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputNumber @bind-Value="command.SeatsCount" class="form-input" placeholder="@PersianResources.NumberOfPeoplePlaceholder" />
+                    <ValidationMessage For="@(() => command.SeatsCount)" class="validation-error" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        @PersianResources.PricePerHour <span class="required">@PersianResources.Required</span>
+                    </label>
+                    <InputNumber @bind-Value="command.Fee" class="form-input" placeholder="@PersianResources.PricePerHourPlaceholder" />
+                    <ValidationMessage For="@(() => command.Fee)" class="validation-error" />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-gaming" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>@PersianResources.Saving</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-save"></i>
+                            <span>@PersianResources.Save</span>
+                        }
+                    </button>
+                    <button type="button" class="btn-gaming btn-secondary" @onclick="NavigateBack" disabled="@isLoading">
+                        <i class="fas fa-times"></i>
+                        @PersianResources.Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</section>

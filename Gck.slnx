@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Gck.Api/Gck.Api.csproj" />
+  <Project Path="Gck.Application/Gck.Application.csproj" />
+  <Project Path="Gck.Common/Gck.Common.csproj" />
+  <Project Path="Gck.Domain/Gck.Domain.csproj" />
+  <Project Path="Gck.Persistence/Gck.Persistence.csproj" />
+  <Project Path="Gck/Gck.csproj" />
+</Solution>

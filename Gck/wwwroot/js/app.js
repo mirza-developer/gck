@@ -37,9 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize dropdown menu
     initDropdownMenu();
     
-    // Gaming cursor effect
-    createGamingCursor();
-    
     // Particle background
     createParticleBackground();
 });
@@ -93,7 +90,9 @@ function initDropdownMenu() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             if (window.innerWidth > 768) {
-                navMenu.classList.remove('mobile-open');
+                if (navMenu) {
+                    navMenu.classList.remove('mobile-open');
+                }
                 const icon = mobileMenuToggle?.querySelector('i');
                 if (icon) {
                     icon.classList.add('fa-bars');
@@ -110,42 +109,6 @@ function initDropdownMenu() {
 // Helper function to safely check if element matches selector
 function elementMatches(element, selector) {
     return element && element.nodeType === Node.ELEMENT_NODE && element.matches && element.matches(selector);
-}
-
-// Gaming cursor effect
-function createGamingCursor() {
-    const cursor = document.createElement('div');
-    cursor.classList.add('gaming-cursor');
-    cursor.style.cssText = `
-        position: fixed;
-        width: 20px;
-        height: 20px;
-        background: radial-gradient(circle, #6c5ce7, #fd79a8);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transition: transform 0.1s ease;
-        mix-blend-mode: difference;
-    `;
-    document.body.appendChild(cursor);
-    
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX - 10 + 'px';
-        cursor.style.top = e.clientY - 10 + 'px';
-    });
-    
-    // Scale cursor on hover
-    document.addEventListener('mouseenter', (e) => {
-        if (elementMatches(e.target, 'button, a, .gaming-card, .game-card')) {
-            cursor.style.transform = 'scale(1.5)';
-        }
-    }, true);
-    
-    document.addEventListener('mouseleave', (e) => {
-        if (elementMatches(e.target, 'button, a, .gaming-card, .game-card')) {
-            cursor.style.transform = 'scale(1)';
-        }
-    }, true);
 }
 
 // Particle background effect
