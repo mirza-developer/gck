@@ -31,7 +31,6 @@ public partial class FinishSessionModal
     private decimal totalDiscountAmount = 0;
 
     // Credit usage
-    private bool useCreditEnabled = false;
     private int? selectedCreditCustomerId;
     private decimal creditCustomerBalance = 0;
     private decimal creditToUse = 0;
@@ -42,7 +41,6 @@ public partial class FinishSessionModal
         SessionId = sessionId;
         showConfirm = false;
         selectedFinancialAccountId = 0;
-        useCreditEnabled = false;
         selectedCreditCustomerId = null;
         creditCustomerBalance = 0;
         creditToUse = 0;

@@ -44,11 +44,11 @@ public partial class Index
             .Where(c => c.ReferredByCustomerId.HasValue)
             .ToList();
 
-        // Initialize pending percentages
+        // Initialize pending percentages with existing values
         pendingPercentages.Clear();
         foreach (var c in pendingReferrals)
         {
-            pendingPercentages[c.Id] = 0;
+            pendingPercentages[c.Id] = c.ReferralRewardPercentage;
         }
 
         isLoading = false;

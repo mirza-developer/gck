@@ -109,10 +109,11 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         }
 
         // Calculate referral rewards for each customer in the session
-        decimal actualPayment = request.FinalPrice + request.CreditUsed;
-        if (totalPeople > 0 && actualPayment > 0)
+        // totalSessionCost = cash paid + credit used = total value of the session
+        decimal totalSessionCost = request.FinalPrice + request.CreditUsed;
+        if (totalPeople > 0 && totalSessionCost > 0)
         {
-            decimal paymentPerPerson = actualPayment / totalPeople;
+            decimal paymentPerPerson = totalSessionCost / totalPeople;
 
             foreach (var sessionCustomer in session.SessionCustomers)
             {

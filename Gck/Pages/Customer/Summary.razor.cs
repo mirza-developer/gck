@@ -96,6 +96,7 @@ public partial class Summary
         public bool IsLoyal { get; set; }
         public int SessionsRequiredForFree { get; set; }
         public int PaidSessionsCount { get; set; }
+        public decimal ReferralCredit { get; set; }
     }
 
     public class CustomerSessionDto

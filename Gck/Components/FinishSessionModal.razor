@@ -189,7 +189,7 @@
                                 <i class="fas fa-user"></i>
                                 @PersianResources.SelectCustomerForCredit
                             </label>
-                            <select class="form-input" @onchange="@(e => OnCreditCustomerChanged(e.Value?.ToString() is { Length: > 0 } s ? int.Parse(s) : (int?)null))">
+                            <select class="form-input" @onchange="@(e => OnCreditCustomerChanged(int.TryParse(e.Value?.ToString(), out var cid) ? (int?)cid : null))">
                                 <option value="">-- بدون اعتبار --</option>
                                 @foreach (var c in sessionCustomerCredits)
                                 {
