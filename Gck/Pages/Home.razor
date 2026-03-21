@@ -212,15 +212,7 @@
         <div class="gaming-card fade-in-up pricing-card">
             <div class="pricing-header">
                 <h3 class="primary-purple mb-1rem">@PersianResources.OurHourlyRates</h3>
-                <div class="text-secondary mb-1-5rem">@PersianResources.PleaseCallBeforeVisit</div>
-                @if (isLoadingFees)
-                {
-                    <div class="text-center p-2rem">
-                        <i class="fas fa-spinner fa-spin fa-2x primary-purple"></i>
-                        <p class="mt-1rem text-secondary">@PersianResources.Loading</p>
-                    </div>
-                }
-                else if (hourlyFees.Any())
+                @if (hourlyFees.Any())
                 {
                     <table class="pricing-table">
                         <thead class="gradient-1-bg text-white">
@@ -237,35 +229,6 @@
                                     <td class="p-0-7rem font-700 primary-purple">@fee.Fee.ToString("N0") @PersianResources.Toman</td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <table class="pricing-table">
-                        <thead class="gradient-1-bg text-white">
-                            <tr>
-                                <th class="p-0-7rem">@PersianResources.NumberOfPeople</th>
-                                <th class="p-0-7rem">@PersianResources.PricePerHour</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="bg-purple-07">
-                                <td class="p-0-7rem font-600">@PersianResources.TwoPeople</td>
-                                <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price150000</td>
-                            </tr>
-                            <tr>
-                                <td class="p-0-7rem font-600">@PersianResources.ThreePeople</td>
-                                <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price200000</td>
-                            </tr>
-                            <tr class="bg-purple-07">
-                                <td class="p-0-7rem font-600">@PersianResources.FourPeople</td>
-                                <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price250000</td>
-                            </tr>
-                            <tr>
-                                <td class="p-0-7rem font-600">@PersianResources.FivePeople</td>
-                                <td class="p-0-7rem font-700 primary-purple">@PersianResources.Price300000</td>
-                            </tr>
                         </tbody>
                     </table>
                 }

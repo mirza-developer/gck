@@ -357,14 +357,13 @@ public static class PersianResources
     public const string SnacksAndFood = "میان‌وعده و اسنک‌ها";
     
     // Home Page - Pricing Section
-    public const string PricingAndDiscounts = "از نرخ‌ها و تخفیف‌ها";
+    public const string PricingAndDiscounts = "نرخ‌ها";
     public const string OurHourlyRates = "نرخ‌های ساعتی ما بسته به نفرات متغیر است";
     public const string PleaseCallBeforeVisit = "لطفا پیش از مراجعه تماس بگیرید";
     public const string NumberOfPeople = "تعداد نفرات";
     public const string PricePerHour = "نرخ بر ساعت";
     public const string UnlimitedPS5Access = "دسترسی نامحدود به بازی PS5";
-    public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال و لایسنس";
-    public const string FreeInternet = "اینترنت آزاد و همیشه فعال";
+    public const string AllOriginalGameplay = "تمامی گیم پلی اورجینال";
     
     // Home Page - Contact Section
     public const string LocationAndContactInfo = "از مکان و اطلاعات تماس";

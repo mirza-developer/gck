@@ -1,10 +1,10 @@
 using Gck.Application.Services;
+using Gck.Common.Helpers;
 using Gck.Domain.Entities;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MD.PersianDateTime;
 
 namespace Gck.Application.Features.Sessions.Commands.FinishSession;
 
@@ -117,8 +117,7 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
     private async Task SendSessionCompletionMessagesAsync(Session session, CancellationToken cancellationToken)
     {
         // Get Persian date and time
-        var persianDateTime = new PersianDateTime(DateTime.Now);
-        var persianDateTimeStr = $"{persianDateTime.ToShortDateString()} {persianDateTime.ToString("HH:mm")}";
+        var persianDateTimeStr = DateTime.Now.ToPersianDateTime();
 
         foreach (var sessionCustomer in session.SessionCustomers)
         {
