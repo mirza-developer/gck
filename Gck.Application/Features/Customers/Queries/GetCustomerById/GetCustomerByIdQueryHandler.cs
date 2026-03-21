@@ -17,6 +17,7 @@ public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery,
     public async Task<CustomerDto?> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
         var customer = await _context.Customers
+            .Include(c => c.ReferredByCustomer)
             .Where(c => c.Id == request.Id)
             .Select(c => new CustomerDto
             {
@@ -28,7 +29,12 @@ public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery,
                 SessionCount = c.SessionCustomers.Count,
                 IsLoyal = c.IsLoyal,
                 SessionsRequiredForFree = c.SessionsRequiredForFree,
-                PaidSessionsCount = c.PaidSessionsCount
+                PaidSessionsCount = c.PaidSessionsCount,
+                ReferredByCustomerId = c.ReferredByCustomerId,
+                ReferredByCustomerName = c.ReferredByCustomer != null ? c.ReferredByCustomer.Name : null,
+                IsVerifiedByAdmin = c.IsVerifiedByAdmin,
+                ReferralCredit = c.ReferralCredit,
+                ReferralRewardPercentage = c.ReferralRewardPercentage
             })
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -175,6 +175,59 @@
                         <span>@PersianResources.PriceDifference: @Math.Abs(finalPrice - recommendedPrice).ToString("N0") @PersianResources.Toman</span>
                     </div>
                 }
+
+                @* Credit Usage Section *@
+                @if (sessionCustomerCredits.Any())
+                {
+                    <div class="loyalty-section" style="margin-top: 1rem;">
+                        <div class="loyalty-header">
+                            <i class="fas fa-coins"></i>
+                            <span>@PersianResources.UseCredit</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                @PersianResources.SelectCustomerForCredit
+                            </label>
+                            <select class="form-input" @onchange="@(e => OnCreditCustomerChanged(e.Value?.ToString() is { Length: > 0 } s ? int.Parse(s) : (int?)null))">
+                                <option value="">-- بدون اعتبار --</option>
+                                @foreach (var c in sessionCustomerCredits)
+                                {
+                                    <option value="@c.CustomerId">@c.CustomerName - @c.CreditBalance.ToString("N0") @PersianResources.Toman</option>
+                                }
+                            </select>
+                        </div>
+                        @if (selectedCreditCustomerId.HasValue && creditCustomerBalance > 0)
+                        {
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-coins"></i>
+                                    @PersianResources.CreditToUse (@PersianResources.AvailableCredit: @creditCustomerBalance.ToString("N0") @PersianResources.Toman)
+                                </label>
+                                <input type="number"
+                                       class="form-input"
+                                       min="0"
+                                       max="@Math.Min(creditCustomerBalance, finalPrice)"
+                                       step="1000"
+                                       value="@creditToUse"
+                                       @oninput="@(e => OnCreditToUseChanged(decimal.TryParse(e.Value?.ToString(), out var v) ? v : 0))" />
+                            </div>
+                            @if (creditToUse > 0)
+                            {
+                                <div class="recommended-price discount-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>@PersianResources.CreditUsedInSession:</span>
+                                    <strong class="discount-text">-@creditToUse.ToString("N0") @PersianResources.Toman</strong>
+                                </div>
+                                <div class="recommended-price discounted-price">
+                                    <i class="fas fa-calculator"></i>
+                                    <span>مبلغ پرداختی نقدی:</span>
+                                    <strong class="recommended-text">@((finalPrice - creditToUse).ToString("N0")) @PersianResources.Toman</strong>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
             </div>
 
             <div class="modal-actions">
@@ -204,6 +257,17 @@
                 <span class="label">@PersianResources.FinalPrice:</span>
                 <span class="value highlight">@finalPrice.ToString("N0") @PersianResources.Toman</span>
             </div>
+            @if (creditToUse > 0)
+            {
+                <div class="summary-item">
+                    <span class="label">@PersianResources.CreditUsedInSession:</span>
+                    <span class="value" style="color: #00cc66;">-@creditToUse.ToString("N0") @PersianResources.Toman</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">مبلغ پرداختی نقدی:</span>
+                    <span class="value highlight">@((finalPrice - creditToUse).ToString("N0")) @PersianResources.Toman</span>
+                </div>
+            }
         </div>
 
         <div class="form-group">

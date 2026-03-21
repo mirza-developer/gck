@@ -43,7 +43,11 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
                     Gender = sc.Customer.IsMale ? "Male" : "Female",
                     IsLoyal = sc.Customer.IsLoyal,
                     SessionsRequiredForFree = sc.Customer.SessionsRequiredForFree,
-                    PaidSessionsCount = sc.Customer.PaidSessionsCount
+                    PaidSessionsCount = sc.Customer.PaidSessionsCount,
+                    ReferralCredit = sc.Customer.ReferralCredit,
+                    ReferralRewardPercentage = sc.Customer.ReferralRewardPercentage,
+                    ReferredByCustomerId = sc.Customer.ReferredByCustomerId,
+                    IsVerifiedByAdmin = sc.Customer.IsVerifiedByAdmin
                 }).ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);

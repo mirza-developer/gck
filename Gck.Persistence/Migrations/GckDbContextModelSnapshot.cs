@@ -81,6 +81,10 @@ namespace Gck.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsVerifiedByAdmin")
+                        .HasDefaultValue(true)
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -97,12 +101,27 @@ namespace Gck.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal>("ReferralCredit")
+                        .HasDefaultValue(0m)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ReferralRewardPercentage")
+                        .HasDefaultValue(0m)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int?>("ReferredByCustomerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SessionsRequiredForFree")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsVerifiedByAdmin");
+
                     b.HasIndex("PhoneNumber");
+
+                    b.HasIndex("ReferredByCustomerId");
 
                     b.ToTable("tbl_Customer");
                 });
@@ -351,7 +370,7 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_Table");
                 });
 
-            modelBuilder.Entity("Gck.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("Gck.Domain.Entities.CreditWithdrawalRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -365,10 +384,50 @@ namespace Gck.Persistence.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
                         .IsRequired()
+                        .HasDefaultValue("")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("RequestDate");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("tbl_CreditWithdrawalRequest");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("FinancialAccountId")
                         .HasColumnType("int");
@@ -496,6 +555,27 @@ namespace Gck.Persistence.Migrations
                     b.Navigation("Session");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.CreditWithdrawalRequest", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
+                {
+                    b.HasOne("Gck.Domain.Entities.Customer", "ReferredByCustomer")
+                        .WithMany("ReferredCustomers")
+                        .HasForeignKey("ReferredByCustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ReferredByCustomer");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.CustomerFeedback", b =>
                 {
                     b.HasOne("Gck.Domain.Entities.Customer", "Customer")
@@ -569,6 +649,8 @@ namespace Gck.Persistence.Migrations
 
             modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
                 {
+                    b.Navigation("ReferredCustomers");
+
                     b.Navigation("SessionCustomers");
                 });
 

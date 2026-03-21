@@ -11,6 +11,11 @@ public class CustomerDto
     public bool IsLoyal { get; set; }
     public int SessionsRequiredForFree { get; set; }
     public int PaidSessionsCount { get; set; }
+    public int? ReferredByCustomerId { get; set; }
+    public string? ReferredByCustomerName { get; set; }
+    public bool IsVerifiedByAdmin { get; set; }
+    public decimal ReferralCredit { get; set; }
+    public decimal ReferralRewardPercentage { get; set; }
 }
 
 public class CreateCustomerDto

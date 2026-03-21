@@ -62,6 +62,19 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         session.Table.IsOccupied = false;
         session.Table.LastModifiedDate = DateTime.Now;
 
+        // Handle credit usage: deduct from a customer's credit balance
+        if (request.CreditUsed > 0 && request.CreditCustomerId.HasValue)
+        {
+            var creditCustomer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Id == request.CreditCustomerId.Value, cancellationToken);
+            
+            if (creditCustomer != null && creditCustomer.ReferralCredit >= request.CreditUsed)
+            {
+                creditCustomer.ReferralCredit -= request.CreditUsed;
+                creditCustomer.LastModifiedDate = DateTime.Now;
+            }
+        }
+
         // Handle loyalty program - per-person basis
         int totalPeople = session.SessionCustomers.Count + session.AnonymousCustomersCount;
         decimal pricePerPerson = totalPeople > 0 ? recommendedPrice / totalPeople : recommendedPrice;
@@ -93,6 +106,35 @@ public class FinishSessionCommandHandler : IRequestHandler<FinishSessionCommand,
         if (anyFreeSession)
         {
             session.IsFreeSession = true;
+        }
+
+        // Calculate referral rewards for each customer in the session
+        decimal actualPayment = request.FinalPrice + request.CreditUsed;
+        if (totalPeople > 0 && actualPayment > 0)
+        {
+            decimal paymentPerPerson = actualPayment / totalPeople;
+
+            foreach (var sessionCustomer in session.SessionCustomers)
+            {
+                var customer = sessionCustomer.Customer;
+
+                // Check if this customer has a referrer and a reward percentage
+                if (customer.ReferredByCustomerId.HasValue && customer.ReferralRewardPercentage > 0)
+                {
+                    var referrer = await _context.Customers
+                        .FirstOrDefaultAsync(c => c.Id == customer.ReferredByCustomerId.Value, cancellationToken);
+
+                    if (referrer != null)
+                    {
+                        decimal rewardAmount = Math.Round(paymentPerPerson * customer.ReferralRewardPercentage / 100, 2);
+                        referrer.ReferralCredit += rewardAmount;
+                        referrer.LastModifiedDate = DateTime.Now;
+
+                        _logger.LogInformation("Referral reward: Customer {ReferrerId} gets {Reward} Tomans from Customer {CustomerId}'s payment",
+                            referrer.Id, rewardAmount, customer.Id);
+                    }
+                }
+            }
         }
 
         var receipt = new AccountantReceipt

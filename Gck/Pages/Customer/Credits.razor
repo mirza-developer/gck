@@ -1,0 +1,162 @@
+@page "/customer/credits"
+@using Gck.Resources
+@using Gck.Components
+@using Gck.Application.DTOs
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-wallet"></i>
+                @PersianResources.MyCreditBalance
+            </h2>
+        </div>
+
+        @if (isLoading)
+        {
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
+        }
+        else
+        {
+            <!-- Credit Balance Card -->
+            <div class="gaming-card fade-in-up" style="margin-bottom: 2rem;">
+                <div class="grid-details-header">
+                    <i class="fas fa-coins"></i>
+                    <h4>@PersianResources.CreditBalance</h4>
+                </div>
+                <div class="grid-details-body">
+                    <div class="grid-detail-item">
+                        <div class="grid-detail-label">
+                            <i class="fas fa-wallet"></i>
+                            @PersianResources.AvailableCredit
+                        </div>
+                        <div class="grid-detail-value highlight" style="font-size: 2rem; color: #00cc66;">
+                            @creditBalance.ToString("N0") @PersianResources.Toman
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Withdrawal -->
+            @if (creditBalance > 0)
+            {
+                <div class="gaming-card fade-in-up" style="margin-bottom: 2rem;">
+                    <div class="grid-details-header">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h4>@PersianResources.RequestCashWithdrawal</h4>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(successMsg))
+                    {
+                        <div style="background: rgba(0,200,0,0.1); border: 1px solid rgba(0,200,0,0.3); color: #00cc00; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <i class="fas fa-check-circle"></i> @successMsg
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(errorMsg))
+                    {
+                        <div style="background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); color: #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-triangle"></i> @errorMsg
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-coins"></i>
+                            @PersianResources.WithdrawalAmount @PersianResources.Required
+                        </label>
+                        <input type="number"
+                               class="form-input"
+                               placeholder="@PersianResources.WithdrawalAmountPlaceholder"
+                               min="1"
+                               max="@creditBalance"
+                               @bind="withdrawalAmount" />
+                        <small style="color: #888; margin-top: 0.25rem; display: block;">
+                            حداکثر: @creditBalance.ToString("N0") @PersianResources.Toman
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comment"></i>
+                            @PersianResources.WithdrawalNotes
+                        </label>
+                        <textarea class="form-input"
+                                  placeholder="@PersianResources.WithdrawalNotesPlaceholder"
+                                  rows="3"
+                                  @bind="withdrawalNotes"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-gaming" @onclick="SubmitWithdrawal" disabled="@(isSubmitting || hasPendingRequest)">
+                            @if (isSubmitting)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>@PersianResources.Submitting</span>
+                            }
+                            else if (hasPendingRequest)
+                            {
+                                <i class="fas fa-clock"></i>
+                                <span>@PersianResources.PendingWithdrawalExists</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-paper-plane"></i>
+                                <span>@PersianResources.RequestCashWithdrawal</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <!-- Withdrawal History -->
+            <div class="gaming-card fade-in-up">
+                <div class="grid-details-header">
+                    <i class="fas fa-history"></i>
+                    <h4>@PersianResources.MyWithdrawals</h4>
+                </div>
+
+                @if (withdrawals.Any())
+                {
+                    <div class="data-grid">
+                        <table class="data-grid-table">
+                            <thead class="data-grid-header">
+                                <tr>
+                                    <th>@PersianResources.WithdrawalAmount</th>
+                                    <th>@PersianResources.WithdrawalRequestDate</th>
+                                    <th>وضعیت</th>
+                                    <th>@PersianResources.WithdrawalProcessedDate</th>
+                                    <th>@PersianResources.WithdrawalNotes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="data-grid-body">
+                                @foreach (var w in withdrawals)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="grid-cell-badge" style="background: rgba(0,200,100,0.2); color: #00cc66;">
+                                                <i class="fas fa-coins"></i>
+                                                @w.Amount.ToString("N0") @PersianResources.Toman
+                                            </span>
+                                        </td>
+                                        <td><span class="grid-cell-secondary">@w.RequestDate.ToString("yyyy/MM/dd")</span></td>
+                                        <td>@GetStatusBadge(w.Status)</td>
+                                        <td><span class="grid-cell-secondary">@(w.ProcessedDate?.ToString("yyyy/MM/dd") ?? "-")</span></td>
+                                        <td><span class="grid-cell-secondary">@(string.IsNullOrEmpty(w.Notes) ? "-" : w.Notes)</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>@PersianResources.NoWithdrawalsFound</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

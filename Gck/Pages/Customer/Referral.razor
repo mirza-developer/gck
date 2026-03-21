@@ -1,0 +1,131 @@
+@page "/customer/referral"
+@using Gck.Resources
+@using Gck.Components
+
+<section class="section">
+    <div class="container">
+        <div class="page-header fade-in-up">
+            <h2 class="section-title">
+                <i class="fas fa-user-plus"></i>
+                @PersianResources.IntroduceFriendTitle
+            </h2>
+        </div>
+
+        @if (isLoading)
+        {
+            <LoadingSpinner LoadingText="@PersianResources.Loading" />
+        }
+        else
+        {
+            <!-- Credit Balance Card -->
+            <div class="gaming-card fade-in-up" style="margin-bottom: 2rem;">
+                <div class="grid-details-header">
+                    <i class="fas fa-coins"></i>
+                    <h4>@PersianResources.MyCreditBalance</h4>
+                </div>
+                <div class="grid-details-body">
+                    <div class="grid-detail-item">
+                        <div class="grid-detail-label">
+                            <i class="fas fa-wallet"></i>
+                            @PersianResources.CreditBalance
+                        </div>
+                        <div class="grid-detail-value highlight" style="font-size: 1.5rem; color: #00cc66;">
+                            @creditBalance.ToString("N0") @PersianResources.Toman
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="gaming-card fade-in-up" style="margin-bottom: 2rem; background: rgba(100,100,255,0.05); border: 1px solid rgba(100,100,255,0.2);">
+                <div style="padding: 1rem;">
+                    <i class="fas fa-info-circle" style="color: #8888ff;"></i>
+                    <span style="margin-right: 0.5rem; color: #ccccff;">@PersianResources.IntroduceFriendDesc</span>
+                </div>
+            </div>
+
+            <!-- Introduce Form -->
+            <div class="gaming-card fade-in-up">
+                <div class="grid-details-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h4>@PersianResources.IntroduceFriendTitle</h4>
+                </div>
+
+                @if (!string.IsNullOrEmpty(successMessage))
+                {
+                    <div class="gaming-card" style="background: rgba(0,200,0,0.1); border: 1px solid rgba(0,200,0,0.3); color: #00cc00; margin-bottom: 1rem; padding: 1rem;">
+                        <i class="fas fa-check-circle"></i>
+                        @successMessage
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="gaming-card" style="background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); color: #ff4444; margin-bottom: 1rem; padding: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i>
+                        @PersianResources.CustomerName @PersianResources.Required
+                    </label>
+                    <input type="text"
+                           class="form-input"
+                           placeholder="@PersianResources.CustomerNamePlaceholder"
+                           @bind="friendName" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-phone"></i>
+                        @PersianResources.PhoneNumber @PersianResources.Required
+                    </label>
+                    <input type="text"
+                           class="form-input"
+                           placeholder="@PersianResources.PhonePlaceholder"
+                           @bind="friendPhone" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        @PersianResources.BirthYear
+                    </label>
+                    <input type="number"
+                           class="form-input"
+                           placeholder="@PersianResources.BirthYearPlaceholder"
+                           @bind="friendBirthYear" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-venus-mars"></i>
+                        @PersianResources.Gender
+                    </label>
+                    <select class="form-input" @bind="friendGender">
+                        <option value="Male">@PersianResources.Male</option>
+                        <option value="Female">@PersianResources.Female</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-gaming" @onclick="SubmitIntroduction" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>@PersianResources.Submitting</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-paper-plane"></i>
+                            <span>@PersianResources.SubmitCustomer</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</section>

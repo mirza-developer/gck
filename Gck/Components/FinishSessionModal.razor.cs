@@ -30,11 +30,23 @@ public partial class FinishSessionModal
     private int totalPeopleInSession = 0;
     private decimal totalDiscountAmount = 0;
 
+    // Credit usage
+    private bool useCreditEnabled = false;
+    private int? selectedCreditCustomerId;
+    private decimal creditCustomerBalance = 0;
+    private decimal creditToUse = 0;
+    private List<CustomerCreditInfo> sessionCustomerCredits = new();
+
     public async Task Show(int sessionId)
     {
         SessionId = sessionId;
         showConfirm = false;
         selectedFinancialAccountId = 0;
+        useCreditEnabled = false;
+        selectedCreditCustomerId = null;
+        creditCustomerBalance = 0;
+        creditToUse = 0;
+        sessionCustomerCredits.Clear();
         isVisible = true;
         loading = true;
 
@@ -117,7 +129,35 @@ public partial class FinishSessionModal
             }
 
             finalPrice = recommendedPrice;
+
+            // Load credit info for all customers in session
+            sessionCustomerCredits.Clear();
+            foreach (var customer in sessionDetails.Customers)
+            {
+                if (customer.ReferralCredit > 0)
+                {
+                    sessionCustomerCredits.Add(new CustomerCreditInfo
+                    {
+                        CustomerId = customer.Id,
+                        CustomerName = customer.Name,
+                        CreditBalance = customer.ReferralCredit
+                    });
+                }
+            }
         }
+    }
+
+    private void OnCreditCustomerChanged(int? customerId)
+    {
+        selectedCreditCustomerId = customerId;
+        var creditInfo = sessionCustomerCredits.FirstOrDefault(c => c.CustomerId == customerId);
+        creditCustomerBalance = creditInfo?.CreditBalance ?? 0;
+        creditToUse = 0;
+    }
+
+    private void OnCreditToUseChanged(decimal amount)
+    {
+        creditToUse = Math.Max(0, Math.Min(amount, Math.Min(creditCustomerBalance, finalPrice)));
     }
 
     private async Task ProceedToConfirm()
@@ -158,8 +198,10 @@ public partial class FinishSessionModal
         var command = new
         {
             sessionId = SessionId,
-            finalPrice = finalPrice,
-            financialAccountId = selectedFinancialAccountId
+            finalPrice = finalPrice - creditToUse,
+            financialAccountId = selectedFinancialAccountId,
+            creditUsed = creditToUse,
+            creditCustomerId = creditToUse > 0 ? selectedCreditCustomerId : (int?)null
         };
 
         var response = await Http.PostAsJsonAsync(ApiConfig.GetApiUrl($"/api/sessions/{SessionId}/finish"), command);
@@ -194,5 +236,12 @@ public partial class FinishSessionModal
         {
             return $"{minutes} {PersianResources.Minutes}";
         }
+    }
+
+    public class CustomerCreditInfo
+    {
+        public int CustomerId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public decimal CreditBalance { get; set; }
     }
 }

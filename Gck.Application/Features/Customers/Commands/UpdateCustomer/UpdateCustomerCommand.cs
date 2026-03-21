@@ -11,4 +11,6 @@ public class UpdateCustomerCommand : IRequest<Unit>
     public string Gender { get; set; } = string.Empty;
     public bool IsLoyal { get; set; }
     public int SessionsRequiredForFree { get; set; }
+    public bool IsVerifiedByAdmin { get; set; } = true;
+    public decimal ReferralRewardPercentage { get; set; } = 0;
 }
