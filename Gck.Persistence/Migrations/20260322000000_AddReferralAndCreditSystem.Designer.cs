@@ -63,6 +63,50 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_AccountantReceipt");
                 });
 
+            modelBuilder.Entity("Gck.Domain.Entities.CreditWithdrawalRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("RequestDate");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("tbl_CreditWithdrawalRequest");
+                });
+
             modelBuilder.Entity("Gck.Domain.Entities.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -85,7 +129,6 @@ namespace Gck.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsVerifiedByAdmin")
-                        .HasDefaultValue(true)
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModifiedDate")
@@ -105,11 +148,9 @@ namespace Gck.Persistence.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<decimal>("ReferralCredit")
-                        .HasDefaultValue(0m)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("ReferralRewardPercentage")
-                        .HasDefaultValue(0m)
                         .HasColumnType("decimal(5,2)");
 
                     b.Property<int?>("ReferredByCustomerId")
@@ -373,51 +414,6 @@ namespace Gck.Persistence.Migrations
                     b.ToTable("tbl_Table");
                 });
 
-            modelBuilder.Entity("Gck.Domain.Entities.CreditWithdrawalRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasDefaultValue("")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("ProcessedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("RequestDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("RequestDate");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("tbl_CreditWithdrawalRequest");
-                });
-
             modelBuilder.Entity("Gck.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -431,6 +427,11 @@ namespace Gck.Persistence.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("FinancialAccountId")
                         .HasColumnType("int");

@@ -49,7 +49,7 @@ namespace Gck.Persistence.Migrations
                     RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     ProcessedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false, defaultValue: ""),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -88,6 +88,14 @@ namespace Gck.Persistence.Migrations
                 table: "tbl_CreditWithdrawalRequest",
                 column: "Status");
 
+            migrationBuilder.AddColumn<string>(
+                name: "Description",
+                table: "tbl_Transaction",
+                type: "nvarchar(500)",
+                maxLength: 500,
+                nullable: false,
+                defaultValue: "");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_tbl_Customer_tbl_Customer_ReferredByCustomerId",
                 table: "tbl_Customer",
@@ -106,6 +114,10 @@ namespace Gck.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "tbl_CreditWithdrawalRequest");
+
+            migrationBuilder.DropColumn(
+                name: "Description",
+                table: "tbl_Transaction");
 
             migrationBuilder.DropIndex(
                 name: "IX_tbl_Customer_IsVerifiedByAdmin",
