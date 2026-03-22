@@ -120,6 +120,34 @@
                     </div>
                 }
 
+                <!-- Credit Balance Section -->
+                @if (customer.ReferralCredit > 0)
+                {
+                    <div class="grid-details-content" style="margin-bottom: 2rem;">
+                        <div class="grid-details-header">
+                            <i class="fas fa-coins"></i>
+                            <h4>@PersianResources.ReferralCredit</h4>
+                        </div>
+                        <div class="grid-details-body">
+                            <div class="grid-detail-item">
+                                <div class="grid-detail-label">
+                                    <i class="fas fa-wallet"></i>
+                                    @PersianResources.CreditBalance
+                                </div>
+                                <div class="grid-detail-value highlight" style="font-size: 1.5rem; color: #00cc66;">
+                                    @customer.ReferralCredit.ToString("N0") @PersianResources.Toman
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 0 1rem 1rem;">
+                            <a href="/customer/credits" class="btn-gaming" style="display: inline-block; text-decoration: none; font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-money-bill-wave"></i>
+                                @PersianResources.RequestCashWithdrawal
+                            </a>
+                        </div>
+                    </div>
+                }
+
                 <!-- Sessions List -->
                 <div class="grid-details-header">
                     <i class="fas fa-gamepad"></i>

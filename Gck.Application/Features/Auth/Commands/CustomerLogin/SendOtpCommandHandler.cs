@@ -33,6 +33,15 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             };
         }
 
+        if (!customer.IsVerifiedByAdmin)
+        {
+            return new SendOtpResponse
+            {
+                Success = false,
+                Message = "حساب کاربری شما هنوز توسط مدیر تایید نشده است"
+            };
+        }
+
         // Generate cryptographically secure 6-digit OTP
         var otpCode = GenerateSecureOtp();
 

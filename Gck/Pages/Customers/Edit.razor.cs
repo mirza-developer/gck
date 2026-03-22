@@ -47,7 +47,9 @@ public partial class Edit
                 BirthYear = customer.BirthYear,
                 Gender = customer.Gender,
                 IsLoyal = customer.IsLoyal,
-                SessionsRequiredForFree = customer.SessionsRequiredForFree
+                SessionsRequiredForFree = customer.SessionsRequiredForFree,
+                IsVerifiedByAdmin = customer.IsVerifiedByAdmin,
+                ReferralRewardPercentage = customer.ReferralRewardPercentage
             };
         }
 

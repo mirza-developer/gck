@@ -3,22 +3,23 @@ using Gck.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gck.Application.Features.Customers.Queries.GetAllCustomers;
+namespace Gck.Application.Features.Customers.Queries.GetPendingReferrals;
 
-public class GetAllCustomersQueryHandler : IRequestHandler<GetAllCustomersQuery, List<CustomerDto>>
+public class GetPendingReferralsQueryHandler : IRequestHandler<GetPendingReferralsQuery, List<CustomerDto>>
 {
     private readonly GckDbContext _context;
 
-    public GetAllCustomersQueryHandler(GckDbContext context)
+    public GetPendingReferralsQueryHandler(GckDbContext context)
     {
         _context = context;
     }
 
-    public async Task<List<CustomerDto>> Handle(GetAllCustomersQuery request, CancellationToken cancellationToken)
+    public async Task<List<CustomerDto>> Handle(GetPendingReferralsQuery request, CancellationToken cancellationToken)
     {
         var customers = await _context.Customers
             .Include(c => c.ReferredByCustomer)
-            .OrderBy(c => c.Name)
+            .Where(c => !c.IsVerifiedByAdmin && c.ReferredByCustomerId.HasValue)
+            .OrderByDescending(c => c.CreateDate)
             .Select(c => new CustomerDto
             {
                 Id = c.Id,

@@ -23,6 +23,7 @@ public class GckDbContext : DbContext
     public DbSet<AccountantReceipt> AccountantReceipts { get; set; } = null!;
     public DbSet<HourlyFee> Fees { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
+    public DbSet<CreditWithdrawalRequest> CreditWithdrawalRequests { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,6 +54,15 @@ public class GckDbContext : DbContext
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.HasIndex(e => e.PhoneNumber);
+
+            entity.HasOne(e => e.ReferredByCustomer)
+                  .WithMany(c => c.ReferredCustomers)
+                  .HasForeignKey(e => e.ReferredByCustomerId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .IsRequired(false);
+
+            entity.HasIndex(e => e.ReferredByCustomerId);
+            entity.HasIndex(e => e.IsVerifiedByAdmin);
         });
 
         // Configure CustomerOtp entity
@@ -132,6 +142,19 @@ public class GckDbContext : DbContext
             entity.HasIndex(e => e.FinancialAccountId);
             entity.HasIndex(e => e.TransactionDate);
             entity.HasIndex(e => e.Type);
+        });
+
+        // Configure CreditWithdrawalRequest entity
+        modelBuilder.Entity<CreditWithdrawalRequest>(entity =>
+        {
+            entity.HasOne(e => e.Customer)
+                  .WithMany()
+                  .HasForeignKey(e => e.CustomerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.CustomerId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.RequestDate);
         });
     }
 }

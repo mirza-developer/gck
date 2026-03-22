@@ -1,9 +1,12 @@
 using Gck.Application.DTOs;
 using Gck.Application.Features.Customers.Commands.CreateCustomer;
 using Gck.Application.Features.Customers.Commands.DeleteCustomer;
+using Gck.Application.Features.Customers.Commands.IntroduceCustomer;
 using Gck.Application.Features.Customers.Commands.UpdateCustomer;
+using Gck.Application.Features.Customers.Commands.VerifyReferral;
 using Gck.Application.Features.Customers.Queries.GetAllCustomers;
 using Gck.Application.Features.Customers.Queries.GetCustomerById;
+using Gck.Application.Features.Customers.Queries.GetPendingReferrals;
 using Gck.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -101,6 +104,32 @@ public class CustomersController : ControllerBase
                 .ToListAsync();
 
         return Ok(sessions);
+    }
+
+    [HttpGet("referrals/pending")]
+    [ProducesResponseType(typeof(List<CustomerDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<CustomerDto>>> GetPendingReferrals()
+    {
+        var pending = await _mediator.Send(new GetPendingReferralsQuery());
+        return Ok(pending);
+    }
+
+    [HttpPost("{id}/verify-referral")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> VerifyReferral(int id, [FromBody] VerifyReferralCommand command)
+    {
+        command.CustomerId = id;
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpPost("introduce")]
+    [ProducesResponseType(typeof(IntroduceCustomerResult), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IntroduceCustomerResult>> IntroduceCustomer([FromBody] IntroduceCustomerCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 }
 

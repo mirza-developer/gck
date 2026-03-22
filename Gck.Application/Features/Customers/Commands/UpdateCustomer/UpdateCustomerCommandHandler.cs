@@ -29,6 +29,8 @@ public class UpdateCustomerCommandHandler : IRequestHandler<UpdateCustomerComman
         customer.IsMale = request.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase);
         customer.IsLoyal = request.IsLoyal;
         customer.SessionsRequiredForFree = request.SessionsRequiredForFree;
+        customer.IsVerifiedByAdmin = request.IsVerifiedByAdmin;
+        customer.ReferralRewardPercentage = request.ReferralRewardPercentage;
         customer.LastModifiedDate = DateTime.Now;
 
         await _context.SaveChangesAsync(cancellationToken);

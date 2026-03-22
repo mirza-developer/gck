@@ -93,6 +93,25 @@
                         </div>
                     }
 
+                    <div class="form-group">
+                        <div class="form-checkbox-group">
+                            <InputCheckbox @bind-Value="command.IsVerifiedByAdmin" id="isVerified" class="form-checkbox" />
+                            <label for="isVerified" class="form-label" style="margin-bottom: 0;">
+                                <i class="fas fa-check-circle"></i>
+                                @PersianResources.IsVerifiedByAdmin
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-percent"></i>
+                            @PersianResources.ReferralRewardPercentage
+                        </label>
+                        <InputNumber @bind-Value="command.ReferralRewardPercentage" class="form-input" placeholder="@PersianResources.ReferralRewardPercentagePlaceholder" min="0" max="100" />
+                        <small style="color: #888;">درصد پاداش پرداختی‌های این مشتری که به معرف او تعلق می‌گیرد (۰ تا ۱۰۰)</small>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn-gaming" disabled="@isSubmitting">
                             @if (isSubmitting)

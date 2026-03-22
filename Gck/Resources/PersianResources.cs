@@ -412,5 +412,59 @@ public static class PersianResources
 
     // Validation
     public const string ValidationRequired = "ورود اطلاعات فیلد {0} الزامی است";
+
+    // Referral Program
+    public const string ReferralProgram = "برنامه معرفی دوست";
+    public const string IntroduceFriend = "معرفی دوست";
+    public const string ReferralCredit = "اعتبار معرفی";
+    public const string MyCreditBalance = "موجودی اعتبار من";
+    public const string CreditBalance = "موجودی اعتبار";
+    public const string ReferralRewardPercentage = "درصد پاداش معرفی";
+    public const string ReferredByCustomer = "معرف";
+    public const string PendingReferrals = "معرفی‌های در انتظار تایید";
+    public const string VerifyReferral = "تایید معرفی";
+    public const string ReferralVerified = "معرفی با موفقیت تایید شد";
+    public const string ReferralPending = "در انتظار تایید";
+    public const string ReferralVerifiedStatus = "تایید شده";
+    public const string IntroduceFriendTitle = "معرفی دوست جدید";
+    public const string IntroduceFriendDesc = "شما می‌توانید دوستان خود را معرفی کنید تا پس از تایید مدیر، بتوانند وارد سیستم شوند و شما از خریدهای آن‌ها اعتبار دریافت کنید.";
+    public const string ReferralSubmitted = "درخواست معرفی با موفقیت ثبت شد";
+    public const string ReferralPhoneExists = "این شماره تلفن قبلاً در سیستم ثبت شده است";
+    public const string ReferralRewardPercentagePlaceholder = "مثال: 20";
+    public const string NoReferralReward = "بدون پاداش";
+    public const string SetRewardPercentage = "تنظیم درصد پاداش";
+    public const string RewardPercentage = "درصد پاداش";
+    public const string IsVerifiedByAdmin = "تایید شده توسط مدیر";
+    public const string NotVerified = "تایید نشده";
+    public const string Verified = "تایید شده";
+
+    // Credit Withdrawals
+    public const string CreditWithdrawals = "درخواست‌های برداشت نقدی";
+    public const string RequestCashWithdrawal = "درخواست برداشت نقدی";
+    public const string WithdrawalAmount = "مبلغ برداشت (تومان)";
+    public const string WithdrawalNotes = "توضیحات";
+    public const string WithdrawalPending = "در انتظار بررسی";
+    public const string WithdrawalApproved = "تایید شده";
+    public const string WithdrawalRejected = "رد شده";
+    public const string ApproveWithdrawal = "تایید پرداخت";
+    public const string RejectWithdrawal = "رد درخواست";
+    public const string WithdrawalProcessed = "درخواست با موفقیت پردازش شد";
+    public const string WithdrawalRequestDate = "تاریخ درخواست";
+    public const string WithdrawalProcessedDate = "تاریخ پردازش";
+    public const string MyWithdrawals = "درخواست‌های برداشت من";
+    public const string WithdrawalNotesPlaceholder = "توضیحات اختیاری...";
+    public const string InsufficientCredit = "موجودی اعتبار کافی نیست";
+    public const string WithdrawalAmountPlaceholder = "مبلغ را به تومان وارد کنید";
+    public const string NoPendingWithdrawals = "درخواست برداشت در انتظار وجود ندارد";
+    public const string NoWithdrawalsFound = "درخواست برداشتی یافت نشد";
+    public const string WithdrawalSubmitted = "درخواست برداشت با موفقیت ثبت شد";
+    public const string PendingWithdrawalExists = "یک درخواست برداشت در انتظار بررسی دارید";
+    public const string UseCredit = "استفاده از اعتبار";
+    public const string CreditToUse = "مبلغ اعتبار مورد استفاده (تومان)";
+    public const string AvailableCredit = "اعتبار موجود";
+    public const string CreditUsedInSession = "اعتبار استفاده شده در جلسه";
+    public const string NoCreditAvailable = "اعتبار موجود نیست";
+    public const string SelectCustomerForCredit = "مشتری برای استفاده از اعتبار";
+    public const string AllReferralsManagement = "مدیریت معرفی‌ها";
 }
 

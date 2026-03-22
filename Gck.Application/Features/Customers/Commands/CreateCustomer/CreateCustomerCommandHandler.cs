@@ -24,6 +24,10 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             IsLoyal = request.IsLoyal,
             SessionsRequiredForFree = request.SessionsRequiredForFree,
             PaidSessionsCount = 0,
+            ReferredByCustomerId = request.ReferredByCustomerId,
+            IsVerifiedByAdmin = request.IsVerifiedByAdmin,
+            ReferralCredit = 0,
+            ReferralRewardPercentage = 0,
             CreateDate = DateTime.Now,
             LastModifiedDate = DateTime.Now
         };
