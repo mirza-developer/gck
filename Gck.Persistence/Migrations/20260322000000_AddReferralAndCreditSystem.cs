@@ -94,7 +94,7 @@ namespace Gck.Persistence.Migrations
                 column: "ReferredByCustomerId",
                 principalTable: "tbl_Customer",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.NoAction);
         }
 
         /// <inheritdoc />

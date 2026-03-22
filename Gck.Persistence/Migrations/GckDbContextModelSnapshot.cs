@@ -572,7 +572,7 @@ namespace Gck.Persistence.Migrations
                     b.HasOne("Gck.Domain.Entities.Customer", "ReferredByCustomer")
                         .WithMany("ReferredCustomers")
                         .HasForeignKey("ReferredByCustomerId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.ClientSetNull);
 
                     b.Navigation("ReferredByCustomer");
                 });

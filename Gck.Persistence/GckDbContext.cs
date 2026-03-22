@@ -58,7 +58,7 @@ public class GckDbContext : DbContext
             entity.HasOne(e => e.ReferredByCustomer)
                   .WithMany(c => c.ReferredCustomers)
                   .HasForeignKey(e => e.ReferredByCustomerId)
-                  .OnDelete(DeleteBehavior.SetNull)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
                   .IsRequired(false);
 
             entity.HasIndex(e => e.ReferredByCustomerId);
